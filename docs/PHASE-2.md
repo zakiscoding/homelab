@@ -76,4 +76,4 @@ Spec detail: [services/rag.md](services/rag.md).
 
 ## Next: Phase 3
 
-Real QLoRA training via GPU worker, artifact publish to ML-STORE, `experiments` linkage.
+See [PHASE-3.md](PHASE-3.md) — QLoRA training, experiments, adapter sync.

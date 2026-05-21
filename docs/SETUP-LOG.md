@@ -4,6 +4,14 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 ---
 
+## 2026-05-21 — Phase 3 QLoRA training
+
+**Goal:** Real train via GPU worker; experiment registry; adapter artifacts.
+
+**Repos:** homelab-gpu (`lora_quickstart/train.py`, `run_train` qlora mode), homelab-services (train job payload, `/experiment`), [PHASE-3.md](PHASE-3.md).
+
+---
+
 ## 2026-05-21 — Phase 2 RAG pipeline
 
 **Goal:** Ingest → chunk → embed → Qdrant → `/rag/query` with iMac worker.
