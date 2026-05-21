@@ -2,6 +2,8 @@
 
 **Documentation only** — hardware, network, services, setup logs. No Docker code here.
 
+**Share with someone else (one file):** [share/HOMELAB-COMPLETE-OVERVIEW.md](share/HOMELAB-COMPLETE-OVERVIEW.md) — full standalone overview, no other docs required.
+
 ## Who is what
 
 | Node | Machine | Windows user | Hostname | Role |
