@@ -18,7 +18,13 @@ Docker Desktop is optional for non-Ollama containers. **Checkpoints and datasets
 
 LAN API target: `http://<GPU_NODE_IP>:11434`
 
-**Status:** Inference **complete** — Ollama on `0.0.0.0:11434`, LAN + Tailscale. Training repo **[homelab-gpu](https://github.com/zakiscoding/homelab-gpu)** scaffolded (add projects under `training/`).
+**Status:** Inference **complete**. Training **ready to start** — `homelab-gpu` cloned, Python + PyTorch, `C:\Users\zakar\homelab-data\`. Add dataset + `train.py` for first LoRA run.
+
+| Path | Purpose |
+|------|---------|
+| `C:\Users\zakar\homelab-gpu` | Training repo (git) |
+| `C:\Users\zakar\homelab-data\checkpoints` | Model outputs (not git) |
+| `C:\Users\zakar\homelab-data\datasets` | JSONL / datasets (not git) |
 
 See [REPOS.md](../REPOS.md) for how this node fits with [homelab-services](https://github.com/zakiscoding/homelab-services) on the iMac.
 
@@ -177,7 +183,10 @@ Skip until you have a specific container workload.
 - [x] `OLLAMA_HOST=0.0.0.0:11434` set (Machine) + `ollama serve`
 - [x] Firewall rule for 11434
 - [x] Remote curl via Tailscale (`100.88.71.33`) from controller (`cashh`)
-- [x] Scheduled task **`OllamaServe`** (AtStartup) — confirm after next reboot
+- [x] Scheduled task **`OllamaServe`** (AtStartup)
+- [x] `homelab-gpu` cloned; Python 3.12 + venv + PyTorch CUDA
+- [x] `C:\Users\zakar\homelab-data\{checkpoints,datasets}`
+- [ ] First LoRA training run
 - [ ] OpenSSH (optional)
 
 ---

@@ -51,7 +51,7 @@ GPU PC keeps large artifacts **local** (Ollama models, checkpoints, datasets) â€
 | Workload | Where it runs | Versioned in |
 |----------|---------------|--------------|
 | **Inference** | Ollama on GPU (`:11434`) | Documented in `homelab/docs/nodes/gpu-node.md` |
-| **Training** | Python/PyTorch on GPU | Future **`homelab-gpu`** repo (scripts + configs only) |
+| **Training** | Python/PyTorch on GPU | **`homelab-gpu`** â€” `C:\Users\zakar\homelab-gpu` on `zak_pc` |
 | **API gateway** | iMac `homelab-services` | This repo |
 
 Before long training jobs: free VRAM (stop idle Ollama models). Checkpoints stay on GPU disk, not GitHub.

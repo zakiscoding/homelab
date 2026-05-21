@@ -14,7 +14,7 @@ Hardware and logical resources. Update when we add, rename, or retire anything.
 
 | Hostname | Type | OS / hypervisor | CPU / RAM / disk | IP | Notes |
 |----------|------|-----------------|------------------|-----|-------|
-| gpu-node (`zak_pc`) | Bare metal | **Windows**, login **`zakar`** | RTX 5070, driver 596.x | **10.0.0.156**, **100.88.71.33** (Tailscale) | Ollama :11434; `OllamaServe` at startup |
+| gpu-node (`zak_pc`) | Bare metal | **Windows**, login **`zakar`** | RTX 5070, driver 596.x | **10.0.0.156**, **100.88.71.33** (Tailscale) | Ollama :11434; `homelab-gpu`; data `C:\Users\zakar\homelab-data\` |
 | imac-node (`Mos-iMac`) | Bare metal | **macOS** 15.7.3, **Apple M1**, **`momo`** | iMac | **100.91.113.98** (Tailscale) | Colima on 1TB; stack **running** — [SERVICES](SERVICES.md) |
 | controller (laptop) | Laptop | **Windows**, login **`cashh`** | — | N/A | `C:\Users\cashh\homelab`; Tailscale to GPU |
 

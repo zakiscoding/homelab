@@ -4,6 +4,33 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 ---
 
+## 2026-05-21 — Homelab open items closed (GPU PC session)
+
+**Goal:** Finish remaining setup-log tasks: Tailscale tests, `homelab-gpu` on `zak_pc`, training prep, backups doc.
+
+**Done:**
+
+| Task | Result |
+|------|--------|
+| Tailscale from GPU/controller path | OK — GPU `:11434`, iMac `/health`, Prometheus, Qdrant |
+| Clone `homelab-gpu` | `C:\Users\zakar\homelab-gpu` |
+| Python 3.12 + venv + PyTorch (cu124) | `cuda True` RTX 5070 (sm_120 warning — upgrade PyTorch when newer wheel supports 5070) |
+| Data dirs | `C:\Users\zakar\homelab-data\{checkpoints,datasets}` (no `D:` on this PC) |
+| Training scaffold | `scripts/*.ps1`, `training/lora-quickstart/`, `configs/paths.example.yaml` |
+| Backups | [BACKUPS.md](BACKUPS.md) + `homelab-services/scripts/backup-postgres.sh` |
+| Clone `homelab-services` on GPU (reference) | `C:\Users\zakar\homelab-services` |
+
+**Still manual / next:**
+
+- [ ] Run `backup-postgres.sh` on iMac + schedule (cron/launchd)
+- [ ] Test iMac `/chat` from **`cashh`** laptop with `x-api-key` (need key from iMac `.env`)
+- [ ] Add first `train.py` + dataset in `homelab-gpu/training/lora-quickstart/`
+- [ ] iMac: `git pull` in `homelab`, `homelab-services`, `homelab-gpu` on 1TB
+
+**Pushed:** `homelab`, `homelab-gpu`, `homelab-services` (see commits).
+
+---
+
 ## 2026-05-21 — 1TB drive folder structure cleanup
 
 **Goal:** Separate homelab repos, runtime, and personal files; clear volume root.
@@ -44,8 +71,9 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 **Next:**
 
-- [ ] Clone `homelab-gpu` on `zak_pc` and add first training project
-- [ ] Document `CHECKPOINT_DIR` / dataset path on GPU local disk
+- [x] Clone `homelab-gpu` on `zak_pc` — `C:\Users\zakar\homelab-gpu`
+- [x] `CHECKPOINT_DIR` / `DATASET_DIR` — `C:\Users\zakar\homelab-data\`
+- [ ] First training run — see `training/lora-quickstart/`
 
 ---
 
@@ -72,8 +100,9 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 **Open:**
 
-- [ ] Test all URLs from laptop `cashh` over Tailscale
-- [ ] Create `homelab-gpu` when training code exists
+- [x] Test URLs over Tailscale (from `zak_pc` 2026-05-21)
+- [x] `homelab-gpu` repo + scaffold on GPU PC
+- [ ] `/chat` from **`cashh`** with API key (user test)
 
 ---
 

@@ -44,7 +44,9 @@ See **[docs/DRIVE-LAYOUT.md](docs/DRIVE-LAYOUT.md)** for the full tree.
 | [Architecture](docs/ARCHITECTURE.md) | Three-node layout (GPU / iMac / controller) |
 | [GPU node runbook](docs/nodes/gpu-node.md) | Ollama on Windows |
 | [Git workflow](docs/GIT.md) | Clone, pull, push — GitHub `zakiscoding/homelab` |
-| [Repositories](docs/REPOS.md) | `homelab` + `homelab-services` + planned `homelab-gpu` |
+| [Repositories](docs/REPOS.md) | `homelab` + `homelab-services` + `homelab-gpu` |
+| [Backups](docs/BACKUPS.md) | Postgres dumps, checkpoints, restic |
+| [1TB layout](docs/DRIVE-LAYOUT.md) | iMac volume folder map |
 | [1TB drive layout](docs/DRIVE-LAYOUT.md) | Folder structure on external volume |
 | [iMac stack](docs/services/imac-stack.md) | Docker — `homelab-services` repo |
 
@@ -69,4 +71,7 @@ Runtime compose and API code: **`homelab-services/`** — document from `docs/se
 | Services on 1TB drive | Done | `/Volumes/1tb drive/homelab-services` |
 | GitHub repos | **Done** | `homelab` + `homelab-services` + `homelab-gpu` (all private) |
 | Monitoring | Running | Prometheus :9090, Grafana :3000 on iMac |
-| Backups | TBD | `pg_dump` / Restic not configured |
+| Tailscale E2E tests | **Done** | GPU + iMac health from `zak_pc` |
+| GPU training prep | **Done** | `homelab-gpu` cloned, Python, torch, data dirs |
+| Backups | Documented | [BACKUPS.md](docs/BACKUPS.md) + `backup-postgres.sh` on iMac |
+| First LoRA run | **Next** | Add dataset + `train.py` in `homelab-gpu/training/` |
