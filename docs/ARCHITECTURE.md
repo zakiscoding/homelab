@@ -24,7 +24,9 @@ Three-node homelab split by role. GPU node first; iMac and API layer connected a
 ## Traffic flow (target)
 
 1. **Controller** hits GPU node at `http://<GPU_IP>:11434` for model inference (Ollama API).
-2. **Later:** clients or the iMac API call the GPU node or a gateway on the iMac for orchestration + persistence.
+2. **Now:** clients hit **iMac** `homelab-services` (Caddy → FastAPI) → GPU Ollama; Postgres/Redis on iMac.
+
+**Paths:** docs → `homelab/` · runtime → `homelab-services/` (both on 1TB drive).
 
 ## Principles
 

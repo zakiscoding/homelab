@@ -7,7 +7,7 @@ Hardware and logical resources. Update when we add, rename, or retire anything.
 | Name | Role | Model / specs | Location | Notes |
 |------|------|---------------|----------|-------|
 | GPU PC (`zak_pc`) | AI inference | RTX 5070 | Homelab | Windows user **`zakar`** |
-| iMac (`Mos-iMac`) | API / database | Apple iMac | Homelab | macOS user **`momo`**; repo on 1TB |
+| iMac (`Mos-iMac`) | API / database | Apple iMac | Homelab | macOS user **`momo`** |
 | Laptop (controller) | Ops / docs | Windows | Desk | User **`cashh`**; git + SSH to GPU |
 
 ## Hypervisor / hosts
@@ -15,8 +15,8 @@ Hardware and logical resources. Update when we add, rename, or retire anything.
 | Hostname | Type | OS / hypervisor | CPU / RAM / disk | IP | Notes |
 |----------|------|-----------------|------------------|-----|-------|
 | gpu-node (`zak_pc`) | Bare metal | **Windows**, login **`zakar`** | RTX 5070, driver 596.x | **10.0.0.156**, **100.88.71.33** (Tailscale) | Ollama :11434; `OllamaServe` at startup |
-| imac-node (`Mos-iMac`) | Bare metal | **macOS**, login **`momo`** | iMac | _TBD_ Tailscale IP_ | `/Volumes/1tb drive/homelab`; iMac→GPU OK |
-| controller (laptop) | Laptop | **Windows**, login **`cashh`** | — | N/A | `C:\Users\cashh\homelab`; Tailscale curl to GPU |
+| imac-node (`Mos-iMac`) | Bare metal | **macOS**, login **`momo`** | iMac | _TBD_ Tailscale IP_ | Docs: `homelab/` · Stack: `homelab-services/` |
+| controller (laptop) | Laptop | **Windows**, login **`cashh`** | — | N/A | `C:\Users\cashh\homelab`; Tailscale to GPU |
 
 ## Virtual machines
 
@@ -24,17 +24,23 @@ Hardware and logical resources. Update when we add, rename, or retire anything.
 |---------|------|------|-----|------|-----|---------|
 | | | | | | | |
 
-## Containers / LXC
+## Containers (iMac — `homelab-services`)
 
-| Name | Host | Image / stack | IP / ports | Purpose |
-|------|------|---------------|------------|---------|
-| | | | | |
+| Name | Host | Image / stack | Ports | Purpose |
+|------|------|---------------|-------|---------|
+| api | Mos-iMac | build `./api` | 8000 (internal) | FastAPI → GPU |
+| postgres | Mos-iMac | postgres:16-alpine | internal | Chat logs |
+| redis | Mos-iMac | redis:7-alpine | internal | Counters / queue |
+| caddy | Mos-iMac | caddy:2-alpine | 80, 443 | Reverse proxy |
+| qdrant | Mos-iMac | qdrant/qdrant | 6333 | Vectors / RAG |
+| prometheus | Mos-iMac | prom/prometheus | 9090 | Metrics |
+| grafana | Mos-iMac | grafana/grafana | 3000 | Dashboards |
 
 ## Storage
 
 | Pool / share | Backend | Size | Mount / export | Used for |
 |--------------|---------|------|----------------|----------|
-| | | | | |
+| 1TB drive | External/USB | 1 TB | `/Volumes/1tb drive` | `homelab/`, `homelab-services/data/` |
 
 ## Domains & DNS (internal)
 

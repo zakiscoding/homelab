@@ -32,8 +32,9 @@ git pull
 ```powershell
 git clone https://github.com/zakiscoding/homelab.git C:\Users\cashh\homelab
 cd C:\Users\cashh\homelab
-copy compose\.env.example compose\.env
-# edit compose\.env with real secrets (never commit .env)
+# Services stack is NOT in this repo — see homelab-services on 1TB drive
+# cd "/Volumes/1tb drive/homelab-services"
+# copy .env.example .env
 ```
 
 **GPU PC (user `zakar`, optional second clone):**

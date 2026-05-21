@@ -4,11 +4,32 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 ---
 
+## 2026-05-21 — Services split: `homelab-services/` on 1TB drive
+
+**Goal:** Keep `homelab/` docs-only; run Docker stack in a separate folder on the 1TB drive.
+
+**Done:**
+
+- Created **`/Volumes/1tb drive/homelab-services`** with:
+  - FastAPI (`api/`) — `/chat`, `/health`, `/health/gpu`, Postgres chat logs
+  - PostgreSQL, Redis, Qdrant, Caddy, Prometheus, Grafana
+  - Persistent data under `homelab-services/data/` (bind mounts)
+- Removed `homelab/compose/` (no services in docs repo)
+- Docs: [services/imac-stack.md](services/imac-stack.md), updated [imac-node.md](nodes/imac-node.md), [SERVICES.md](SERVICES.md)
+
+**Next:**
+
+- [ ] Install Docker Desktop on iMac
+- [ ] `cp .env.example .env` in `homelab-services/`
+- [ ] `docker compose up -d --build`
+- [ ] Test `curl http://localhost/health` and `/chat` with API key
+- [ ] Optional: separate git repo `homelab-services` on GitHub
+
+---
+
 ## 2026-05-21 — Doc changes must be pushed (GitHub sync)
 
 **Rule:** Every homelab doc edit → `git commit` + `git push` so iMac / `cashh` / `zakar` can `git pull`.
-
-**Pushed:** `0493ba6` — cashh vs zakar identities; mandatory push workflow in [GIT.md](GIT.md).
 
 **Other nodes:**
 
@@ -51,7 +72,7 @@ Docs updated so `cashh` is never confused with the GPU machine.
 | iMac | `/Volumes/1tb drive/homelab` |
 | Old copy | `~/homelab` — use 1TB path instead |
 
-**Next:** Docker Compose + FastAPI under `homelab/compose/` on iMac; log iMac Tailscale IP in inventory.
+**Next:** Run stack from `homelab-services/`; log iMac Tailscale IP in inventory.
 
 ---
 

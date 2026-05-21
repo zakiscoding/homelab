@@ -1,6 +1,6 @@
 # HOMELAB
 
-Living documentation for this homelab: hardware, network, services, and every setup step we take.
+**Documentation only** — hardware, network, services, setup logs. No Docker code here.
 
 ## Who is what
 
@@ -8,21 +8,24 @@ Living documentation for this homelab: hardware, network, services, and every se
 |------|---------|--------------|----------|------|
 | **Controller** | Laptop | **`cashh`** | — | Docs, `git`, `curl` tests, SSH to GPU |
 | **GPU node** | Desktop PC | **`zakar`** | `zak_pc` | Ollama + RTX 5070 |
-| **App / DB** | iMac | **`momo`** | `Mos-iMac` | API, compose, repo on 1TB drive |
+| **App / DB** | iMac | **`momo`** | `Mos-iMac` | API stack in `homelab-services/` |
 
 Both homelab Windows boxes run **Windows** (PowerShell). `cashh` = laptop only; `zakar` = GPU PC only.
 
-## Repo location (canonical)
+## Paths on the 1TB drive
 
-| Machine | Path |
-|---------|------|
-| **iMac** | `/Volumes/1tb drive/homelab` |
-| **Controller (laptop `cashh`)** | `C:\Users\cashh\homelab` (git clone) |
-| **GPU PC (`zakar`)** | `C:\Users\zakar\HOMELAB` or clone `homelab` — same GitHub repo |
+| Folder | Purpose |
+|--------|---------|
+| **`/Volumes/1tb drive/homelab`** | This repo — docs only |
+| **`/Volumes/1tb drive/homelab-services`** | Docker stack, API, databases, `data/` |
 
-Config, compose stacks, and scripts live under this tree — not in `~/homelab`.
+| Machine | Docs | Services |
+|---------|------|----------|
+| **iMac** | `homelab/` | `homelab-services/` |
+| **Controller (`cashh`)** | `C:\Users\cashh\homelab` (git clone) | Copy or clone `homelab-services` |
+| **GPU PC (`zakar`)** | Optional clone of `homelab` | — |
 
-**GitHub:** [github.com/zakiscoding/homelab](https://github.com/zakiscoding/homelab) (private) — see [docs/GIT.md](docs/GIT.md) to push/clone.
+**GitHub (docs):** [github.com/zakiscoding/homelab](https://github.com/zakiscoding/homelab) (private) — [docs/GIT.md](docs/GIT.md)
 
 ## Quick links
 
@@ -31,32 +34,31 @@ Config, compose stacks, and scripts live under this tree — not in `~/homelab`.
 | [Setup log](docs/SETUP-LOG.md) | Chronological record of what we did and when |
 | [Inventory](docs/INVENTORY.md) | Hosts, VMs, containers, hardware |
 | [Network](docs/NETWORK.md) | VLANs, subnets, DNS, firewall, VPN |
-| [Services](docs/SERVICES.md) | Running apps and how to reach/manage them |
+| [Services](docs/SERVICES.md) | Running apps and how to reach/manage services |
 | [Secrets & access](docs/ACCESS.md) | Where credentials live (not the secrets themselves) |
 | [Architecture](docs/ARCHITECTURE.md) | Three-node layout (GPU / iMac / controller) |
-| [GPU node runbook](docs/nodes/gpu-node.md) | Docker, NVIDIA toolkit, Ollama |
+| [GPU node runbook](docs/nodes/gpu-node.md) | Ollama on Windows |
 | [Git workflow](docs/GIT.md) | Clone, pull, push — GitHub `zakiscoding/homelab` |
+| [iMac stack (services)](docs/services/imac-stack.md) | Docker on 1TB — `homelab-services/` |
 
 ## How we use this repo
 
-1. **`git pull`** — GitHub is canonical; other nodes depend on it.
-2. **Before a change** — skim [SETUP-LOG](docs/SETUP-LOG.md) so we do not repeat mistakes.
-3. **During setup** — note commands, versions, and config paths in the log (or a service section).
-4. **After it works** — update inventory, network, and services, then **`git commit` + `git push`** so every node can `git pull` and see the latest.
+1. **`git pull`** — GitHub is canonical for docs.
+2. **Before a change** — skim [SETUP-LOG](docs/SETUP-LOG.md).
+3. **During setup** — log commands and paths; service config lives in **`homelab-services/`**.
+4. **After it works** — update inventory/services, then **`git commit` + `git push`**.
 
-Config files, compose stacks, and scripts can live in this repo as we add them; link them from the relevant doc sections.
+Runtime compose and API code: **`homelab-services/`** — document from `docs/services/` and the setup log.
 
 ## Status
 
 | Area | Status | Notes |
 |------|--------|-------|
 | Documentation scaffold | Done | 2026-05-21 |
-| Architecture (3 nodes) | Documented | GPU first, iMac phase 2 |
-| GPU node — OS/GPU verify | **Done** | Windows; RTX 5070, `nvidia-smi` OK |
-| GPU node — Ollama LAN | **Done** | `OLLAMA_HOST`, firewall, Tailscale + LAN curl OK |
-| GPU node — Docker | Optional | Skip unless needed for other containers |
-| iMac — API/DB | In progress | iMac → GPU Ollama verified; Docker stack TBD |
-| Repo on 1TB drive | Done | `/Volumes/1tb drive/homelab` |
-| Core network | Partial | Fill IPs in inventory |
-| Storage | — | |
-| Monitoring / backups | — | |
+| Architecture (3 nodes) | Documented | GPU done; iMac phase 2 |
+| GPU node — Ollama | **Done** | RTX 5070; LAN + Tailscale |
+| iMac — API/DB | In progress | Stack in `homelab-services/`; install Docker Desktop |
+| Docs on 1TB drive | Done | `/Volumes/1tb drive/homelab` |
+| Services on 1TB drive | Done | `/Volumes/1tb drive/homelab-services` |
+| Core network | Partial | Fill iMac Tailscale IP in inventory |
+| Monitoring / backups | — | Grafana/Prometheus in stack; backups TBD |
