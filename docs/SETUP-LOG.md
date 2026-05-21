@@ -4,6 +4,32 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 ---
 
+## 2026-05-21 — 1TB drive folder structure cleanup
+
+**Goal:** Separate homelab repos, runtime, and personal files; clear volume root.
+
+**Done:**
+
+- **`homelab-runtime/`** — moved `colima/`, `docker-config/` from volume root
+- **`Personal/`** — `School/`, `Resumes/`, `Screenshots/`, `Projects/` (MLOps, GitHub, redis-clone, etc.)
+- Volume root **`README.md`** + [DRIVE-LAYOUT.md](DRIVE-LAYOUT.md)
+- Updated `homelab-services/scripts/*` for new `COLIMA_HOME` paths
+- Removed stray `curl.exe`, empty `docker-data/`
+
+**Left in place:** `Desktop/`, `Documents/` (macOS folders)
+
+---
+
+## 2026-05-21 — Colima recovered after folder move
+
+**Problem:** VM broke after move; `colima start` timed out (~10 min).
+
+**Fix:** `colima delete -f` then `colima start --cpu 4 --memory 6 --disk 40 ...` — ~3 min. Restart API if Caddy shows 502.
+
+**Verified:** All 7 containers up; `/health` and `/chat` → GPU OK.
+
+---
+
 ## 2026-05-21 — `homelab-gpu` private repo created
 
 **Goal:** Version training code on GPU PC; confirm all homelab GitHub repos are private.

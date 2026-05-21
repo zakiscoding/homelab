@@ -40,7 +40,7 @@ Hardware and logical resources. Update when we add, rename, or retire anything.
 
 | Pool / share | Backend | Size | Mount / export | Used for |
 |--------------|---------|------|----------------|----------|
-| 1TB drive | External/USB | ~1 TB | `/Volumes/1tb drive` | `homelab/`, `homelab-services/`, `colima/`, `docker-config/` |
+| 1TB drive | External/USB | ~1 TB | `/Volumes/1tb drive` | `homelab/`, `homelab-services/`, `homelab-gpu/`, `homelab-runtime/`, `Personal/` — [DRIVE-LAYOUT](DRIVE-LAYOUT.md) |
 
 ## Domains & DNS (internal)
 

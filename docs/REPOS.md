@@ -12,10 +12,15 @@ How homelab code and docs are split across GitHub. **Do not put Docker/services 
 
 ## Paths on the 1TB drive (iMac)
 
+Full tree: [DRIVE-LAYOUT.md](DRIVE-LAYOUT.md)
+
 | Folder | Git repo |
 |--------|----------|
-| `/Volumes/1tb drive/homelab` | `homelab` |
-| `/Volumes/1tb drive/homelab-services` | `homelab-services` |
+| `homelab/` | `homelab` |
+| `homelab-services/` | `homelab-services` |
+| `homelab-gpu/` | `homelab-gpu` |
+| `homelab-runtime/` | _(not git — Colima)_ |
+| `Personal/` | _(not git — school/resumes)_ |
 
 **GPU PC (Windows):** clone `homelab-gpu` to `C:\Users\zakar\homelab-gpu` (canonical on GPU machine).
 

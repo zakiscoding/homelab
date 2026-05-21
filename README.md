@@ -14,10 +14,15 @@ Both homelab Windows boxes run **Windows** (PowerShell). `cashh` = laptop only; 
 
 ## Paths on the 1TB drive
 
+See **[docs/DRIVE-LAYOUT.md](docs/DRIVE-LAYOUT.md)** for the full tree.
+
 | Folder | Purpose |
 |--------|---------|
-| **`/Volumes/1tb drive/homelab`** | This repo — docs only |
-| **`/Volumes/1tb drive/homelab-services`** | Docker stack, API, databases, `data/` |
+| **`homelab/`** | This repo — docs only |
+| **`homelab-services/`** | Docker stack, API, databases, `data/` |
+| **`homelab-gpu/`** | GPU training code (mirror) |
+| **`homelab-runtime/`** | Colima + Docker CLI config |
+| **`Personal/`** | School, resumes, projects (not homelab) |
 
 | Machine | Docs | Services |
 |---------|------|----------|
@@ -40,6 +45,7 @@ Both homelab Windows boxes run **Windows** (PowerShell). `cashh` = laptop only; 
 | [GPU node runbook](docs/nodes/gpu-node.md) | Ollama on Windows |
 | [Git workflow](docs/GIT.md) | Clone, pull, push — GitHub `zakiscoding/homelab` |
 | [Repositories](docs/REPOS.md) | `homelab` + `homelab-services` + planned `homelab-gpu` |
+| [1TB drive layout](docs/DRIVE-LAYOUT.md) | Folder structure on external volume |
 | [iMac stack](docs/services/imac-stack.md) | Docker — `homelab-services` repo |
 
 ## How we use this repo

@@ -13,8 +13,8 @@ HTTP API, database, and supporting services. GPU node serves Ollama; iMac proxie
 |------|---------|
 | `homelab/` | Documentation (git: `zakiscoding/homelab`) |
 | `homelab-services/` | Compose stack (git: `zakiscoding/homelab-services`) |
-| `colima/` | Colima VM + Docker engine data |
-| `docker-config/` | Docker CLI config (compose plugin path) |
+| `homelab-runtime/colima/` | Colima VM + Docker engine data |
+| `homelab-runtime/docker-config/` | Docker CLI config (compose plugin path) |
 | `~/1tb-drive` | Symlink → `/Volumes/1tb drive` (for Colima bind mounts) |
 
 ## Verified
@@ -52,7 +52,7 @@ brew install colima docker docker-compose
 Or manually:
 
 ```bash
-export COLIMA_HOME="/Volumes/1tb drive/colima"
+export COLIMA_HOME="/Volumes/1tb drive/homelab-runtime/colima"
 colima start --cpu 4 --memory 6 --disk 80 --mount-type virtiofs --mount "/Volumes/1tb drive:w"
 cd ~/1tb-drive/homelab-services
 docker-compose up -d

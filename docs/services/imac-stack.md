@@ -4,7 +4,7 @@
 |--|--|
 | **Repo** | [github.com/zakiscoding/homelab-services](https://github.com/zakiscoding/homelab-services) |
 | **Path** | `/Volumes/1tb drive/homelab-services` |
-| **Docker** | Colima — data under `/Volumes/1tb drive/colima` |
+| **Docker** | Colima — `homelab-runtime/colima/` on 1TB drive |
 | **Docs** | [homelab](https://github.com/zakiscoding/homelab) (this file) |
 
 ## Why Colima
@@ -48,8 +48,8 @@ See `homelab-services/.env.example`. Copy to `.env` on the iMac only.
 
 | Variable / path | Location |
 |-----------------|----------|
-| `COLIMA_HOME` | `/Volumes/1tb drive/colima` |
-| `DOCKER_CONFIG` | `/Volumes/1tb drive/docker-config` |
+| `COLIMA_HOME` | `/Volumes/1tb drive/homelab-runtime/colima` |
+| `DOCKER_CONFIG` | `/Volumes/1tb drive/homelab-runtime/docker-config` |
 | Compose project | `/Volumes/1tb drive/homelab-services` |
 | Service data | `homelab-services/data/*` |
 
