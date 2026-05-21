@@ -29,6 +29,8 @@ LAN API target: `http://<GPU_NODE_IP>:11434`
 
 See [REPOS.md](../REPOS.md) for how this node fits with [homelab-services](https://github.com/zakiscoding/homelab-services) on the iMac.
 
+**Checklist (install / ports / what not to run):** [GPU-NODE-CHECKLIST.md](GPU-NODE-CHECKLIST.md)
+
 ---
 
 ## 0. Prerequisites (on the GPU node)

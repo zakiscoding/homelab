@@ -132,6 +132,9 @@ Tailscale gives each device a stable IP on a private mesh. Team members with Tai
 
 ## 6. GPU node (`zak_pc`) — inference and training
 
+**Rule:** GPU runs **ML only** — not Postgres, Redis, Grafana, Qdrant, or the main API (those are on the iMac).  
+**Checklist:** see `docs/nodes/GPU-NODE-CHECKLIST.md` in the homelab repo.
+
 ### 6.1 Inference — Ollama
 
 | Item | Detail |
