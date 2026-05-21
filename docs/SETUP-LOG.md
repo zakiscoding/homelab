@@ -4,6 +4,16 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 ---
 
+## 2026-05-21 — Phase 0B leases, retry, system status
+
+**Goal:** Auto-recover stuck train jobs; observability; infer jobs on `/chat`; ML-STORE layout.
+
+**Repos:** homelab-services (`003_phase0b.sql`, expanded `jobs.py`, API v0.3), homelab-gpu (heartbeat + 0B reset-stale), homelab docs [PHASE-0B.md](PHASE-0B.md).
+
+**Deploy:** iMac `migrate-phase0b.sh` + `setup-ml-store.sh` + `force-recreate api`; GPU `git pull` + worker scripts.
+
+---
+
 ## 2026-05-21 — Phase 0A job control plane (code + docs)
 
 **Goal:** Postgres-backed `train` jobs; GPU MVW worker; execution gate (crash-safe, idempotent artifacts).
@@ -26,7 +36,9 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 **Smoke test:** `POST /jobs` from laptop → job `355e220f-...` → `status=succeeded`, `locked_by=zak_pc`.
 
-**Gate test (remaining):** [PHASE-0A.md](PHASE-0A.md#gate-test-from-laptop) — kill -9 worker mid-run, reset-stale, confirm single `published.json` per `job_id`.
+**Gate test (passed):** job `3d6a966b-9a19-4437-b37c-5931831b614b` — `taskkill` on GPU mid-train → job stayed `running` → `POST /internal/worker/jobs/reset-stale` → `pending` → worker finished → `succeeded`; one `published.json` under `checkpoints\{job_id}\`. See [PHASE-0A.md](PHASE-0A.md#gate-test-from-laptop).
+
+**Ops notes:** API needed `docker-compose up -d --force-recreate api` after adding `WORKER_API_KEY` to `.env`. GPU worker must load `.env` (`run-worker-once.ps1` / `start-gpu-worker-bg.ps1`); raw `python -m worker.poll_jobs` without env returns 401 / no claim.
 
 **RTX 5070:** 0A uses CPU stub train (no VRAM); real QLoRA requires `stop-ollama.ps1` first.
 

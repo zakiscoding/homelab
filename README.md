@@ -45,6 +45,7 @@ See **[docs/DRIVE-LAYOUT.md](docs/DRIVE-LAYOUT.md)** for the full tree.
 | [Secrets & access](docs/ACCESS.md) | Where credentials live (not the secrets themselves) |
 | [Architecture](docs/ARCHITECTURE.md) | Three-node layout (GPU / iMac / controller) |
 | [**Phase 0A**](docs/PHASE-0A.md) | Job control plane — deploy + gate test |
+| [**Phase 0B**](docs/PHASE-0B.md) | Leases, retry, `/system/status`, ML-STORE |
 | [Execution model](docs/EXECUTION-MODEL.md) | Postgres SSOT, GPU worker, SSH aliases |
 | [GPU node runbook](docs/nodes/gpu-node.md) | Ollama on Windows |
 | [GPU node checklist](docs/nodes/GPU-NODE-CHECKLIST.md) | Install ✅, ports, ML-only rule |

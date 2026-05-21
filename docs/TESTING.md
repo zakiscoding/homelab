@@ -15,7 +15,7 @@ curl.exe http://100.91.113.98:6333/
 
 # Chat (replace KEY from iMac homelab-services/.env)
 $key = "YOUR_API_KEY"
-$body = @{ message = "Hello" } | ConvertTo-Json -Compress
+$body = @{ prompt = "Hello" } | ConvertTo-Json -Compress
 Invoke-RestMethod -Uri "http://100.91.113.98/chat" -Method Post -Headers @{ "x-api-key" = $key } -Body $body -ContentType "application/json"
 ```
 

@@ -23,6 +23,18 @@ GPU → POST .../succeeded → Postgres succeeded
 
 Recovery after **kill -9:** worker startup calls `POST .../reset-stale` (running → pending), then claims again. Same `job_id` must not duplicate `published.json`.
 
+## Phase 0B additions
+
+```text
+claim → lease_expires_at = now + 15m
+failed(transient) → pending + scheduled_at backoff (if attempts remain)
+lease expired → auto-requeue via expire_stale_leases() or reset-stale
+/chat → infer job (priority 10) + Ollama; 503 gpu_busy if train running (unless flag set)
+GET /system/status → queue + workers + flags + GPU + Qdrant
+```
+
+Runbook: [PHASE-0B.md](PHASE-0B.md).
+
 ## Who updates jobs
 
 | Actor | Updates status |

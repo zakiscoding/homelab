@@ -1,6 +1,6 @@
 # Phase 0A — Job control plane (execution gate)
 
-**Status:** Deployed on iMac + GPU (2026-05-21); gate test in progress  
+**Status:** Deployed on iMac + GPU (2026-05-21); **gate test passed**  
 **Goal:** Prove jobs survive worker crash without duplicate artifacts.  
 **Hardware:** RTX 5070 12 GB — train uses stub in 0A; stop Ollama before real QLoRA (Phase 3).
 
@@ -12,7 +12,7 @@
 | Job API | homelab-services | `api/jobs.py`, `api/main.py` |
 | Migration script | homelab-services | `scripts/migrate-jobs.sh` |
 | GPU MVW worker | homelab-gpu | `worker/poll_jobs.py`, `worker/run_train.py` |
-| Start worker | homelab-gpu | `scripts/start-gpu-worker.ps1` |
+| Start worker | homelab-gpu | `scripts/start-gpu-worker.ps1`, `scripts/run-worker-once.ps1`, `scripts/start-gpu-worker-bg.ps1` |
 
 **Principle:** Postgres on iMac is the only source of truth for job state. GPU worker is stateless; it calls the iMac API (not Postgres directly).
 
@@ -66,6 +66,12 @@ docker-compose up -d --build api
 curl http://localhost/health
 ```
 
+After changing `.env` (e.g. adding `WORKER_API_KEY`), recreate the API container so env vars load:
+
+```bash
+docker-compose up -d --force-recreate api
+```
+
 If Colima is stopped: `colima start` then `docker-compose up -d` (see [imac-stack.md](services/imac-stack.md)).
 
 ## Deploy on GPU (`zakar`)
@@ -100,6 +106,10 @@ Invoke-RestMethod -Uri "http://100.91.113.98/internal/worker/jobs/reset-stale" -
 # 5. Assert one published.json under checkpoints\{job_id}\ on GPU
 ```
 
+**Gate passed (2026-05-21):** job `3d6a966b-9a19-4437-b37c-5931831b614b` — killed `python.exe` mid-run (`running` stuck), `reset-stale` → `pending`, worker completed → `succeeded`; checkpoint dir contains exactly `progress.json` + `published.json` (no duplicate publish).
+
+Use `.\scripts\run-worker-once.ps1` for a single poll cycle (loads `.env`). For a detached worker on GPU, `.\scripts\start-gpu-worker-bg.ps1` (same `.env` loading as `run-worker-once.ps1`).
+
 ## Idempotency (0A)
 
 - Artifacts only under `CHECKPOINT_DIR/{job_id}/`
@@ -111,8 +121,10 @@ Invoke-RestMethod -Uri "http://100.91.113.98/internal/worker/jobs/reset-stale" -
 - **0A stub** does not use CUDA (safe with Ollama up for other tests)
 - **Real LoRA (Phase 3):** run `scripts/stop-ollama.ps1` first; QLoRA 4-bit only; see [nodes/gpu-node.md](nodes/gpu-node.md)
 
-## Deferred (Phase 0B+)
+## Next: Phase 0B
 
-Auto-retry/backoff, leases, iMac ingest/embed worker, `/system/status`, ML-STORE, RAG pipeline, Redis queue.
+Leases, auto-retry, `/system/status`, ML-STORE — see [PHASE-0B.md](PHASE-0B.md).
+
+**Later:** iMac ingest/embed worker, RAG pipeline, Redis queue.
 
 See [EXECUTION-MODEL.md](EXECUTION-MODEL.md) and [SETUP-LOG.md](SETUP-LOG.md).
