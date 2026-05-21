@@ -45,6 +45,7 @@ See **[docs/DRIVE-LAYOUT.md](docs/DRIVE-LAYOUT.md)** for the full tree.
 | [Secrets & access](docs/ACCESS.md) | Where credentials live (not the secrets themselves) |
 | [Architecture](docs/ARCHITECTURE.md) | Three-node layout (GPU / iMac / controller) |
 | [GPU node runbook](docs/nodes/gpu-node.md) | Ollama on Windows |
+| [GPU node checklist](docs/nodes/GPU-NODE-CHECKLIST.md) | Install ✅, ports, ML-only rule |
 | [Git workflow](docs/GIT.md) | Clone, pull, push — GitHub `zakiscoding/homelab` |
 | [Repositories](docs/REPOS.md) | `homelab` + `homelab-services` + `homelab-gpu` |
 | [Backups](docs/BACKUPS.md) | Postgres dumps, checkpoints, restic |
