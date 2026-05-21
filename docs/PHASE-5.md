@@ -1,6 +1,6 @@
 # Phase 5 — Ops / observability
 
-**Status:** Code shipped (2026-05-21) — deploy stack + GPU metrics task  
+**Status:** Deployed (2026-05-21) — iMac stack + GPU metrics push  
 **Prerequisite:** [Phase 4](PHASE-4.md).
 
 ## Goal
