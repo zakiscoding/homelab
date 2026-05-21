@@ -42,7 +42,7 @@ Internal records: see [Inventory — Domains](INVENTORY.md#domains--dns-internal
 
 | Method | Endpoint | Auth | Notes |
 |--------|----------|------|-------|
-| Tailscale | GPU node `100.88.71.33` | Tailscale account | Ollama `http://100.88.71.33:11434` verified 2026-05-21 |
+| Tailscale | GPU `100.88.71.33`, iMac `100.91.113.98` | Tailscale account | Ollama :11434; iMac API :80, Grafana :3000, etc. |
 
 ## Wi‑Fi
 

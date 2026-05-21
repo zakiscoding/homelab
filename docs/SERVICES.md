@@ -6,9 +6,9 @@ What runs in the lab and how to operate it. One row per service; link to config 
 
 | Service | Runs on | URL / access | Config path (1TB) | Backup |
 |---------|---------|--------------|-------------------|--------|
-| Caddy | imac-node | `http://<imac>:80` | `homelab-services/caddy/` | — |
-| Prometheus | imac-node | `http://<imac>:9090` | `homelab-services/prometheus/` | `data/prometheus` |
-| Grafana | imac-node | `http://<imac>:3000` | `homelab-services/data/grafana` | same |
+| Caddy | imac-node | `http://100.91.113.98/` (Tailscale) | `homelab-services` compose | Reverse proxy |
+| Prometheus | imac-node | `http://100.91.113.98:9090` | `homelab-services/data/prometheus` | Healthy |
+| Grafana | imac-node | `http://100.91.113.98:3000` | `homelab-services/data/grafana` | Login: `.env` `GRAFANA_*` |
 | Backups | — | — | — | TBD `pg_dump` → external |
 
 ## Applications
@@ -16,10 +16,10 @@ What runs in the lab and how to operate it. One row per service; link to config 
 | Service | Runs on | URL / access | Config path (1TB) | Notes |
 |---------|---------|--------------|-------------------|-------|
 | Ollama | gpu-node | `http://10.0.0.156:11434`, `http://100.88.71.33:11434` | [gpu-node.md](nodes/gpu-node.md) | `llama3.2:latest` |
-| Homelab API | imac-node | `http://<imac>/chat` (via Caddy) | `homelab-services/api/` | Proxies to GPU |
+| Homelab API | imac-node | `http://100.91.113.98/health`, `/chat` | `homelab-services/api/` | `x-api-key`; proxies to GPU |
 | PostgreSQL | imac-node | internal | `homelab-services/data/postgres` | Chat logs |
 | Redis | imac-node | internal | `homelab-services/data/redis` | Request counters |
-| Qdrant | imac-node | `http://<imac>:6333` | `homelab-services/data/qdrant` | RAG (optional) |
+| Qdrant | imac-node | `http://100.91.113.98:6333` | `homelab-services/data/qdrant` | v1.18 — RAG |
 
 Stack doc: [services/imac-stack.md](services/imac-stack.md)
 

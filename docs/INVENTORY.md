@@ -7,7 +7,7 @@ Hardware and logical resources. Update when we add, rename, or retire anything.
 | Name | Role | Model / specs | Location | Notes |
 |------|------|---------------|----------|-------|
 | GPU PC (`zak_pc`) | AI inference | RTX 5070 | Homelab | Windows user **`zakar`** |
-| iMac (`Mos-iMac`) | API / database | Apple iMac | Homelab | macOS user **`momo`** |
+| iMac (`Mos-iMac`) | API / database | Apple iMac, **M1**, macOS 15.7 | Homelab | user **`momo`**; Colima + stack |
 | Laptop (controller) | Ops / docs | Windows | Desk | User **`cashh`**; git + SSH to GPU |
 
 ## Hypervisor / hosts
@@ -15,7 +15,7 @@ Hardware and logical resources. Update when we add, rename, or retire anything.
 | Hostname | Type | OS / hypervisor | CPU / RAM / disk | IP | Notes |
 |----------|------|-----------------|------------------|-----|-------|
 | gpu-node (`zak_pc`) | Bare metal | **Windows**, login **`zakar`** | RTX 5070, driver 596.x | **10.0.0.156**, **100.88.71.33** (Tailscale) | Ollama :11434; `OllamaServe` at startup |
-| imac-node (`Mos-iMac`) | Bare metal | **macOS**, login **`momo`** | iMac | _TBD_ Tailscale IP_ | Docs: `homelab/` · Stack: `homelab-services/` |
+| imac-node (`Mos-iMac`) | Bare metal | **macOS** 15.7.3, **Apple M1**, **`momo`** | iMac | **100.91.113.98** (Tailscale) | Colima on 1TB; stack **running** — [SERVICES](SERVICES.md) |
 | controller (laptop) | Laptop | **Windows**, login **`cashh`** | — | N/A | `C:\Users\cashh\homelab`; Tailscale to GPU |
 
 ## Virtual machines
@@ -40,7 +40,7 @@ Hardware and logical resources. Update when we add, rename, or retire anything.
 
 | Pool / share | Backend | Size | Mount / export | Used for |
 |--------------|---------|------|----------------|----------|
-| 1TB drive | External/USB | 1 TB | `/Volumes/1tb drive` | `homelab/`, `homelab-services/data/` |
+| 1TB drive | External/USB | ~1 TB | `/Volumes/1tb drive` | `homelab/`, `homelab-services/`, `colima/`, `docker-config/` |
 
 ## Domains & DNS (internal)
 

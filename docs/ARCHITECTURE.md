@@ -18,7 +18,7 @@ Three-node homelab split by role. GPU node first; iMac and API layer connected a
 | Node | Windows/macOS user | Role | Primary workloads | Phase |
 |------|-------------------|------|-------------------|-------|
 | **GPU PC** | **`zakar`** (`zak_pc`) | Inference + **training** | Ollama; future `homelab-gpu` for train code | **1 — inference done** |
-| **iMac** | **`momo`** (`Mos-iMac`) | App / data plane | [`homelab-services`](https://github.com/zakiscoding/homelab-services) | 2 — in progress |
+| **iMac** | **`momo`** (`Mos-iMac`) | App / data plane | [`homelab-services`](https://github.com/zakiscoding/homelab-services) | **2 — done** (Colima) |
 | **Laptop** | **`cashh`** | Controller | SSH to GPU, `git pull`/`push`, remote tests | Ongoing |
 
 ## Traffic flow (target)

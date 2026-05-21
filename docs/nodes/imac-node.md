@@ -67,8 +67,8 @@ colima stop   # stops all containers when VM stops
 - [x] GPU Ollama — [gpu-node.md](gpu-node.md)
 - [x] Colima + images pulled
 - [x] `.env` in `homelab-services/`
-- [ ] iMac Tailscale IP in [INVENTORY](../INVENTORY.md)
-- [ ] `sw_vers` + iMac model in inventory
+- [x] iMac Tailscale IP **100.91.113.98** — [INVENTORY](../INVENTORY.md)
+- [x] macOS 15.7 documented in inventory
 
 ## Test from controller
 

@@ -56,10 +56,11 @@ Runtime compose and API code: **`homelab-services/`** — document from `docs/se
 | Area | Status | Notes |
 |------|--------|-------|
 | Documentation scaffold | Done | 2026-05-21 |
-| Architecture (3 nodes) | Documented | GPU done; iMac phase 2 |
-| GPU node — Ollama | **Done** | RTX 5070; LAN + Tailscale |
-| iMac — API/DB | In progress | Stack in `homelab-services/`; install Docker Desktop |
+| Architecture (3 nodes) | Documented | GPU + iMac live |
+| GPU node — Ollama | **Done** | RTX 5070; `100.88.71.33:11434` |
+| iMac — API/DB (Colima) | **Done** | All 7 containers up; `100.91.113.98` |
 | Docs on 1TB drive | Done | `/Volumes/1tb drive/homelab` |
 | Services on 1TB drive | Done | `/Volumes/1tb drive/homelab-services` |
-| Core network | Partial | Fill iMac Tailscale IP in inventory |
-| Monitoring / backups | — | Grafana/Prometheus in stack; backups TBD |
+| GitHub repos | **Done** | `homelab` + `homelab-services` (private) |
+| Monitoring | Running | Prometheus :9090, Grafana :3000 on iMac |
+| Backups | TBD | `pg_dump` / Restic not configured |

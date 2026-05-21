@@ -18,10 +18,17 @@ Chronological record of homelab setup work. Newest entries at the top.
 - Scripts: `homelab-services/scripts/setup-1tb.sh`, `start-stack.sh`, `docker-1tb-env.sh`
 - Compose fix: directory mounts + Caddy `reverse-proxy` command (Colima file-bind issue)
 
+**Also done (later same day):**
+
+- Grafana + Prometheus up (`user: "0"` for Colima virtiofs volumes)
+- iMac Tailscale IP: **100.91.113.98**
+- Full service check: health, `/chat`, Qdrant, Prometheus, Grafana — all OK
+- Pushed to GitHub: `homelab` + `homelab-services`
+
 **Open:**
 
-- [ ] Grafana `data/grafana` permissions (`chown 472:472` on iMac)
-- [ ] Log iMac Tailscale IP; test from laptop `cashh`
+- [ ] Test all URLs from laptop `cashh` over Tailscale
+- [ ] Create `homelab-gpu` when training code exists
 
 ---
 
