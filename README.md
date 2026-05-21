@@ -25,7 +25,7 @@ Both homelab Windows boxes run **Windows** (PowerShell). `cashh` = laptop only; 
 | **Controller (`cashh`)** | `C:\Users\cashh\homelab` (git clone) | Copy or clone `homelab-services` |
 | **GPU PC (`zakar`)** | Optional clone of `homelab` | — |
 
-**GitHub (docs):** [github.com/zakiscoding/homelab](https://github.com/zakiscoding/homelab) (private) — [docs/GIT.md](docs/GIT.md)
+**GitHub:** [homelab](https://github.com/zakiscoding/homelab) (docs) · [homelab-services](https://github.com/zakiscoding/homelab-services) (iMac stack) — [docs/REPOS.md](docs/REPOS.md)
 
 ## Quick links
 
@@ -39,7 +39,8 @@ Both homelab Windows boxes run **Windows** (PowerShell). `cashh` = laptop only; 
 | [Architecture](docs/ARCHITECTURE.md) | Three-node layout (GPU / iMac / controller) |
 | [GPU node runbook](docs/nodes/gpu-node.md) | Ollama on Windows |
 | [Git workflow](docs/GIT.md) | Clone, pull, push — GitHub `zakiscoding/homelab` |
-| [iMac stack (services)](docs/services/imac-stack.md) | Docker on 1TB — `homelab-services/` |
+| [Repositories](docs/REPOS.md) | `homelab` + `homelab-services` + planned `homelab-gpu` |
+| [iMac stack](docs/services/imac-stack.md) | Docker — `homelab-services` repo |
 
 ## How we use this repo
 

@@ -1,7 +1,8 @@
 # iMac services stack
 
-**Code & compose:** `/Volumes/1tb drive/homelab-services`  
-**Not in this repo** — `homelab` is documentation only.
+**Repo:** [github.com/zakiscoding/homelab-services](https://github.com/zakiscoding/homelab-services) (private)  
+**iMac path:** `/Volumes/1tb drive/homelab-services`  
+**Docs:** this file lives in [homelab](https://github.com/zakiscoding/homelab) — see [REPOS.md](../REPOS.md).
 
 ## Layout on 1TB drive
 

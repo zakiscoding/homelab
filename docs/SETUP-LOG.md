@@ -4,6 +4,25 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 ---
 
+## 2026-05-21 — GitHub repo `homelab-services` + repo plan in docs
+
+**Goal:** Private GitHub repo for iMac stack; document multi-repo layout (incl. future GPU training).
+
+**Done:**
+
+- GitHub: **[zakiscoding/homelab-services](https://github.com/zakiscoding/homelab-services)** (private)
+- Local path: `/Volumes/1tb drive/homelab-services`
+- Docs: [REPOS.md](REPOS.md) — `homelab` / `homelab-services` / planned `homelab-gpu`
+- Updated [ARCHITECTURE.md](ARCHITECTURE.md), [GIT.md](GIT.md), [imac-stack.md](services/imac-stack.md)
+
+**Next:**
+
+- [ ] `git pull` on iMac in both folders after clone/push
+- [ ] Docker Desktop + `docker compose up` on iMac
+- [ ] Create `homelab-gpu` when training scripts exist
+
+---
+
 ## 2026-05-21 — Services split: `homelab-services/` on 1TB drive
 
 **Goal:** Keep `homelab/` docs-only; run Docker stack in a separate folder on the 1TB drive.
@@ -23,7 +42,7 @@ Chronological record of homelab setup work. Newest entries at the top.
 - [ ] `cp .env.example .env` in `homelab-services/`
 - [ ] `docker compose up -d --build`
 - [ ] Test `curl http://localhost/health` and `/chat` with API key
-- [ ] Optional: separate git repo `homelab-services` on GitHub
+- [x] GitHub repo `homelab-services` (see entry above)
 
 ---
 

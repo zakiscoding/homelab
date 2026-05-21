@@ -1,6 +1,8 @@
-# Git workflow
+# Git workflow — `homelab` (documentation)
 
 **Remote:** `https://github.com/zakiscoding/homelab` (private)
+
+For the iMac Docker stack, use **[homelab-services](https://github.com/zakiscoding/homelab-services)** — see [REPOS.md](REPOS.md).
 
 ## One-time: publish repo from iMac
 
@@ -32,9 +34,9 @@ git pull
 ```powershell
 git clone https://github.com/zakiscoding/homelab.git C:\Users\cashh\homelab
 cd C:\Users\cashh\homelab
-# Services stack is NOT in this repo — see homelab-services on 1TB drive
-# cd "/Volumes/1tb drive/homelab-services"
-# copy .env.example .env
+git clone https://github.com/zakiscoding/homelab-services.git C:\Users\cashh\homelab-services
+cd C:\Users\cashh\homelab-services
+copy .env.example .env
 ```
 
 **GPU PC (user `zakar`, optional second clone):**
@@ -80,5 +82,5 @@ git push origin main
 
 ## Never commit
 
-- `compose/.env` (use `.env.example` as template)
+- `homelab-services/.env` (use `.env.example` in that repo)
 - Keys, tokens, `secrets/`
