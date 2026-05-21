@@ -55,27 +55,19 @@ Docs updated so `cashh` is never confused with the GPU machine.
 
 ---
 
-## 2026-05-21 — Git repo (local) → GitHub `zakiscoding/homelab`
+## 2026-05-21 — Git repo → GitHub `zakiscoding/homelab` (private)
 
 **Goal:** Private GitHub repo; sync docs/compose across iMac and controller.
 
-**Done (local):**
+**Done:**
 
 - `git init` in `/Volumes/1tb drive/homelab`
-- Initial commit on `main` (docs + `compose/.env.example`)
+- 2 commits on `main`; pushed to **https://github.com/zakiscoding/homelab** (`isPrivate: true`)
+- `gh` authenticated as **zakiscoding**
 - Remote: `https://github.com/zakiscoding/homelab.git`
+- Latest commit: `6857852` (local = remote)
 
-**Blocked:** `gh` token invalid on iMac — user must re-auth, then create/push (see [GIT.md](GIT.md)).
-
-**After auth (run on iMac):**
-
-```bash
-cd "/Volumes/1tb drive/homelab"
-gh auth login
-gh repo create homelab --private --source=. --remote=origin --push
-```
-
-If the repo already exists on GitHub empty: `git push -u origin main`
+**Clone on controller:** see [GIT.md](GIT.md)
 
 ---
 
