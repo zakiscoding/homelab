@@ -39,6 +39,17 @@ cd C:\Users\zakar\homelab-gpu
 | iMac /chat | JSON with GPU-backed reply |
 | verify-gpu | `cuda True`, RTX 5070 |
 
+## Phase 1 — /chat inference
+
+```powershell
+$key = "YOUR_API_KEY"
+$body = @{ prompt = "Hello"; model = "llama3.2:latest" } | ConvertTo-Json -Compress
+$r = Invoke-RestMethod -Uri "http://100.91.113.98/chat" -Method Post `
+  -Headers @{ "x-api-key" = $key; "Content-Type" = "application/json" } -Body $body
+$r | Select-Object job_id, duration_ms, model
+Invoke-RestMethod -Uri "http://100.91.113.98/jobs/$($r.job_id)" -Headers @{ "x-api-key" = $key }
+```
+
 ## Phase 0B — system status
 
 ```powershell

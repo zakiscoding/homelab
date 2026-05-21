@@ -4,6 +4,14 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 ---
 
+## 2026-05-21 — Phase 1 inference (chat_logs.job_id)
+
+**Goal:** Complete inference pipeline traceability; optional GPU worker scheduled task.
+
+**Repos:** homelab-services `004_phase1.sql`, homelab-gpu `register-gpu-worker-task.ps1`, [PHASE-1.md](PHASE-1.md).
+
+---
+
 ## 2026-05-21 — Phase 0B leases, retry, system status
 
 **Goal:** Auto-recover stuck train jobs; observability; infer jobs on `/chat`; ML-STORE layout.
