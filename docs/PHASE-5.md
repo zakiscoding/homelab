@@ -29,10 +29,11 @@ Qdrant :6333/metrics → Prometheus
 
 ```bash
 ssh imac-ts
-source /Volumes/1tb\ drive/homelab-services/scripts/docker-1tb-env.sh
-cd /Volumes/1tb\ drive/homelab-services
+source $HOME/1tb-drive/homelab-services/scripts/docker-1tb-env.sh
+cd $HOME/1tb-drive/homelab-services
 git pull
-docker-compose up -d --build --force-recreate api prometheus pushgateway grafana
+bash scripts/sync-grafana-provisioning.sh
+docker-compose up -d --force-recreate grafana
 ```
 
 ## Deploy (GPU metrics)
