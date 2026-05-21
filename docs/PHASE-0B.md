@@ -1,6 +1,6 @@
 # Phase 0B — Leases, retry, observability
 
-**Status:** Deploy in progress (2026-05-21)  
+**Status:** Deployed (2026-05-21)  
 **Prerequisite:** [Phase 0A](PHASE-0A.md) gate passed.
 
 ## What ships

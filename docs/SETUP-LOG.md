@@ -10,7 +10,9 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 **Repos:** homelab-services (`003_phase0b.sql`, expanded `jobs.py`, API v0.3), homelab-gpu (heartbeat + 0B reset-stale), homelab docs [PHASE-0B.md](PHASE-0B.md).
 
-**Deploy:** iMac `migrate-phase0b.sh` + `setup-ml-store.sh` + `force-recreate api`; GPU `git pull` + worker scripts.
+**Deploy:** iMac `migrate-phase0b.sh` + `setup-ml-store.sh` + `start-stack.sh` (Colima); re-ran `002` after stack recreate; GPU `git pull` `1d099fe`. Heartbeat fix `a435577`.
+
+**Smoke:** `/system/status` OK (GPU + Qdrant); train job `2f77e255-...` succeeded; worker `zak_pc` in heartbeats.
 
 ---
 
