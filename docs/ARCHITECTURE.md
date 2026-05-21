@@ -3,24 +3,23 @@
 Three-node homelab split by role. GPU node first; iMac and API layer connected after.
 
 ```text
-                    [ Laptop — Windows controller ]
-                           SSH / curl.exe / docs (no apt/nvidia setup here)
-                                |
-                    +-----------+-----------+
-                    |                       |
-            [ GPU PC — Windows ]      [ iMac node ]
-            AI inference              API, database,
-            Ollama (+ GPU drivers)    supporting services
-            (Phase 1 — now)           (Phase 2 — later)
+         [ Laptop — Windows, user cashh (controller) ]
+              git / curl.exe / SSH ─────────────────────┐
+                                |                        |
+                    +-----------+-----------+            |
+                    |                       |            |
+      [ GPU PC — Windows, user zakar ]   [ iMac — momo ] |
+      zak_pc · Ollama · RTX 5070         API / compose   |
+      (Phase 1 — done)                   (Phase 2)       │
 ```
 
 ## Node roles
 
-| Node | Role | Primary workloads | Phase |
-|------|------|-------------------|-------|
-| **GPU PC** | Inference | **Windows**, Ollama, NVIDIA driver; Docker optional | **1 — in progress** |
-| **iMac** | App / data plane | HTTP API, database, related services | 2 — planned |
-| **Laptop** | Controller | SSH, testing (`curl` to Ollama), docs in this repo | Ongoing |
+| Node | Windows/macOS user | Role | Primary workloads | Phase |
+|------|-------------------|------|-------------------|-------|
+| **GPU PC** | **`zakar`** (`zak_pc`) | Inference | Ollama, NVIDIA driver | **1 — done** |
+| **iMac** | **`momo`** (`Mos-iMac`) | App / data plane | API, database, `compose/` | 2 — in progress |
+| **Laptop** | **`cashh`** | Controller | SSH to GPU, `git pull`/`push`, remote tests | Ongoing |
 
 ## Traffic flow (target)
 

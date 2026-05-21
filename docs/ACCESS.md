@@ -16,7 +16,9 @@ Where authentication lives — **never** commit passwords, API keys, or private 
 
 | Host | User | Key location | Port | Notes |
 |------|------|--------------|------|-------|
-| | | | 22 | |
+| GPU PC (`zak_pc`) | **`zakar`** | _TBD_ | 22 | From laptop **`cashh`**: `ssh zakar@100.88.71.33` |
+| iMac (`Mos-iMac`) | **`momo`** | _TBD_ | 22 | |
+| Controller | **`cashh`** | — | — | Laptop; initiates SSH |
 
 ## Admin UIs
 

@@ -4,6 +4,18 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 ---
 
+## 2026-05-21 — Node identities (Windows users)
+
+| Node | Login | Hostname |
+|------|-------|----------|
+| Controller laptop | **`cashh`** | — |
+| GPU PC | **`zakar`** | `zak_pc` |
+| iMac | **`momo`** | `Mos-iMac` |
+
+Docs updated so `cashh` is never confused with the GPU machine.
+
+---
+
 ## 2026-05-21 — Repo on 1TB drive + iMac → GPU verified
 
 **Goal:** Keep all homelab files on the iMac’s 1TB volume; confirm inference path from iMac.

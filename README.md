@@ -2,12 +2,23 @@
 
 Living documentation for this homelab: hardware, network, services, and every setup step we take.
 
+## Who is what
+
+| Node | Machine | Windows user | Hostname | Role |
+|------|---------|--------------|----------|------|
+| **Controller** | Laptop | **`cashh`** | — | Docs, `git`, `curl` tests, SSH to GPU |
+| **GPU node** | Desktop PC | **`zakar`** | `zak_pc` | Ollama + RTX 5070 |
+| **App / DB** | iMac | **`momo`** | `Mos-iMac` | API, compose, repo on 1TB drive |
+
+Both homelab Windows boxes run **Windows** (PowerShell). `cashh` = laptop only; `zakar` = GPU PC only.
+
 ## Repo location (canonical)
 
 | Machine | Path |
 |---------|------|
 | **iMac** | `/Volumes/1tb drive/homelab` |
-| **Controller (Windows)** | Clone or sync this folder (e.g. copy `homelab` from the 1TB drive, or use git) |
+| **Controller (laptop `cashh`)** | `C:\Users\cashh\homelab` (git clone) |
+| **GPU PC (`zakar`)** | `C:\Users\zakar\HOMELAB` or clone `homelab` — same GitHub repo |
 
 Config, compose stacks, and scripts live under this tree — not in `~/homelab`.
 
@@ -28,9 +39,10 @@ Config, compose stacks, and scripts live under this tree — not in `~/homelab`.
 
 ## How we use this repo
 
-1. **Before a change** — skim [SETUP-LOG](docs/SETUP-LOG.md) so we do not repeat mistakes.
-2. **During setup** — note commands, versions, and config paths in the log (or a service section).
-3. **After it works** — update inventory, network, and services so the docs match reality.
+1. **`git pull`** — GitHub is canonical; other nodes depend on it.
+2. **Before a change** — skim [SETUP-LOG](docs/SETUP-LOG.md) so we do not repeat mistakes.
+3. **During setup** — note commands, versions, and config paths in the log (or a service section).
+4. **After it works** — update inventory, network, and services, then **`git commit` + `git push`** so every node can `git pull` and see the latest.
 
 Config files, compose stacks, and scripts can live in this repo as we add them; link them from the relevant doc sections.
 

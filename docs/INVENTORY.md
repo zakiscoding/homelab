@@ -6,17 +6,17 @@ Hardware and logical resources. Update when we add, rename, or retire anything.
 
 | Name | Role | Model / specs | Location | Notes |
 |------|------|---------------|----------|-------|
-| GPU PC | AI inference node | NVIDIA GPU (model TBD) | Homelab | Phase 1 |
-| iMac | API / database node | Apple iMac (`Mos-iMac`) | Homelab | Phase 2; repo on 1TB drive |
-| Laptop | Controller | Windows (user `cashh` tested Tailscale) | Desk | SSH/docs; reach GPU via `100.88.71.33:11434` |
+| GPU PC (`zak_pc`) | AI inference | RTX 5070 | Homelab | Windows user **`zakar`** |
+| iMac (`Mos-iMac`) | API / database | Apple iMac | Homelab | macOS user **`momo`**; repo on 1TB |
+| Laptop (controller) | Ops / docs | Windows | Desk | User **`cashh`**; git + SSH to GPU |
 
 ## Hypervisor / hosts
 
 | Hostname | Type | OS / hypervisor | CPU / RAM / disk | IP | Notes |
 |----------|------|-----------------|------------------|-----|-------|
-| gpu-node (`zak_pc`) | Bare metal | **Windows** (10/11) | RTX 5070, driver 596.x | **10.0.0.156** (Wi‑Fi), **100.88.71.33** (Tailscale) | Ollama :11434; task `OllamaServe` at startup |
-| imac-node (`Mos-iMac`) | Bare metal | **macOS** (user `momo`) | iMac | _TBD_ Tailscale IP_ | Repo: `/Volumes/1tb drive/homelab`; iMac→GPU Ollama OK |
-| controller | Laptop | Windows 10/11 | Laptop | N/A | Sync docs from `homelab` on 1TB drive |
+| gpu-node (`zak_pc`) | Bare metal | **Windows**, login **`zakar`** | RTX 5070, driver 596.x | **10.0.0.156**, **100.88.71.33** (Tailscale) | Ollama :11434; `OllamaServe` at startup |
+| imac-node (`Mos-iMac`) | Bare metal | **macOS**, login **`momo`** | iMac | _TBD_ Tailscale IP_ | `/Volumes/1tb drive/homelab`; iMac→GPU OK |
+| controller (laptop) | Laptop | **Windows**, login **`cashh`** | — | N/A | `C:\Users\cashh\homelab`; Tailscale curl to GPU |
 
 ## Virtual machines
 

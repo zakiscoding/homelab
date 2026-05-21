@@ -1,59 +1,69 @@
-# Controller — Windows laptop
+# Controller — Windows laptop (`cashh`)
 
-**OS:** Windows  
-**Repo:** Sync from iMac — **`/Volumes/1tb drive/homelab`** (canonical).  
-On Windows, copy that folder via USB/network share, or use git once initialized.  
-**Role:** Docs, remote tests, SSH to GPU PC and iMac.
+| | |
+|--|--|
+| **Machine** | Laptop (not the GPU desktop) |
+| **OS** | Windows |
+| **Login** | **`cashh`** |
+| **Repo (git clone)** | `C:\Users\cashh\homelab` |
+| **Role** | Docs, `git pull`/`push`, `curl` tests, SSH into GPU PC |
+
+Do not confuse with the **GPU PC** — that machine logs in as **`zakar`** (`zak_pc`). See [gpu-node.md](gpu-node.md).
 
 ## Homelab nodes
 
-| Node | OS | How you manage it |
-|------|-----|-------------------|
-| **GPU PC** | **Windows** | PowerShell on box, or `ssh` if OpenSSH Server enabled |
-| **iMac** | TBD (macOS likely) | SSH / Screen Sharing later |
-| **This laptop** | Windows | Local PowerShell + this repo |
+| Node | User / host | How you manage it |
+|------|-------------|-------------------|
+| **GPU PC** | **`zakar`** @ `zak_pc` | `ssh zakar@<gpu-ip>` or Tailscale `100.88.71.33` |
+| **iMac** | **`momo`** @ `Mos-iMac` | SSH / Screen Sharing |
+| **This laptop** | **`cashh`** | Local PowerShell + `C:\Users\cashh\homelab` |
 
-The GPU node is **not Linux**. Over SSH you still get **PowerShell** (`PS C:\...>`), not `user@host:~$`.
-
-## Commands on the GPU node (Windows)
-
-Run on the GPU PC (local or SSH):
+## Git (GitHub first)
 
 ```powershell
-nvidia-smi
-systeminfo | findstr /B /C:"OS Name" /C:"OS Version"
-ipconfig
-curl.exe http://127.0.0.1:11434/api/tags
+cd C:\Users\cashh\homelab
+git pull
+# edit docs...
+git add -A
+git commit -m "Describe change"
+git push
 ```
 
-Do **not** expect `cat /etc/os-release` or `apt` to work on the GPU node.
+See [GIT.md](../GIT.md). GitHub: **zakiscoding/homelab** (private).
 
-## Test GPU node Ollama from this laptop
+## Test GPU Ollama from this laptop
 
-```powershell
-curl.exe http://<GPU_NODE_IP>:11434/api/tags
-```
-
-`127.0.0.1` on the laptop only hits **local** Ollama on the laptop — use the GPU PC’s LAN IP for the homelab node.
-
-## Remote-only workflow
-
-You may only have the **GPU node SSH terminal** (not at the desk, not on the laptop). Run all fix/start commands **in that SSH session** — see [gpu-node.md § Remote-only](gpu-node.md#remote-only-setup-ssh--no-monitor--no-tray).
-
-From the laptop (optional), test over Tailscale if you are away from home:
+Use the **GPU node IP** — not `127.0.0.1` (that would be laptop-local only).
 
 ```powershell
+# Tailscale (works away from home)
 curl.exe http://100.88.71.33:11434/api/tags
+
+# Home LAN
+curl.exe http://10.0.0.156:11434/api/tags
 ```
 
-## SSH to Windows GPU node (optional)
+**Generate (PowerShell):**
 
 ```powershell
-ssh <windows-user>@<gpu-node-ip>
+$body = @{ model = "llama3.2:latest"; prompt = "Say hello in one sentence."; stream = $false } | ConvertTo-Json -Compress
+Invoke-RestMethod -Uri "http://100.88.71.33:11434/api/generate" -Method Post -Body $body -ContentType "application/json"
 ```
 
-Then run PowerShell commands as above. See [gpu-node.md](gpu-node.md) § OpenSSH.
+## SSH to GPU PC (`zakar`)
 
-## Same GPU on two machines?
+```powershell
+ssh zakar@10.0.0.156
+# or over Tailscale:
+ssh zakar@100.88.71.33
+```
 
-If both the laptop and GPU PC have an RTX 5070, they are separate boxes — always use **IP address** to tell them apart in tests and docs.
+Prompt will be `PS C:\Users\zakar>` on the **GPU** machine.
+
+## Remote-only on GPU
+
+If you are SSH’d into **`zakar`**@`zak_pc`, you are on the GPU node — not the controller. GPU fixes: [gpu-node.md § Remote-only](gpu-node.md#remote-only-setup-ssh--no-monitor--no-tray).
+
+## Cursor on the GPU PC?
+
+If you open this repo under `C:\Users\zakar\HOMELAB` on **`zak_pc`**, that is still the same GitHub repo — just the GPU workstation copy. Prefer **`cashh`** laptop for day-to-day `git push` if that is your main controller.

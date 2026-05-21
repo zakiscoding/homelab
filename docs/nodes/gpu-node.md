@@ -1,5 +1,12 @@
 # GPU node — AI inference (Windows)
 
+| | |
+|--|--|
+| **Machine** | Desktop GPU PC |
+| **Hostname** | `zak_pc` |
+| **Windows login** | **`zakar`** (`PS C:\Users\zakar>`) |
+| **Controller laptop** | **`cashh`** — runs `curl` / `ssh zakar@...` from elsewhere |
+
 Physical GPU PC runs **Windows**. Primary stack: **NVIDIA driver + Ollama** (native Windows). Docker Desktop is optional later for non-Ollama containers.
 
 LAN API target: `http://<GPU_NODE_IP>:11434`
@@ -101,15 +108,14 @@ If the network is marked **Public**, use `-Profile Private,Public` deliberately 
 
 ---
 
-## 4. Verify from the controller laptop
+## 4. Verify from the controller laptop (`cashh`)
 
 ```powershell
-curl.exe http://<GPU_NODE_IP>:11434/api/tags
+curl.exe http://10.0.0.156:11434/api/tags
+curl.exe http://100.88.71.33:11434/api/tags
 ```
 
-JSON with models = homelab GPU node is reachable.
-
-Document `<GPU_NODE_IP>` in [INVENTORY](../INVENTORY.md).
+JSON with models = homelab GPU node is reachable. IPs in [INVENTORY](../INVENTORY.md).
 
 **Generate (PowerShell — avoid `curl -d` JSON escaping issues):**
 
