@@ -39,6 +39,15 @@ cd C:\Users\zakar\homelab-gpu
 | iMac /chat | JSON with GPU-backed reply |
 | verify-gpu | `cuda True`, RTX 5070 |
 
+## Phase 0B — system status
+
+```powershell
+$key = "YOUR_API_KEY"
+Invoke-RestMethod -Uri "http://100.91.113.98/system/status" -Headers @{ "x-api-key" = $key }
+```
+
+Expect `workers.zak_pc`, `gpu.reachable`, `rag.qdrant_ready`.
+
 ## Phase 0A — train jobs (after deploy)
 
 See [PHASE-0A.md](PHASE-0A.md). SSH: `imac-ts`, `zak-ts`.
