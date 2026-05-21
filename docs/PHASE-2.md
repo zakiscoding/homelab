@@ -1,6 +1,6 @@
 # Phase 2 — RAG pipeline
 
-**Status:** Deploy in progress (2026-05-21)  
+**Status:** Deployed (2026-05-21)  
 **Prerequisite:** [Phase 1](PHASE-1.md).
 
 ## Goal
