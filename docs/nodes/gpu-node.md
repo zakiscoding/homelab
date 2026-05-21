@@ -194,6 +194,28 @@ Skip until you have a specific container workload.
 
 ---
 
+## RTX 5070 (12 GB VRAM)
+
+| Workload | Rule |
+|----------|------|
+| Ollama inference | Small quantized models (e.g. `llama3.2:latest` ~2 GB) |
+| Training | **QLoRA / 4-bit only** — not full fine-tune of large models |
+| Ollama + train | **Do not run together** — `.\scripts\stop-ollama.ps1` before training |
+| Concurrent trains | **Max 1** (job claim SQL on iMac) |
+
+PyTorch: `cuda True`; may warn on sm_120 until newer wheel — see [SETUP-LOG](../SETUP-LOG.md).
+
+## Phase 0A GPU worker
+
+| Item | Value |
+|------|-------|
+| Repo path | `C:\Users\zakar\homelab-gpu` |
+| Worker | `.\scripts\start-gpu-worker.ps1` (polls iMac API) |
+| Artifacts | `homelab-data\checkpoints\{job_id}\` |
+| Docs | [PHASE-0A.md](../PHASE-0A.md) |
+
+SSH from laptop: `ssh zak-ts`.
+
 ## Ops notes
 
 | Item | Value |

@@ -4,6 +4,33 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 ---
 
+## 2026-05-21 — Phase 0A job control plane (code + docs)
+
+**Goal:** Postgres-backed `train` jobs; GPU MVW worker; execution gate (crash-safe, idempotent artifacts).
+
+**Repos:**
+
+| Repo | Changes |
+|------|---------|
+| **homelab-services** | `postgres/002_jobs.sql`, `api/jobs.py`, job routes, `WORKER_API_KEY`, `scripts/migrate-jobs.sh` |
+| **homelab-gpu** | `worker/poll_jobs.py`, `worker/run_train.py`, `scripts/start-gpu-worker.ps1`, `httpx` dep |
+| **homelab** (this) | [PHASE-0A.md](PHASE-0A.md), [EXECUTION-MODEL.md](EXECUTION-MODEL.md) |
+
+**SSH:** laptop uses `imac-ts` (momo), `zak-ts` (zakar) — see [nodes/controller.md](nodes/controller.md).
+
+**Deploy (manual on nodes):**
+
+1. iMac: `git pull` → `./scripts/migrate-jobs.sh` → add `WORKER_API_KEY` to `.env` → `docker-compose up -d --build api`
+2. GPU: `git pull` → set `WORKER_API_KEY` + `API_BASE_URL` → `.\scripts\start-gpu-worker.ps1`
+
+**Gate test:** [PHASE-0A.md](PHASE-0A.md#gate-test-from-laptop) — create job, kill worker, reset-stale, confirm single `published.json` per `job_id`.
+
+**RTX 5070:** 0A uses CPU stub train (no VRAM); real QLoRA requires `stop-ollama.ps1` first.
+
+**Next (0B):** auto-retry, leases, `/system/status`, iMac embed worker, ML-STORE.
+
+---
+
 ## 2026-05-21 — iMac service checklist doc
 
 **Goal:** Single-page checklist for Mos-iMac role (services vs GPU).

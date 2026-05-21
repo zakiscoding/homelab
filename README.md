@@ -44,6 +44,8 @@ See **[docs/DRIVE-LAYOUT.md](docs/DRIVE-LAYOUT.md)** for the full tree.
 | [Services](docs/SERVICES.md) | Running apps and how to reach/manage services |
 | [Secrets & access](docs/ACCESS.md) | Where credentials live (not the secrets themselves) |
 | [Architecture](docs/ARCHITECTURE.md) | Three-node layout (GPU / iMac / controller) |
+| [**Phase 0A**](docs/PHASE-0A.md) | Job control plane — deploy + gate test |
+| [Execution model](docs/EXECUTION-MODEL.md) | Postgres SSOT, GPU worker, SSH aliases |
 | [GPU node runbook](docs/nodes/gpu-node.md) | Ollama on Windows |
 | [GPU node checklist](docs/nodes/GPU-NODE-CHECKLIST.md) | Install ✅, ports, ML-only rule |
 | [Git workflow](docs/GIT.md) | Clone, pull, push — GitHub `zakiscoding/homelab` |

@@ -16,7 +16,8 @@ What runs in the lab and how to operate it. One row per service; link to config 
 | Service | Runs on | URL / access | Config path (1TB) | Notes |
 |---------|---------|--------------|-------------------|-------|
 | Ollama | gpu-node | `http://10.0.0.156:11434`, `http://100.88.71.33:11434` | [gpu-node.md](nodes/gpu-node.md) | `llama3.2:latest` |
-| Homelab API | imac-node | `http://100.91.113.98/health`, `/chat` | `homelab-services/api/` | `x-api-key`; proxies to GPU |
+| Homelab API | imac-node | `http://100.91.113.98/health`, `/chat`, `/jobs` | `homelab-services/api/` | `x-api-key`; proxies to GPU |
+| GPU train worker | gpu-node | Polls iMac internal worker API | `homelab-gpu/worker/` | `WORKER_API_KEY`; Phase [0A](PHASE-0A.md) |
 | PostgreSQL | imac-node | internal | `homelab-services/data/postgres` | Chat logs |
 | Redis | imac-node | internal | `homelab-services/data/redis` | Request counters |
 | Qdrant | imac-node | `http://100.91.113.98:6333` | `homelab-services/data/qdrant` | v1.18 — RAG |

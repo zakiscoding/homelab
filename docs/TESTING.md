@@ -39,4 +39,21 @@ cd C:\Users\zakar\homelab-gpu
 | iMac /chat | JSON with GPU-backed reply |
 | verify-gpu | `cuda True`, RTX 5070 |
 
+## Phase 0A — train jobs (after deploy)
+
+See [PHASE-0A.md](PHASE-0A.md). SSH: `imac-ts`, `zak-ts`.
+
+```powershell
+$key = "YOUR_API_KEY"   # iMac homelab-services/.env
+$job = Invoke-RestMethod -Uri "http://100.91.113.98/jobs" -Method Post -Headers @{ "x-api-key" = $key }
+$job.id
+Invoke-RestMethod -Uri "http://100.91.113.98/jobs/$($job.id)" -Headers @{ "x-api-key" = $key }
+```
+
+| Check | Expected |
+|-------|----------|
+| POST /jobs | `status: pending`, `type: train` |
+| GPU worker running | becomes `running` then `succeeded` |
+| Gate (kill -9) | reset-stale + retry → one `published.json` under `checkpoints\{job_id}\` |
+
 Log results in [SETUP-LOG.md](SETUP-LOG.md).

@@ -12,11 +12,13 @@ Do not confuse with the **GPU PC** — that machine logs in as **`zakar`** (`zak
 
 ## Homelab nodes
 
-| Node | User / host | How you manage it |
-|------|-------------|-------------------|
-| **GPU PC** | **`zakar`** @ `zak_pc` | `ssh zakar@<gpu-ip>` or Tailscale `100.88.71.33` |
-| **iMac** | **`momo`** @ `Mos-iMac` | SSH / Screen Sharing |
+| Node | User / host | SSH alias (laptop `~/.ssh/config`) |
+|------|-------------|--------------------------------------|
+| **GPU PC** | **`zakar`** @ `zak_pc` | `ssh zak-ts` → `100.88.71.33` |
+| **iMac** | **`momo`** @ `Mos-iMac` | `ssh imac-ts` |
 | **This laptop** | **`cashh`** | Local PowerShell + `C:\Users\cashh\homelab` |
+
+Legacy: `ssh zakar@10.0.0.156` on LAN. Phase 0A deploy: [PHASE-0A.md](../PHASE-0A.md).
 
 ## Git (GitHub first)
 
