@@ -10,6 +10,8 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 **Repos:** homelab-services `004_phase1.sql`, homelab-gpu `register-gpu-worker-task.ps1`, [PHASE-1.md](PHASE-1.md).
 
+**Smoke:** `/chat` → `phase1-ok`, infer job `4674dc51-...` succeeded, `chat_logs.job_id` migrated.
+
 ---
 
 ## 2026-05-21 — Phase 0B leases, retry, system status

@@ -1,6 +1,6 @@
 # Phase 1 — Inference pipeline
 
-**Status:** In progress (2026-05-21)  
+**Status:** Deployed (2026-05-21)  
 **Prerequisite:** [Phase 0](PHASE-0A.md) complete (0A + 0B).
 
 ## Goal
