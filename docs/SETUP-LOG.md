@@ -4,6 +4,27 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 ---
 
+## 2026-05-21 — Colima on 1TB + stack running on iMac
+
+**Goal:** Docker on iMac without Desktop; all data on 1TB; full services up.
+
+**Done:**
+
+- **Colima** — `COLIMA_HOME=/Volumes/1tb drive/colima`, `brew install colima docker docker-compose`
+- Images pulled; `docker-compose up` from `~/1tb-drive/homelab-services` (symlink for mount quirks)
+- **Working:** API, Caddy :80, Postgres, Redis, Qdrant :6333, Prometheus :9090
+- **`curl http://localhost/health`** → OK
+- **`POST /chat`** → GPU response (e.g. `"Hello, I'm here!"`)
+- Scripts: `homelab-services/scripts/setup-1tb.sh`, `start-stack.sh`, `docker-1tb-env.sh`
+- Compose fix: directory mounts + Caddy `reverse-proxy` command (Colima file-bind issue)
+
+**Open:**
+
+- [ ] Grafana `data/grafana` permissions (`chown 472:472` on iMac)
+- [ ] Log iMac Tailscale IP; test from laptop `cashh`
+
+---
+
 ## 2026-05-21 — GitHub repo `homelab-services` + repo plan in docs
 
 **Goal:** Private GitHub repo for iMac stack; document multi-repo layout (incl. future GPU training).

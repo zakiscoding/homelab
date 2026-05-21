@@ -1,50 +1,66 @@
 # iMac services stack
 
-**Repo:** [github.com/zakiscoding/homelab-services](https://github.com/zakiscoding/homelab-services) (private)  
-**iMac path:** `/Volumes/1tb drive/homelab-services`  
-**Docs:** this file lives in [homelab](https://github.com/zakiscoding/homelab) — see [REPOS.md](../REPOS.md).
+| | |
+|--|--|
+| **Repo** | [github.com/zakiscoding/homelab-services](https://github.com/zakiscoding/homelab-services) |
+| **Path** | `/Volumes/1tb drive/homelab-services` |
+| **Docker** | Colima — data under `/Volumes/1tb drive/colima` |
+| **Docs** | [homelab](https://github.com/zakiscoding/homelab) (this file) |
 
-## Layout on 1TB drive
+## Why Colima
 
-```text
-/Volumes/1tb drive/
-├── homelab/              ← docs (this git repo)
-└── homelab-services/     ← Docker stack, API, data/
-    ├── docker-compose.yml
-    ├── .env              ← local secrets (gitignored in services repo)
-    ├── api/
-    ├── data/             ← postgres, redis, qdrant, grafana, ...
-    ├── caddy/
-    └── prometheus/
-```
+Lightweight Docker VM on macOS; all VM disk and compose data stay on the **1TB drive**. No Docker Desktop required.
 
-## Install & run
-
-See [homelab-services/README.md](../../../homelab-services/README.md) on the iMac (path above).
-
-Summary:
+## Quick start
 
 ```bash
+brew install colima docker docker-compose
 cd "/Volumes/1tb drive/homelab-services"
-cp .env.example .env
-mkdir -p data/{postgres,redis,qdrant,prometheus,grafana,caddy,caddy-config}
-docker compose up -d --build
+./scripts/setup-1tb.sh      # .env, data dirs, start Colima
+./scripts/start-stack.sh    # pull + docker-compose up
+curl http://localhost/health
 ```
 
-## Environment variables (names only)
+Use `~/1tb-drive/homelab-services` if Colima has trouble with spaces in `/Volumes/1tb drive` (symlink created by scripts).
 
-| Variable | Used by |
-|----------|---------|
-| `GPU_URL` | API → Ollama on GPU node |
-| `POSTGRES_*` | Postgres container |
-| `API_KEY` | FastAPI `x-api-key` header |
-| `GRAFANA_*` | Grafana admin login |
+## Commands
 
-Values live in `homelab-services/.env` only.
+| Task | Command |
+|------|---------|
+| Start | `./scripts/start-stack.sh` |
+| Status | `docker-compose ps` |
+| Logs | `docker-compose logs -f api` |
+| Stop containers | `docker-compose down` |
+| Stop Colima VM | `colima stop` |
+| Rebuild API | `docker-compose up -d --build api` |
 
-## Upgrade / troubleshooting
+Source env before manual docker commands:
 
-- **Rebuild API:** `docker compose up -d --build api`
-- **Logs:** `docker compose logs -f api`
-- **GPU unreachable:** from iMac, `curl $GPU_URL/api/tags`
-- Log changes in [SETUP-LOG](../SETUP-LOG.md)
+```bash
+source ./scripts/docker-1tb-env.sh
+```
+
+## Environment variables
+
+See `homelab-services/.env.example`. Copy to `.env` on the iMac only.
+
+## Colima + 1TB paths
+
+| Variable / path | Location |
+|-----------------|----------|
+| `COLIMA_HOME` | `/Volumes/1tb drive/colima` |
+| `DOCKER_CONFIG` | `/Volumes/1tb drive/docker-config` |
+| Compose project | `/Volumes/1tb drive/homelab-services` |
+| Service data | `homelab-services/data/*` |
+
+## Troubleshooting
+
+| Issue | Fix |
+|-------|-----|
+| `docker compose` not found | Use `docker-compose` or fix `docker-config/config.json` cliPluginsExtraDirs |
+| Bind mount “is a directory” | Run compose from `~/1tb-drive/homelab-services`; use directory mounts (not single files) |
+| Grafana permission denied | `sudo chown -R 472:472 data/grafana` |
+| `/chat` 401 | Set `x-api-key` from `.env` |
+| `/chat` 502 | From iMac: `curl $GPU_URL/api/tags` |
+
+Log changes in [SETUP-LOG](../SETUP-LOG.md).
