@@ -8,7 +8,7 @@ How homelab code and docs are split across GitHub. **Do not put Docker/services 
 |------|--------|---------|----------|
 | **homelab** | [zakiscoding/homelab](https://github.com/zakiscoding/homelab) | All nodes (read) | Markdown docs, setup log, runbooks |
 | **homelab-services** | [zakiscoding/homelab-services](https://github.com/zakiscoding/homelab-services) | **iMac** (`Mos-iMac`) | Docker Compose (via **Colima**), FastAPI, Caddy, DB stack |
-| **homelab-gpu** | _planned_ | **GPU PC** (`zak_pc`) | Training scripts, configs (not inference models) |
+| **homelab-gpu** | [zakiscoding/homelab-gpu](https://github.com/zakiscoding/homelab-gpu) | **GPU PC** (`zak_pc`) | Training scripts, configs (not inference models) |
 
 ## Paths on the 1TB drive (iMac)
 
@@ -16,6 +16,8 @@ How homelab code and docs are split across GitHub. **Do not put Docker/services 
 |--------|----------|
 | `/Volumes/1tb drive/homelab` | `homelab` |
 | `/Volumes/1tb drive/homelab-services` | `homelab-services` |
+
+**GPU PC (Windows):** clone `homelab-gpu` to `C:\Users\zakar\homelab-gpu` (canonical on GPU machine).
 
 GPU PC keeps large artifacts **local** (Ollama models, checkpoints, datasets) — documented in `homelab`, not committed.
 
@@ -27,7 +29,7 @@ GPU PC keeps large artifacts **local** (Ollama models, checkpoints, datasets) �
                   /       |       \
          controller    iMac      GPU PC
          git pull     clone      git pull docs only
-         homelab      both       (homelab-gpu later for training code)
+         homelab      both       homelab-gpu (training)
                         |
                  homelab-services
                  docker compose up
@@ -37,7 +39,7 @@ GPU PC keeps large artifacts **local** (Ollama models, checkpoints, datasets) �
 |------|------|-----------------|--------------------------|
 | Laptop (controller) | `cashh` | Yes — edit & push docs | Optional — deploy/debug |
 | iMac | `momo` | Yes — `git pull` for docs | Yes — **canonical** working copy on 1TB |
-| GPU PC | `zakar` | Optional — runbooks | No — inference is Ollama native |
+| GPU PC | `zakar` | Optional — runbooks | Yes — **`homelab-gpu`** (training code) |
 
 ## GPU PC: inference + training
 

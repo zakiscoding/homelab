@@ -4,6 +4,25 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 ---
 
+## 2026-05-21 — `homelab-gpu` private repo created
+
+**Goal:** Version training code on GPU PC; confirm all homelab GitHub repos are private.
+
+**Done:**
+
+- Verified **homelab-services** → `visibility: PRIVATE`
+- Created **[zakiscoding/homelab-gpu](https://github.com/zakiscoding/homelab-gpu)** (private)
+- Scaffold: `configs/`, `training/`, `scripts/`, `.gitignore`, `.env.example`
+- GPU clone path: `C:\Users\zakar\homelab-gpu`
+- Updated [REPOS.md](REPOS.md), [gpu-node.md](nodes/gpu-node.md)
+
+**Next:**
+
+- [ ] Clone `homelab-gpu` on `zak_pc` and add first training project
+- [ ] Document `CHECKPOINT_DIR` / dataset path on GPU local disk
+
+---
+
 ## 2026-05-21 — Colima on 1TB + stack running on iMac
 
 **Goal:** Docker on iMac without Desktop; all data on 1TB; full services up.

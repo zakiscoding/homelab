@@ -12,13 +12,13 @@ Physical GPU PC runs **Windows**. Two roles on one machine:
 | Role | Stack | Versioned in |
 |------|-------|--------------|
 | **Inference** | NVIDIA driver + **Ollama** | This doc + [homelab SETUP-LOG](../SETUP-LOG.md) |
-| **Training** | Python / PyTorch / fine-tune tooling | Planned repo **`homelab-gpu`** (scripts & configs only) |
+| **Training** | Python / PyTorch / fine-tune tooling | **[homelab-gpu](https://github.com/zakiscoding/homelab-gpu)** (scripts & configs only) |
 
 Docker Desktop is optional for non-Ollama containers. **Checkpoints and datasets stay on GPU local disk** — not GitHub.
 
 LAN API target: `http://<GPU_NODE_IP>:11434`
 
-**Status:** Inference **complete** — Ollama on `0.0.0.0:11434`, LAN + Tailscale. Training repo **not started**.
+**Status:** Inference **complete** — Ollama on `0.0.0.0:11434`, LAN + Tailscale. Training repo **[homelab-gpu](https://github.com/zakiscoding/homelab-gpu)** scaffolded (add projects under `training/`).
 
 See [REPOS.md](../REPOS.md) for how this node fits with [homelab-services](https://github.com/zakiscoding/homelab-services) on the iMac.
 

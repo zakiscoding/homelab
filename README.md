@@ -25,7 +25,7 @@ Both homelab Windows boxes run **Windows** (PowerShell). `cashh` = laptop only; 
 | **Controller (`cashh`)** | `C:\Users\cashh\homelab` (git clone) | Copy or clone `homelab-services` |
 | **GPU PC (`zakar`)** | Optional clone of `homelab` | — |
 
-**GitHub:** [homelab](https://github.com/zakiscoding/homelab) (docs) · [homelab-services](https://github.com/zakiscoding/homelab-services) (iMac stack) — [docs/REPOS.md](docs/REPOS.md)
+**GitHub:** [homelab](https://github.com/zakiscoding/homelab) (docs) · [homelab-services](https://github.com/zakiscoding/homelab-services) (iMac) · [homelab-gpu](https://github.com/zakiscoding/homelab-gpu) (GPU training) — all **private** — [docs/REPOS.md](docs/REPOS.md)
 
 ## Quick links
 
@@ -61,6 +61,6 @@ Runtime compose and API code: **`homelab-services/`** — document from `docs/se
 | iMac — API/DB (Colima) | **Done** | All 7 containers up; `100.91.113.98` |
 | Docs on 1TB drive | Done | `/Volumes/1tb drive/homelab` |
 | Services on 1TB drive | Done | `/Volumes/1tb drive/homelab-services` |
-| GitHub repos | **Done** | `homelab` + `homelab-services` (private) |
+| GitHub repos | **Done** | `homelab` + `homelab-services` + `homelab-gpu` (all private) |
 | Monitoring | Running | Prometheus :9090, Grafana :3000 on iMac |
 | Backups | TBD | `pg_dump` / Restic not configured |
