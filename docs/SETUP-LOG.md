@@ -4,6 +4,24 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 ---
 
+## 2026-05-21 — Doc changes must be pushed (GitHub sync)
+
+**Rule:** Every homelab doc edit → `git commit` + `git push` so iMac / `cashh` / `zakar` can `git pull`.
+
+**Pushed:** `0493ba6` — cashh vs zakar identities; mandatory push workflow in [GIT.md](GIT.md).
+
+**Other nodes:**
+
+```bash
+# iMac
+cd "/Volumes/1tb drive/homelab" && git pull
+
+# laptop cashh
+cd C:\Users\cashh\homelab && git pull
+```
+
+---
+
 ## 2026-05-21 — Node identities (Windows users)
 
 | Node | Login | Hostname |
