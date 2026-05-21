@@ -18,12 +18,15 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 **SSH:** laptop uses `imac-ts` (momo), `zak-ts` (zakar) — see [nodes/controller.md](nodes/controller.md).
 
-**Deploy (manual on nodes):**
+**Deploy (2026-05-21 via SSH `imac-ts` / `zak-ts`):**
 
-1. iMac: `git pull` → `./scripts/migrate-jobs.sh` → add `WORKER_API_KEY` to `.env` → `docker-compose up -d --build api`
-2. GPU: `git pull` → set `WORKER_API_KEY` + `API_BASE_URL` → `.\scripts\start-gpu-worker.ps1`
+1. iMac: `git pull` → `WORKER_API_KEY` appended to `.env` → migrate with `psql -U app` → `docker-compose up -d --build api` — `/health` OK
+2. GPU: `git pull` → `.env` with matching `WORKER_API_KEY` → `pip install httpx` → worker claimed job → **succeeded**
+3. FastAPI fix: `response_model=None` on claim route (pushed `07bc359`)
 
-**Gate test:** [PHASE-0A.md](PHASE-0A.md#gate-test-from-laptop) — create job, kill worker, reset-stale, confirm single `published.json` per `job_id`.
+**Smoke test:** `POST /jobs` from laptop → job `355e220f-...` → `status=succeeded`, `locked_by=zak_pc`.
+
+**Gate test (remaining):** [PHASE-0A.md](PHASE-0A.md#gate-test-from-laptop) — kill -9 worker mid-run, reset-stale, confirm single `published.json` per `job_id`.
 
 **RTX 5070:** 0A uses CPU stub train (no VRAM); real QLoRA requires `stop-ollama.ps1` first.
 

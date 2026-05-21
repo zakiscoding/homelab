@@ -1,6 +1,6 @@
 # Phase 0A — Job control plane (execution gate)
 
-**Status:** In progress (2026-05-21)  
+**Status:** Deployed on iMac + GPU (2026-05-21); gate test in progress  
 **Goal:** Prove jobs survive worker crash without duplicate artifacts.  
 **Hardware:** RTX 5070 12 GB — train uses stub in 0A; stop Ollama before real QLoRA (Phase 3).
 
@@ -60,7 +60,8 @@ cd ~/1tb-drive/homelab-services   # or "/Volumes/1tb drive/homelab-services"
 git pull
 # Add WORKER_API_KEY to .env if missing
 chmod +x scripts/migrate-jobs.sh
-./scripts/migrate-jobs.sh
+# Postgres user on this homelab is `app` (see .env POSTGRES_USER)
+POSTGRES_USER=app ./scripts/migrate-jobs.sh
 docker-compose up -d --build api
 curl http://localhost/health
 ```
@@ -75,10 +76,9 @@ cd C:\Users\zakar\homelab-gpu
 git pull
 .\scripts\setup-venv.ps1   # if needed
 .\.venv\Scripts\pip install httpx
-# Set WORKER_API_KEY + API_BASE_URL in .env or session
-$env:WORKER_API_KEY = "..."
-$env:API_BASE_URL = "http://100.91.113.98"
+# Copy .env.example → .env; WORKER_API_KEY must match iMac homelab-services/.env
 .\scripts\start-gpu-worker.ps1
+# One cycle (debug): .\scripts\run-worker-once.ps1
 ```
 
 ## Gate test (from laptop)
