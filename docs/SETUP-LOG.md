@@ -25,6 +25,30 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 ---
 
+## 2026-05-21 — Git repo (local) → GitHub `zakiscoding/homelab`
+
+**Goal:** Private GitHub repo; sync docs/compose across iMac and controller.
+
+**Done (local):**
+
+- `git init` in `/Volumes/1tb drive/homelab`
+- Initial commit on `main` (docs + `compose/.env.example`)
+- Remote: `https://github.com/zakiscoding/homelab.git`
+
+**Blocked:** `gh` token invalid on iMac — user must re-auth, then create/push (see [GIT.md](GIT.md)).
+
+**After auth (run on iMac):**
+
+```bash
+cd "/Volumes/1tb drive/homelab"
+gh auth login
+gh repo create homelab --private --source=. --remote=origin --push
+```
+
+If the repo already exists on GitHub empty: `git push -u origin main`
+
+---
+
 ## 2026-05-21 — GPU node Ollama live (LAN + Tailscale)
 
 **Goal:** Ollama API reachable remotely without sitting at the GPU PC.

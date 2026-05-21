@@ -2,6 +2,22 @@
 
 **Remote:** `https://github.com/zakiscoding/homelab` (private)
 
+## One-time: publish repo from iMac
+
+`gh` must be logged in as **zakiscoding**:
+
+```bash
+gh auth login
+cd "/Volumes/1tb drive/homelab"
+gh repo create homelab --private --source=. --remote=origin --push
+```
+
+If you already created an empty private repo on GitHub:
+
+```bash
+git push -u origin main
+```
+
 ## Clone
 
 **iMac** (already on 1TB drive):

@@ -11,6 +11,8 @@ Living documentation for this homelab: hardware, network, services, and every se
 
 Config, compose stacks, and scripts live under this tree — not in `~/homelab`.
 
+**GitHub:** [github.com/zakiscoding/homelab](https://github.com/zakiscoding/homelab) (private) — see [docs/GIT.md](docs/GIT.md) to push/clone.
+
 ## Quick links
 
 | Doc | Purpose |
