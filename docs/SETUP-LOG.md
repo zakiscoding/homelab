@@ -4,6 +4,21 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 ---
 
+## 2026-05-21 — Jupyter notebooks in `homelab-gpu`
+
+**Goal:** Interactive fine-tuning on GPU PC (better than one-shot scripts for experiments).
+
+**Done:**
+
+- `notebooks/01_gpu_and_paths.ipynb` — CUDA + path check
+- `scripts/start-jupyter.ps1` — JupyterLab `:8888`
+- `requirements.txt` — `jupyterlab`, `ipykernel`, `python-dotenv`
+- [notebooks/README.md](https://github.com/zakiscoding/homelab-gpu/blob/main/notebooks/README.md) — local + Tailscale access
+
+**Next:** Copy to `02_lora_experiment.ipynb` when dataset is ready.
+
+---
+
 ## 2026-05-21 — Homelab open items closed (GPU PC session)
 
 **Goal:** Finish remaining setup-log tasks: Tailscale tests, `homelab-gpu` on `zak_pc`, training prep, backups doc.

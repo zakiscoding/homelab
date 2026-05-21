@@ -25,6 +25,7 @@ LAN API target: `http://<GPU_NODE_IP>:11434`
 | `C:\Users\zakar\homelab-gpu` | Training repo (git) |
 | `C:\Users\zakar\homelab-data\checkpoints` | Model outputs (not git) |
 | `C:\Users\zakar\homelab-data\datasets` | JSONL / datasets (not git) |
+| `homelab-gpu/notebooks/` | JupyterLab fine-tuning — `.\scripts\start-jupyter.ps1` |
 
 See [REPOS.md](../REPOS.md) for how this node fits with [homelab-services](https://github.com/zakiscoding/homelab-services) on the iMac.
 
