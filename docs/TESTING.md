@@ -39,6 +39,18 @@ cd C:\Users\zakar\homelab-gpu
 | iMac /chat | JSON with GPU-backed reply |
 | verify-gpu | `cuda True`, RTX 5070 |
 
+## Phase 2 — RAG
+
+```powershell
+$key = "YOUR_API_KEY"
+$h = @{ "x-api-key" = $key; "Content-Type" = "application/json" }
+$ing = @{ text = "The GPU node is zak_pc with RTX 5070."; source_id = "test1" } | ConvertTo-Json -Compress
+Invoke-RestMethod -Uri "http://100.91.113.98/rag/ingest" -Method Post -Headers $h -Body $ing
+# Wait for imac-worker (~60s), then:
+$q = @{ query = "What GPU is in the homelab?"; model = "llama3.2:latest" } | ConvertTo-Json -Compress
+Invoke-RestMethod -Uri "http://100.91.113.98/rag/query" -Method Post -Headers $h -Body $q
+```
+
 ## Phase 1 — /chat inference
 
 ```powershell

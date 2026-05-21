@@ -4,6 +4,14 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 ---
 
+## 2026-05-21 — Phase 2 RAG pipeline
+
+**Goal:** Ingest → chunk → embed → Qdrant → `/rag/query` with iMac worker.
+
+**Repos:** homelab-services (`005_phase2_rag.sql`, `rag_*`, `imac-worker` service), homelab [PHASE-2.md](PHASE-2.md), [services/rag.md](services/rag.md).
+
+---
+
 ## 2026-05-21 — Phase 1 inference (chat_logs.job_id)
 
 **Goal:** Complete inference pipeline traceability; optional GPU worker scheduled task.

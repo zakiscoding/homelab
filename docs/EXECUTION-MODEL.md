@@ -35,6 +35,15 @@ GET /system/status → queue + workers + flags + GPU + Qdrant
 
 Runbook: [PHASE-0B.md](PHASE-0B.md).
 
+## Phase 2 — RAG workers
+
+| Actor | Job types | Execution |
+|-------|-----------|-----------|
+| **iMac worker** (`imac-worker` container) | `ingest`, `embed` | Poll `POST /internal/worker/jobs/claim-imac` |
+| **FastAPI** | `rag_query` | Inline in `POST /rag/query` (like `infer` on `/chat`) |
+
+Runbook: [PHASE-2.md](PHASE-2.md) · [services/rag.md](services/rag.md).
+
 ## Who updates jobs
 
 | Actor | Updates status |
