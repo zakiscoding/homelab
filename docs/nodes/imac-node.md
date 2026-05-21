@@ -1,83 +1,73 @@
-# iMac node — API & database (Phase 2)
+# iMac node — API & database
 
-**Host:** `Mos-iMac` · **User:** `momo` · **OS:** macOS  
-**Docs repo:** `/Volumes/1tb drive/homelab`  
-**Services repo:** `/Volumes/1tb drive/homelab-services`  
-**Docker:** [Colima](https://github.com/abiosoft/colima) (not Docker Desktop) — VM disk on 1TB drive
+**Host:** `Mos-iMac` · **User:** `momo` · **OS:** macOS 15.7 · **CPU:** Apple M1  
+**Docs:** `/Volumes/1tb drive/homelab`  
+**Stack:** `/Volumes/1tb drive/homelab-services`  
+**Docker:** [Colima](https://github.com/abiosoft/colima) — VM at `homelab-runtime/colima/`
 
-HTTP API, database, and supporting services. GPU node serves Ollama; iMac proxies and persists.
+Application platform and data services. GPU node runs Ollama; iMac proxies and persists.
 
-## 1TB drive layout
+**Quick checklist:** [imac-checklist.md](imac-checklist.md) — responsibilities, ports, done vs planned.
+
+## Role summary
+
+| Do on iMac | Do on GPU PC |
+|------------|----------------|
+| FastAPI, Caddy, Postgres, Redis, Qdrant | Ollama inference |
+| Prometheus, Grafana | Model training (`homelab-gpu`) |
+| Auth, routing, storage (growing) | CUDA / large models |
+
+## 1TB paths
 
 | Path | Purpose |
 |------|---------|
-| `homelab/` | Documentation (git: `zakiscoding/homelab`) |
-| `homelab-services/` | Compose stack (git: `zakiscoding/homelab-services`) |
-| `homelab-runtime/colima/` | Colima VM + Docker engine data |
-| `homelab-runtime/docker-config/` | Docker CLI config (compose plugin path) |
-| `~/1tb-drive` | Symlink → `/Volumes/1tb drive` (for Colima bind mounts) |
+| `homelab/` | This documentation repo |
+| `homelab-services/` | Docker compose + API code |
+| `homelab-runtime/` | Colima + `docker-config` |
+| `~/1tb-drive` | Symlink to volume (Colima mounts) |
 
-## Verified
+## Network
 
-- iMac → GPU Ollama over Tailscale (`100.88.71.33:11434`)
-- Stack via Colima: `curl http://localhost/health`, `POST /chat` → GPU
+| Interface | IP |
+|-----------|-----|
+| Tailscale | **100.91.113.98** |
+| GPU Ollama (via Tailscale) | `http://100.88.71.33:11434` |
 
-## Services
+## Exposed ports
 
-| Service | Port | Notes |
-|---------|------|-------|
-| Caddy | 80 | Reverse proxy → API |
-| FastAPI | internal 8000 | `x-api-key` required for `/chat` |
-| PostgreSQL | internal | `data/postgres` |
-| Redis | internal | `data/redis` |
-| Qdrant | 6333 | `data/qdrant` |
-| Prometheus | 9090 | `prometheus/config/` |
-| Grafana | 3000 | `data/grafana` (user `472` perms) |
+| Port | Service |
+|------|---------|
+| 80 | Caddy → FastAPI |
+| 3000 | Grafana |
+| 6333 | Qdrant |
+| 9090 | Prometheus |
 
-Runbook: [services/imac-stack.md](../services/imac-stack.md)
-
-## Colima install (one-time)
+## Install (one-time)
 
 ```bash
 brew install colima docker docker-compose
 "/Volumes/1tb drive/homelab-services/scripts/setup-1tb.sh"
 ```
 
-## Start / stop stack
+## Daily operations
 
 ```bash
-"/Volumes/1tb drive/homelab-services/scripts/start-stack.sh"
+source ~/1tb-drive/homelab-services/scripts/docker-1tb-env.sh
+colima start    # if VM not running
+cd ~/1tb-drive/homelab-services && docker-compose up -d
+curl http://localhost/health
 ```
 
-Or manually:
+Full runbook: [services/imac-stack.md](../services/imac-stack.md)
 
-```bash
-export COLIMA_HOME="/Volumes/1tb drive/homelab-runtime/colima"
-colima start --cpu 4 --memory 6 --disk 80 --mount-type virtiofs --mount "/Volumes/1tb drive:w"
-cd ~/1tb-drive/homelab-services
-docker-compose up -d
-```
-
-```bash
-colima stop   # stops all containers when VM stops
-```
-
-## Prerequisites checklist
-
-- [x] GPU Ollama — [gpu-node.md](gpu-node.md)
-- [x] Colima + images pulled
-- [x] `.env` in `homelab-services/`
-- [x] iMac Tailscale IP **100.91.113.98** — [INVENTORY](../INVENTORY.md)
-- [x] macOS 15.7 documented in inventory
-
-## Test from controller
+## Test from controller (`cashh`)
 
 ```powershell
-curl.exe http://<IMAC_TAILSCALE_IP>/health
-curl.exe -X POST http://<IMAC_TAILSCALE_IP>/chat `
+curl.exe http://100.91.113.98/health
+curl.exe -X POST http://100.91.113.98/chat `
   -H "Content-Type: application/json" `
   -H "x-api-key: YOUR_KEY" `
   -d "{\"prompt\":\"Say hello.\"}"
 ```
 
-API key is in `homelab-services/.env` on the iMac (not in git).
+API key: `homelab-services/.env` on the iMac (not in git).

@@ -52,6 +52,7 @@ See **[docs/DRIVE-LAYOUT.md](docs/DRIVE-LAYOUT.md)** for the full tree.
 | [1TB layout](docs/DRIVE-LAYOUT.md) | iMac volume folder map |
 | [Testing](docs/TESTING.md) | Tailscale curl checklist |
 | [1TB drive layout](docs/DRIVE-LAYOUT.md) | Folder structure on external volume |
+| [iMac checklist](docs/nodes/imac-checklist.md) | M1 services role — done vs planned |
 | [iMac stack](docs/services/imac-stack.md) | Docker — `homelab-services` repo |
 
 ## How we use this repo

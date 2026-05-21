@@ -4,6 +4,17 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 ---
 
+## 2026-05-21 — iMac service checklist doc
+
+**Goal:** Single-page checklist for Mos-iMac role (services vs GPU).
+
+**Done:**
+
+- [nodes/imac-checklist.md](nodes/imac-checklist.md) — install, containers, per-service responsibilities, ports, “should NOT run”
+- Updated [imac-node.md](nodes/imac-node.md) — links checklist, M1 + ports
+
+---
+
 ## 2026-05-21 — Jupyter notebooks in `homelab-gpu`
 
 **Goal:** Interactive fine-tuning on GPU PC (better than one-shot scripts for experiments).
