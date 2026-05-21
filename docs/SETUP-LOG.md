@@ -10,6 +10,8 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 **Repos:** homelab-services (`005_phase2_rag.sql`, `rag_*`, `imac-worker` service), homelab [PHASE-2.md](PHASE-2.md), [services/rag.md](services/rag.md).
 
+**Smoke:** `/rag/query` → "The NVIDIA RTX 5070" with citation (score 0.67). Router fix `da3dcd2`.
+
 ---
 
 ## 2026-05-21 — Phase 1 inference (chat_logs.job_id)
