@@ -44,6 +44,18 @@ Runbook: [PHASE-0B.md](PHASE-0B.md).
 
 Runbook: [PHASE-2.md](PHASE-2.md) · [services/rag.md](services/rag.md).
 
+## Phase 4 — Redis notify (wake only)
+
+On `pending` job create or requeue, API `LPUSH`es `job_id` to `homelab:jobs:wake:train` or `homelab:jobs:wake:imac`. Workers `BLPOP` with timeout = `WORKER_POLL_SEC`, then still **claim via Postgres** before execute.
+
+Runbook: [PHASE-4.md](PHASE-4.md).
+
+## Phase 5 — Metrics
+
+API `GET /metrics` (Prometheus). GPU pushes `nvidia-smi` to Pushgateway. Grafana dashboard for jobs, API, workers, GPU.
+
+Runbook: [PHASE-5.md](PHASE-5.md) · [OBSERVABILITY.md](OBSERVABILITY.md).
+
 ## Who updates jobs
 
 | Actor | Updates status |

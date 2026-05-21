@@ -4,6 +4,21 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 ---
 
+## 2026-05-21 — Phase 5 observability
+
+- API `/metrics` (Prometheus client), job/worker gauges
+- Prometheus config scrape: api, qdrant, pushgateway; Pushgateway :9091
+- Grafana provisioned datasource + Homelab ML Platform dashboard
+- GPU `push-gpu-metrics.ps1` → Pushgateway (RTX 5070)
+- Docs: [PHASE-5.md](PHASE-5.md), [OBSERVABILITY.md](OBSERVABILITY.md)
+
+## 2026-05-21 — Phase 4 Redis job notify
+
+- API `job_notify.py`: LPUSH on job create/requeue; `GET /system/status` → `job_notify`
+- Workers: `BLPOP` wake queues (`homelab:jobs:wake:train` / `imac`); Postgres claim unchanged
+- Redis port `6379` exposed on iMac stack for GPU Tailscale access
+- Docs: [PHASE-4.md](PHASE-4.md)
+
 ## 2026-05-21 — Phase 3 QLoRA training
 
 **Goal:** Real train via GPU worker; experiment registry; adapter artifacts.

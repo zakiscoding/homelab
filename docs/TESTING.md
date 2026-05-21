@@ -89,3 +89,35 @@ Invoke-RestMethod -Uri "http://100.91.113.98/jobs/$($job.id)" -Headers @{ "x-api
 | Gate (kill -9) | reset-stale + retry → one `published.json` under `checkpoints\{job_id}\` |
 
 Log results in [SETUP-LOG.md](SETUP-LOG.md).
+
+## Phase 4 — Redis job notify
+
+See [PHASE-4.md](PHASE-4.md). After deploy + GPU `REDIS_URL`:
+
+```powershell
+$key = "YOUR_API_KEY"
+$h = @{ "x-api-key" = $key }
+(Invoke-RestMethod http://100.91.113.98/system/status -Headers $h).job_notify
+```
+
+| Check | Expected |
+|-------|----------|
+| `job_notify.enabled` | `true` |
+| POST `/jobs` (train) | `homelab:jobs:wake:train` depth increases |
+| GPU worker log | `notify=true`; claims soon after job create |
+
+## Phase 5 — Observability
+
+See [PHASE-5.md](PHASE-5.md).
+
+```powershell
+curl.exe http://100.91.113.98/metrics | findstr homelab_jobs
+curl.exe http://100.91.113.98:9090/-/healthy
+```
+
+| Check | Expected |
+|-------|----------|
+| `/metrics` | `homelab_jobs_pending`, `homelab_http_requests_total` |
+| Prometheus targets | `homelab-api`, `qdrant`, `pushgateway` up |
+| Grafana :3000 | Dashboard **Homelab ML Platform** has data |
+| GPU push | `homelab_gpu_utilization_percent` after `push-gpu-metrics.ps1` |

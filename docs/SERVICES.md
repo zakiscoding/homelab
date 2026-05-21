@@ -7,8 +7,10 @@ What runs in the lab and how to operate it. One row per service; link to config 
 | Service | Runs on | URL / access | Config path (1TB) | Backup |
 |---------|---------|--------------|-------------------|--------|
 | Caddy | imac-node | `http://100.91.113.98/` (Tailscale) | `homelab-services` compose | Reverse proxy |
-| Prometheus | imac-node | `http://100.91.113.98:9090` | `homelab-services/data/prometheus` | Healthy |
-| Grafana | imac-node | `http://100.91.113.98:3000` | `homelab-services/data/grafana` | Login: `.env` `GRAFANA_*` |
+| Prometheus | imac-node | `http://100.91.113.98:9090` | `homelab-services/prometheus/config` | Scrapes API, Qdrant, Pushgateway |
+| Pushgateway | imac-node | `http://100.91.113.98:9091` | ephemeral | GPU metrics push target |
+| Grafana | imac-node | `http://100.91.113.98:3000` | `homelab-services/grafana/` | Dashboard: Homelab ML Platform |
+| API `/metrics` | imac-node | `http://100.91.113.98/metrics` | `homelab-services/api/metrics.py` | Phase [5](PHASE-5.md) |
 | Backups | — | — | — | TBD `pg_dump` → external |
 
 ## Applications

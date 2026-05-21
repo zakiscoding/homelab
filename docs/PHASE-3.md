@@ -1,6 +1,6 @@
 # Phase 3 — QLoRA training + experiments
 
-**Status:** Code shipped (2026-05-21) — deploy API + GPU worker  
+**Status:** Gate passed (2026-05-21) — QLoRA smoke train succeeded on RTX 5070  
 **Prerequisite:** [Phase 2](PHASE-2.md).
 
 ## Goal
@@ -96,4 +96,4 @@ checkpoints/{job_id}/
 
 ## Next
 
-Phase 5 ops (Grafana GPU metrics), Phase 4 optional Redis notify, Ollama adapter load for inference.
+[Phase 4](PHASE-4.md) Redis job notify, Phase 5 ops (Grafana GPU metrics), Ollama adapter load for inference.
