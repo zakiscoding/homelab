@@ -27,18 +27,20 @@ git pull
 # Password for the public site (save the hash output)
 ./scripts/hash-web-password.sh 'choose-a-strong-password'
 
-# Edit .env — add:
-# DOMAIN=ml.yourdomain.com
-# ACME_EMAIL=you@yourdomain.com
+# Edit .env — use a hostname YOU own (not the docs placeholder):
+# DOMAIN=ml.example.com
+# ACME_EMAIL=you@example.com
 # WEB_AUTH_USER=admin
-# WEB_AUTH_HASH=<paste hash from hash-web-password.sh>
+# WEB_AUTH_HASH='$2a$14$...'    ← single quotes! bcrypt hash contains $
 
 ./scripts/render-caddyfile.sh
 source ./scripts/docker-1tb-env.sh
 docker-compose up -d --build caddy web
 ```
 
-Open **https://ml.yourdomain.com** from any network. Use the basic-auth user/password you configured.
+Open **https://YOUR-DOMAIN** (the exact value of `DOMAIN` in `.env`). Use the basic-auth user/password you configured.
+
+Run `./scripts/check-public-tls.sh` on the iMac to verify DNS and the certificate before using Chrome.
 
 TLS certificates are issued automatically by **Let's Encrypt** via Caddy (outbound HTTPS only — no tunnel vendor).
 
@@ -55,9 +57,20 @@ Leave `DOMAIN` unset in `.env`. Run `./scripts/render-caddyfile.sh` — Caddy se
 
 ## Troubleshooting
 
+### Chrome: “unusual and incorrect credentials” + HSTS
+
+Almost always one of these:
+
+1. **You opened `ml.yourdomain.com` literally** — that string in the docs is a **placeholder**, not a real site. Use the domain you bought (e.g. `ml.mydomain.net`). If you already visited the placeholder, clear HSTS: Chrome → `chrome://net-internals/#hsts` → Delete domain security policies → `ml.yourdomain.com`.
+2. **DNS does not point to your home** — `dig +short A YOUR-DOMAIN` must show your current public IP.
+3. **Port 443 is not reaching Caddy** — router forward WAN 443 → iMac; run `docker-compose logs caddy` on the iMac for ACME errors.
+4. **Broken `WEB_AUTH_HASH` in `.env`** — bcrypt hashes contain `$`; wrap the hash in **single quotes** or re-run `render-caddyfile.sh` after pulling the latest script.
+
+### Other issues
+
 | Issue | Fix |
 |-------|-----|
-| Certificate pending | Confirm A record points to current public IP; ports 80/443 reach iMac |
+| Certificate pending | Confirm A record → public IP; ports 80/443 reach iMac; `docker-compose logs caddy` |
 | 401 on site | Use `WEB_AUTH_USER` + plaintext password (not the hash) in browser |
 | Blank / 502 | `docker-compose logs web caddy`; rebuild `web` |
 | API errors in UI | `API_KEY` in `.env` must match; `HOMELAB_API_KEY` uses same value in compose |
