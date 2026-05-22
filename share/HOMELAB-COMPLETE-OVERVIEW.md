@@ -2,71 +2,83 @@
 
 **Document purpose:** Standalone description of the homelab for collaborators, reviewers, or future you.  
 **No access required** to other files in the repository — everything essential is here.  
-**Last updated:** May 21, 2026  
+**Last updated:** May 22, 2026  
 **Owner / GitHub:** [zakiscoding](https://github.com/zakiscoding) (private repositories)
 
 ---
 
 ## 1. Executive summary
 
-This homelab is a **three-machine AI stack** built at home:
+This homelab is a **three-machine AI platform** built at home:
 
-1. A **Windows GPU desktop** runs **large language model inference** (Ollama) and will run **fine-tuning / training** experiments.
-2. An **Apple iMac** runs the **application layer**: HTTP API, databases, reverse proxy, monitoring, and vector search — all in Docker via Colima.
-3. A **Windows laptop** is the **controller**: documentation, Git, remote testing, and SSH into the other machines.
+1. A **Windows GPU desktop** (`zak_pc`) runs **LLM inference** (Ollama), **fine-tuning** (PyTorch / QLoRA), and a **GPU job worker** that polls the iMac.
+2. An **Apple iMac** (`Mos-iMac`) runs the **application layer**: Next.js web UI, FastAPI, Postgres (job control plane), Redis, Qdrant (RAG), reverse proxy, and monitoring — all in Docker via Colima on a 1 TB external drive.
+3. A **Windows laptop** (`cashh`) is the **controller**: documentation, Git, browser access to the UI, `curl` tests, and SSH (`imac-ts`, `zak-ts`).
 
-Machines connect over the **local network** and **Tailscale** (mesh VPN) so services can be reached securely from outside the house without exposing ports to the public internet.
+Machines connect over **home LAN** and **Tailscale**. **Default access is Tailscale only** — no public internet exposure unless you optionally add a domain and port-forward (documented separately).
 
-**What works today:**
+**What works today (MVP):**
 
-- Chat-style inference: client → iMac API → GPU (Ollama) → response stored in Postgres on iMac.
-- Direct access to Ollama on the GPU for testing and development.
-- Monitoring (Prometheus + Grafana) on the iMac.
-- GPU training environment prepared (Python, PyTorch, Jupyter notebooks) — first fine-tune run pending dataset + training notebook.
+| Capability | How |
+|------------|-----|
+| **Web UI** | Chat, RAG ingest/query, platform status at `http://100.91.113.98:3080` |
+| **Chat inference** | Browser → iMac web → API → GPU Ollama → response |
+| **RAG** | Ingest text → iMac worker embeds → Qdrant → query with citations |
+| **Jobs** | Postgres SSOT; GPU + iMac workers; Redis wake on job create |
+| **Training** | QLoRA smoke train on GPU; artifacts under `homelab-data/checkpoints/` |
+| **Monitoring** | Prometheus + Grafana (“Homelab ML Platform” dashboard) |
+| **GPU metrics** | Pushgateway from GPU PC every minute |
 
-**What is intentionally not in public Git:** model weights, datasets, API keys, database passwords, and checkpoint files.
+**What is intentionally not in public Git:** model weights, datasets, API keys, database passwords, checkpoints, and `.env` files.
 
 ---
 
 ## 2. High-level architecture
 
 ```text
-                         ┌─────────────────────────────────────┐
-                         │  Controller laptop (Windows)        │
-                         │  User: cashh                        │
-                         │  Role: git, docs, SSH, curl tests   │
-                         └──────────────┬──────────────────────┘
-                                        │ Tailscale / LAN
-                    ┌───────────────────┴───────────────────┐
-                    │                                       │
-         ┌──────────▼──────────┐               ┌───────────▼──────────┐
-         │  GPU PC (Windows)   │               │  iMac (macOS)        │
-         │  Host: zak_pc       │               │  Host: Mos-iMac      │
-         │  User: zakar        │               │  User: momo           │
-         │                     │               │                      │
-         │  • Ollama :11434    │◄── HTTP ──────│  • Caddy :80         │
-         │  • RTX 5070 12GB    │   (inference) │  • FastAPI /chat     │
-         │  • Training / Jupyter│              │  • Postgres, Redis   │
-         │  • homelab-gpu repo │               │  • Qdrant, Prom, Graf│
-         └─────────────────────┘               └──────────────────────┘
+                    ┌──────────────────────────────────────┐
+                    │  Controller laptop (Windows)         │
+                    │  User: cashh                         │
+                    │  Browser, git, SSH (imac-ts / zak-ts)│
+                    └──────────────────┬───────────────────┘
+                                       │ Tailscale / LAN
+                   ┌───────────────────┴────────────────────┐
+                   │                                        │
+        ┌──────────▼──────────┐              ┌─────────────▼─────────────┐
+        │  GPU PC (Windows)   │              │  iMac (macOS, M1)         │
+        │  zak_pc · zakar       │              │  Mos-iMac · momo            │
+        │                       │              │                           │
+        │  • Ollama :11434      │◄── HTTP ─────│  • Web UI :3080 / Caddy :80 │
+        │  • RTX 5070 12GB      │   inference  │  • FastAPI (internal :8000)│
+        │  • homelab-gpu        │              │  • Postgres, Redis, Qdrant│
+        │  • GPU train worker   │── poll jobs ─│  • imac-worker (RAG)      │
+        │  • Jupyter :8888      │              │  • Prometheus, Grafana    │
+        └─────────────────────┘              └───────────────────────────┘
 ```
 
-### Request flow (typical chat)
+### Request flow (chat via web UI)
 
-1. Client sends `POST /chat` to the **iMac** with header `x-api-key`.
-2. **Caddy** reverse-proxies to the **FastAPI** container.
-3. FastAPI calls **Ollama** on the GPU PC (`OLLAMA_HOST` / Tailscale IP).
-4. Response returns to the client; conversation may be logged in **PostgreSQL** on the iMac.
+1. User opens **http://100.91.113.98:3080** (or `http://100.91.113.98/` via Caddy).
+2. **homelab-web** (Next.js) proxies `/api/homelab/chat` to **FastAPI** with `x-api-key` on the server (key never in the browser).
+3. FastAPI calls **Ollama** on the GPU (`http://100.88.71.33:11434`).
+4. Response returns to the UI; chat may be logged in **Postgres**.
+
+### Request flow (RAG)
+
+1. User ingests text in the **RAG** tab → API creates ingest + embed jobs.
+2. **imac-worker** chunks, embeds via GPU/Ollama path, stores vectors in **Qdrant**.
+3. User queries → API searches Qdrant → LLM answer with citations.
 
 ### Design principles
 
 | Principle | Rationale |
 |-----------|-----------|
-| **GPU does heavy ML** | Keeps VRAM for models; iMac (M1) is not used for large inference |
-| **iMac owns state** | Databases, API keys, metrics, and orchestration live with the app stack |
-| **Docs separate from code** | `homelab` repo is markdown only; Docker lives in `homelab-services` |
-| **Private GitHub** | Topology and hostnames stay private; no secrets in repos |
-| **Tailscale for remote ops** | Laptop can test GPU and iMac without port-forwarding on home router |
+| **GPU does heavy ML** | VRAM for Ollama + training; iMac M1 runs services only |
+| **iMac owns state** | Postgres job plane, RAG, metrics, API keys |
+| **Four Git repos** | Docs, iMac stack, GPU training code, web UI — see §5 |
+| **Private GitHub** | No secrets in git |
+| **Tailscale default** | Remote ops without WAN port-forward |
+| **Web BFF** | API key stays on iMac in the Next.js server layer |
 
 ---
 
@@ -74,11 +86,11 @@ Machines connect over the **local network** and **Tailscale** (mesh VPN) so serv
 
 | Machine | Hostname | OS | Primary user | Hardware notes |
 |---------|----------|-----|--------------|----------------|
-| **GPU desktop** | `zak_pc` | Windows 10/11 | `zakar` | NVIDIA GeForce **RTX 5070**, 12 GB VRAM |
+| **GPU desktop** | `zak_pc` | Windows | `zakar` | NVIDIA GeForce **RTX 5070**, 12 GB VRAM |
 | **iMac** | `Mos-iMac` | macOS 15.7 | `momo` | **Apple M1** |
-| **Laptop** | — | Windows | `cashh` | Controller only (no homelab services required) |
+| **Laptop** | — | Windows | `cashh` | Controller — no homelab services required |
 
-**Important:** Both Windows machines use PowerShell. The GPU PC is **`zakar`**; the laptop is **`cashh`**. They are not the same computer.
+**Important:** GPU PC is **`zakar`**; laptop is **`cashh`**. They are different machines.
 
 ---
 
@@ -88,87 +100,92 @@ Machines connect over the **local network** and **Tailscale** (mesh VPN) so serv
 
 | Node | LAN IPv4 | Notes |
 |------|----------|-------|
-| GPU PC | `10.0.0.156` | Wi‑Fi; Ollama port 11434 |
-| iMac | (DHCP on LAN) | Caddy port 80 |
+| GPU PC | `10.0.0.156` | Ollama `11434`, Jupyter `8888` |
+| iMac | (DHCP) | Web `3080`, Caddy `80`, Grafana `3000` |
 | Home gateway | `10.0.0.1` | Typical |
 
-### Tailscale (remote access)
+### Tailscale (primary remote access)
 
-| Node | Tailscale IPv4 | Use |
-|------|----------------|-----|
-| GPU PC | `100.88.71.33` | Ollama API, optional Jupyter |
-| iMac | `100.91.113.98` | Full app stack |
-
-Tailscale gives each device a stable IP on a private mesh. Team members with Tailscale installed can reach services as if on the same VPN.
+| Node | Tailscale IPv4 | Key services |
+|------|----------------|--------------|
+| GPU PC | `100.88.71.33` | Ollama `:11434` |
+| iMac | `100.91.113.98` | Web UI `:3080`, Caddy `:80`, Grafana `:3000` |
+| Laptop | `100.73.132.95` | Controller |
 
 ### Security posture
 
-- Repositories on GitHub are **private**.
-- **Do not** port-forward Ollama (11434) or Jupyter (8888) to the open internet without authentication.
-- API access to `/chat` requires **`x-api-key`** (value stored only in iMac `.env`, not in git).
-- Firewall on Windows GPU allows Ollama on **Private** profile for LAN/Tailscale.
+- GitHub repos are **private**.
+- **Do not** port-forward Ollama (`11434`) or internal API (`8000`) to the internet.
+- Web UI uses server-side API proxy; direct API calls still need `x-api-key`.
+- Optional public HTTPS: domain + router `80/443` → iMac Caddy only (see homelab `docs/deploy/public-internet.md`).
+- GPU firewall: **Ollama LAN** rule; Ollama bound via `OLLAMA_HOST=0.0.0.0:11434`.
 
 ---
 
-## 5. GitHub repositories (three-repo model)
+## 5. GitHub repositories (four-repo model)
 
-| Repository | URL | Runs on | Contains |
-|------------|-----|---------|----------|
-| **homelab** | github.com/zakiscoding/homelab | All nodes (read/write docs) | Markdown documentation, setup logs, architecture |
-| **homelab-services** | github.com/zakiscoding/homelab-services | **iMac** (canonical) | Docker Compose, FastAPI, Caddy, data volumes |
-| **homelab-gpu** | github.com/zakiscoding/homelab-gpu | **GPU PC** (canonical) | Training scripts, Jupyter notebooks, configs |
+| Repository | Runs on | Contains |
+|------------|---------|----------|
+| **homelab** | All nodes (docs) | Markdown, architecture, phases, setup log |
+| **homelab-services** | **iMac** | Docker Compose, FastAPI, Caddy, workers, DB migrations |
+| **homelab-gpu** | **GPU PC** | Training scripts, GPU worker, Ollama helpers, notebooks |
+| **homelab-web** | **Laptop dev**, **iMac prod** | Next.js UI — chat, RAG, status |
 
 ### Local paths (canonical copies)
 
-| Machine | homelab (docs) | homelab-services | homelab-gpu |
-|---------|----------------|------------------|-------------|
-| **iMac** | `/Volumes/1tb drive/homelab` | `/Volumes/1tb drive/homelab-services` | `/Volumes/1tb drive/homelab-gpu` (optional mirror) |
-| **Laptop** | `C:\Users\cashh\homelab` | `C:\Users\cashh\homelab-services` (optional) | — |
-| **GPU PC** | `C:\Users\zakar\HOMELAB` (optional) | — | `C:\Users\zakar\homelab-gpu` |
+| Machine | homelab | homelab-services | homelab-gpu | homelab-web |
+|---------|---------|------------------|-------------|-------------|
+| **iMac** | `…/homelab` | `…/homelab-services` | `…/homelab-gpu` (mirror) | `…/homelab-web` (sibling) |
+| **Laptop** | `C:\Users\cashh\homelab` | optional clone | — | `C:\Users\cashh\homelab-web` |
+| **GPU PC** | optional | — | `C:\Users\zakar\homelab-gpu` | — |
 
-**Workflow:** GitHub is the source of truth. Before editing: `git pull`. After editing: `git commit` + `git push`.
+**Workflow:** `git pull` → edit → `git commit` → `git push`. Secrets only in `.env` / `.env.local` (never committed).
 
 ---
 
 ## 6. GPU node (`zak_pc`) — inference and training
 
-**Rule:** GPU runs **ML only** — not Postgres, Redis, Grafana, Qdrant, or the main API (those are on the iMac).  
-**Checklist:** see `docs/nodes/GPU-NODE-CHECKLIST.md` in the homelab repo.
+**Rule:** GPU runs **ML and the train worker only** — not Postgres, Redis, Grafana, Qdrant, or the main API.
 
 ### 6.1 Inference — Ollama
 
 | Item | Detail |
 |------|--------|
-| Software | [Ollama](https://ollama.com) native on Windows |
-| Port | `11434` |
-| Bind address | `0.0.0.0` (LAN + Tailscale) via env `OLLAMA_HOST=0.0.0.0:11434` |
-| Model in use (example) | `llama3.2:latest` (~2 GB, Q4_K_M quantization) |
-| Startup | Windows scheduled task `OllamaServe` + manual `ollama serve` |
+| Software | [Ollama](https://ollama.com) on Windows |
+| Port | `11434` on `0.0.0.0` (`OLLAMA_HOST=0.0.0.0:11434`) |
+| Model (example) | `llama3.2:latest` |
+| **Persistent start** | Scheduled task **`HomelabOllamaServe`** → `homelab-gpu/scripts/serve-ollama.bat` |
+| Quick recovery | `schtasks /Run /TN HomelabOllamaServe` |
 
-**Test inference:**
+**Health check (from laptop):**
 
-```http
+```text
 GET http://100.88.71.33:11434/api/tags
-GET http://100.88.71.33:11434/api/generate
 ```
 
-### 6.2 Training — prepared, first run pending
+If this fails, the web UI chat stays on “Thinking…”.
+
+**Scripts (homelab-gpu):**
+
+| Script | Purpose |
+|--------|---------|
+| `install-ollama-serve-task.ps1` | One-time Admin setup — task + firewall |
+| `start-ollama.ps1` | Quick start / run task |
+| `stop-ollama.ps1` | Free VRAM before training |
+
+### 6.2 Training and GPU worker
 
 | Item | Path or tool |
 |------|----------------|
 | Repo | `C:\Users\zakar\homelab-gpu` |
-| Python | 3.12, virtualenv `.venv` |
-| Libraries | PyTorch (CUDA), transformers, PEFT, accelerate, datasets |
-| Notebooks | `notebooks/01_gpu_and_paths.ipynb` — environment check |
-| Jupyter | `scripts/start-jupyter.ps1` → default `http://127.0.0.1:8888` |
-| Datasets (local) | `C:\Users\zakar\homelab-data\datasets` |
-| Checkpoints (local) | `C:\Users\zakar\homelab-data\checkpoints` |
+| Python | 3.12, `.venv`, PyTorch (CUDA 12.8 for RTX 5070) |
+| Training | `training/lora_quickstart/train.py` — QLoRA smoke **succeeded** |
+| Worker | Polls iMac `POST /internal/worker/jobs/claim` for `train` jobs |
+| Data (local) | `C:\Users\zakar\homelab-data\` — datasets, checkpoints |
+| Jupyter | `scripts/start-jupyter.ps1` → `:8888` |
+| Metrics | `scripts/push-gpu-metrics.ps1` → iMac Pushgateway `:9091` |
 
-**Before training:** run `scripts/stop-ollama.ps1` to free GPU memory.
-
-**VRAM note:** 12 GB fits **LoRA / QLoRA** on small models; full fine-tune of large models is usually not feasible. RTX 5070 is very new; PyTorch may show a compatibility warning but reports `cuda available` in tests.
-
-**Not yet done:** actual fine-tune job with a real dataset and saved adapter.
+**Before long training:** `stop-ollama.ps1` to free VRAM.
 
 ---
 
@@ -178,42 +195,53 @@ GET http://100.88.71.33:11434/api/generate
 
 | Item | Detail |
 |------|--------|
-| Runtime | **Colima** (not Docker Desktop) |
-| Colima data | `/Volumes/1tb drive/homelab-runtime/colima` |
-| Compose project | `/Volumes/1tb drive/homelab-services` |
-| Symlink workaround | `~/1tb-drive/homelab-services` if paths with spaces break mounts |
+| Runtime | **Colima** on 1 TB drive |
+| Colima | `/Volumes/1tb drive/homelab-runtime/colima` |
+| Compose | `/Volumes/1tb drive/homelab-services` |
+| Symlink | `~/1tb-drive/homelab-services` (paths with spaces) |
 
-Helper scripts: `setup-1tb.sh`, `start-stack.sh`, `docker-1tb-env.sh`.
+**Always before docker commands:** `source ./scripts/docker-1tb-env.sh`
 
-### 7.2 Running containers (seven services)
+Key scripts: `setup-1tb.sh`, `start-stack.sh`, `ensure-homelab-web.sh`, `render-caddyfile.sh`, `bootstrap-env.sh`.
 
-| Container | Purpose | External port (via Tailscale) |
-|-----------|---------|--------------------------------|
-| **api** | FastAPI — `/health`, `/chat`, GPU proxy | via Caddy |
-| **caddy** | Reverse proxy, TLS-ready | **80** |
-| **postgres** | Chat / app persistence | internal |
-| **redis** | Counters / cache | internal |
-| **qdrant** | Vector DB for RAG | **6333** |
-| **prometheus** | Metrics | **9090** |
+### 7.2 Running containers
+
+| Container | Purpose | Tailscale port |
+|-----------|---------|----------------|
+| **web** | Next.js UI (homelab-web) | **3080** |
+| **caddy** | Reverse proxy → `web:3000` | **80**, 443 |
+| **api** | FastAPI — chat, RAG, jobs, metrics | internal 8000 |
+| **imac-worker** | RAG ingest + embed | internal |
+| **postgres** | Jobs, chat logs, RAG metadata | internal |
+| **redis** | Counters, job wake queues | **6379** (GPU worker) |
+| **qdrant** | Vector search | **6333** |
+| **prometheus** | Metrics scrape | **9090** |
 | **grafana** | Dashboards | **3000** |
+| **pushgateway** | GPU metric push | **9091** |
 
-### 7.3 API behavior (summary)
+### 7.3 API surface (summary)
 
-| Endpoint | Method | Auth | Behavior |
-|----------|--------|------|----------|
-| `/health` | GET | None | Liveness check |
-| `/chat` | POST | `x-api-key` | Forwards prompt to GPU Ollama; may log to Postgres |
+| Area | Endpoints | Auth |
+|------|-----------|------|
+| Health | `/health`, `/health/gpu` | None / LAN |
+| Chat | `POST /chat` | `x-api-key` |
+| RAG | `POST /rag/ingest`, `POST /rag/query`, `GET /rag/status` | `x-api-key` |
+| Jobs | `POST /jobs`, `GET /jobs/{id}` | `x-api-key` |
+| Workers | `/internal/worker/*` | `X-Worker-Key` |
+| Metrics | `GET /metrics` | LAN/Tailscale |
+| System | `GET /system/status` | `x-api-key` |
 
-**Test from any Tailscale device:**
+The **web UI** calls these through `/api/homelab/*` on the Next.js server (browser never holds the API key).
 
-```http
-GET  http://100.91.113.98/health
-GET  http://100.91.113.98:9090/-/healthy
-GET  http://100.91.113.98:6333/
-POST http://100.91.113.98/chat
-     Header: x-api-key: <from iMac .env only>
-     Body: JSON with user message
-```
+### 7.4 Web UI (homelab-web)
+
+| Item | Detail |
+|------|--------|
+| Repo | github.com/zakiscoding/homelab-web |
+| Production URL | http://100.91.113.98:3080 or http://100.91.113.98/ |
+| Pages | `/` overview, `/chat`, `/rag` |
+| Dev | `npm run dev` on laptop → `http://localhost:3000` |
+| Deploy | `docker-compose up -d --build web caddy` on iMac |
 
 ---
 
@@ -221,91 +249,131 @@ POST http://100.91.113.98/chat
 
 | Responsibility | Detail |
 |----------------|--------|
-| Documentation | Edit `homelab` repo, push to GitHub |
-| Remote testing | `curl` / browser to Tailscale IPs |
-| SSH | `ssh zakar@100.88.71.33` for GPU PowerShell |
-| Optional | Clone `homelab-services` for debugging |
+| Documentation | Edit **homelab**, push to GitHub |
+| Web dev | **homelab-web** locally |
+| Browser | Production UI on iMac Tailscale IP |
+| SSH | `ssh imac-ts` (iMac), `ssh zak-ts` (GPU) — `~/.ssh/config` |
+| Testing | `curl.exe`, PowerShell `Invoke-RestMethod` |
 
-The laptop does **not** need to run Ollama or Docker for the homelab to function.
+The laptop does **not** need Docker or Ollama for the homelab to run.
+
+**Deploy UI to iMac (example):**
+
+```bash
+ssh imac-ts
+cd ~/1tb-drive/homelab-services && git pull
+./scripts/ensure-homelab-web.sh
+source ./scripts/docker-1tb-env.sh
+./scripts/render-caddyfile.sh
+docker-compose up -d --build web caddy
+```
 
 ---
 
 ## 9. 1TB external drive layout (iMac)
 
-The iMac uses a **1 TB external volume** as the main workspace:
-
 ```text
 /Volumes/1tb drive/
 ├── homelab/              ← documentation (git)
 ├── homelab-services/     ← Docker stack (git)
-├── homelab-gpu/          ← training code mirror (git, optional)
-├── homelab-runtime/      ← Colima + Docker config (not git)
-│   ├── colima/
-│   └── docker-config/
-└── Personal/             ← non-homelab files
+├── homelab-web/          ← Next.js UI (git, sibling of services)
+├── homelab-gpu/          ← training mirror (git, optional)
+├── homelab-runtime/      ← Colima (not git)
+└── Personal/             ← non-homelab
 ```
 
-Service **data** (Postgres files, Grafana, etc.) lives under `homelab-services/data/`.
+Persistent service data: `homelab-services/data/` (Postgres, Grafana, Qdrant, etc.).
 
 ---
 
-## 10. What is complete vs. what is next
+## 10. Platform phases (what was built)
+
+| Phase | Theme | Status |
+|-------|--------|--------|
+| **0A** | Job control plane, GPU worker, leases | Done |
+| **0B** | Retry, stale jobs, `/system/status`, ML-STORE paths | Done |
+| **1** | `/chat` inference + infer jobs | Done |
+| **2** | RAG — ingest, embed, Qdrant, `/rag/query` | Done |
+| **3** | QLoRA training smoke on GPU | Done |
+| **4** | Redis job wake (LPUSH / BLPOP) | Done |
+| **5** | Prometheus, Pushgateway, Grafana dashboards | Done |
+| **Web UI** | homelab-web on `:3080` | Done (May 2026) |
+
+**Not in MVP yet (optional):** served LoRA adapter in Ollama, MLflow, public domain HTTPS, full user auth in UI.
+
+---
+
+## 11. What is complete vs. what is next
 
 ### Complete
 
-- [x] Three-node architecture deployed and documented  
-- [x] GPU: drivers, Ollama, LAN/Tailscale, scheduled task  
-- [x] iMac: Colima, full Docker stack, `/health` and `/chat` to GPU  
-- [x] Three private GitHub repositories  
-- [x] Tailscale connectivity tested (GPU + iMac)  
-- [x] GPU: Python, PyTorch, Jupyter, notebook scaffold  
-- [x] Backup procedure documented + Postgres backup script in `homelab-services`  
+- [x] Four-repo layout on GitHub (private)  
+- [x] GPU: Ollama, Tailscale, `HomelabOllamaServe`, training env, QLoRA smoke  
+- [x] iMac: full compose stack + web UI + RAG worker  
+- [x] Tailscale E2E: UI, chat, RAG, Grafana  
+- [x] Job plane + Redis wake + observability  
 
-### Next steps (operational)
+### Sensible next steps
 
-- [ ] Run scheduled Postgres backups on iMac (`scripts/backup-postgres.sh`)  
-- [ ] Full test of `/chat` from laptop with production API key  
-- [ ] First LoRA fine-tune: dataset + `02_lora_experiment.ipynb` on GPU  
-- [ ] Optional: export fine-tuned model to GGUF and load in Ollama  
-- [ ] Confirm Ollama still starts correctly after GPU PC reboot  
+- [ ] Scheduled Postgres backups on iMac (`backup-postgres.sh`)  
+- [ ] Sync LoRA adapter to ML-STORE / load in Ollama for inference  
+- [ ] Optional: public domain + HTTPS (homelab deploy doc)  
+- [ ] After GPU reboot: confirm `schtasks /Run /TN HomelabOllamaServe`  
 
 ---
 
-## 11. Quick reference — URLs (Tailscale)
+## 12. Quick reference — URLs (Tailscale)
 
 | Service | URL |
 |---------|-----|
-| GPU Ollama | http://100.88.71.33:11434 |
-| iMac health | http://100.91.113.98/health |
-| iMac chat API | http://100.91.113.98/chat |
+| **Web UI (primary)** | http://100.91.113.98:3080 |
+| **Web UI (Caddy)** | http://100.91.113.98/ |
+| GPU Ollama health | http://100.88.71.33:11434/api/tags |
+| iMac API health (ops) | http://100.91.113.98/health |
 | Grafana | http://100.91.113.98:3000 |
 | Prometheus | http://100.91.113.98:9090 |
+| Pushgateway | http://100.91.113.98:9091 |
 | Qdrant | http://100.91.113.98:6333 |
 | Jupyter (GPU, if started) | http://100.88.71.33:8888 |
 
 ---
 
-## 12. Glossary
+## 13. Troubleshooting (common)
 
-| Term | Meaning |
-|------|---------|
-| **Ollama** | Local LLM runtime; serves models over HTTP on port 11434 |
-| **Colima** | Lightweight Docker VM for macOS |
-| **LoRA / QLoRA** | Parameter-efficient fine-tuning; fits consumer GPUs |
-| **Tailscale** | Mesh VPN; private IPs for home machines |
-| **PEFT** | Hugging Face library for adapter-based training |
-| **Caddy** | Reverse proxy in front of the FastAPI app |
-| **Qdrant** | Vector database for embeddings / RAG |
+| Symptom | Likely cause | Fix |
+|---------|--------------|-----|
+| `:3080` connection refused | `web` container down on iMac | `docker-compose up -d web` (+ `source docker-1tb-env.sh`) |
+| Chat “Thinking…” forever | GPU Ollama not running | `curl` GPU tags; `schtasks /Run /TN HomelabOllamaServe` on GPU |
+| Chat 502 | iMac cannot reach GPU `:11434` | Check `GPU_URL` in `.env`, firewall, Ollama bind |
+| RAG query empty | Embed not finished | Wait 30–90s after ingest; check `imac-worker` logs |
+| `docker ps` empty on iMac | Wrong Docker context | `source scripts/docker-1tb-env.sh` |
 
 ---
 
-## 13. Contact and repository access
+## 14. Glossary
 
-- GitHub organization / user: **zakiscoding**  
-- Access to private repos must be granted by the owner.  
-- This document does **not** contain passwords, API keys, or tokens.
+| Term | Meaning |
+|------|---------|
+| **Ollama** | Local LLM server on GPU, port 11434 |
+| **homelab-web** | Next.js UI; BFF hides API key |
+| **Colima** | Docker VM on macOS (iMac) |
+| **LoRA / QLoRA** | Efficient fine-tuning on consumer GPUs |
+| **Tailscale** | Mesh VPN for home machines |
+| **imac-worker** | Container that runs RAG ingest/embed jobs |
+| **BFF** | Backend-for-frontend — Next.js `/api/homelab` proxy |
+| **Caddy** | Reverse proxy; LAN mode forwards `:80` → web UI |
+| **Qdrant** | Vector DB for RAG |
+| **Pushgateway** | Prometheus target for GPU-pushed metrics |
 
-For internal technical runbooks after joining the project, clone **homelab** and read `docs/SETUP-LOG.md` for chronological build history.
+---
+
+## 15. Contact and repository access
+
+- GitHub user: **zakiscoding**  
+- Private repo access must be granted by the owner.  
+- This document contains **no** passwords, API keys, or tokens.
+
+After joining the project: clone **homelab**, read `docs/SETUP-LOG.md` for build history, and `docs/services/web-ui.md` for the browser UI.
 
 ---
 
