@@ -7,9 +7,9 @@ Next.js app for chat, RAG, and platform overview. Repo: **`homelab-web`** (lapto
 | Phase | Host | URL |
 |-------|------|-----|
 | Dev | Laptop `cashh` | http://localhost:3000 |
-| Prod | iMac Docker `:3080` | http://100.91.113.98:3080 |
+| Prod | iMac Docker `:3080` or Caddy `:80` | http://100.91.113.98:3080 or http://100.91.113.98/ |
 
-Do **not** run the UI on the GPU PC. Grafana already uses iMac **`:3000`** — web uses **`:3080`** to avoid a port clash.
+**No domain required** — use Tailscale (or home LAN). Grafana stays on **`:3000`**; web uses **`:3080`** so ports do not clash.
 
 The UI calls the iMac API through a Next.js **BFF** (`/api/homelab/*`) so `HOMELAB_API_KEY` stays server-side.
 
@@ -34,10 +34,6 @@ docker-compose up -d --build web
 ```
 
 Open http://100.91.113.98:3080 (or http://100.91.113.98/ via Caddy)
-
-## Public internet (your domain, no tunnel vendor)
-
-See [deploy/public-internet.md](../deploy/public-internet.md) — port-forward **80/443** to the iMac, set `DOMAIN` + basic auth in `.env`, run `render-caddyfile.sh`.
 
 ## Surfaces
 
