@@ -4,6 +4,18 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 ---
 
+## 2026-05-22 — Web UI (homelab-web) + Ollama persistence
+
+**Goal:** Browser UI for chat, RAG, and status over Tailscale (no public domain).
+
+**Repos:** [homelab-web](https://github.com/zakiscoding/homelab-web), [homelab-services](https://github.com/zakiscoding/homelab-services) (`web` `:3080`, Caddy → web), [homelab-gpu](https://github.com/zakiscoding/homelab-gpu) (`HomelabOllamaServe` task).
+
+**URLs:** `http://100.91.113.98:3080`, `http://100.91.113.98/` · Grafana `:3000` unchanged.
+
+**GPU:** Task `HomelabOllamaServe` keeps Ollama on `0.0.0.0:11434` (fixes chat stuck on “Thinking…”).
+
+**Docs:** [services/web-ui.md](services/web-ui.md). Deploy: `ssh imac-ts`, `ensure-homelab-web.sh`, `docker-compose up -d --build web caddy`.
+
 ## 2026-05-21 — Phase 5 observability
 
 - API `/metrics` (Prometheus client), job/worker gauges

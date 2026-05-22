@@ -122,7 +122,14 @@ C:\Users\zakar\homelab-data\
 
 **Do not** port-forward these to the public internet without auth.
 
-Firewall: Ollama **11434** (Private) rule added on Windows.
+Firewall: **Ollama LAN** rule (Profile Any when installed via `install-ollama-serve-task.ps1`).
+
+**Persistent serve:** Scheduled task **`HomelabOllamaServe`** → `homelab-gpu/scripts/serve-ollama.bat` (`OLLAMA_HOST=0.0.0.0:11434`).
+
+```powershell
+schtasks /Run /TN HomelabOllamaServe
+curl.exe http://100.88.71.33:11434/api/tags
+```
 
 ---
 

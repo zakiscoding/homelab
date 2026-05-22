@@ -31,8 +31,10 @@ Hardware and logical resources. Update when we add, rename, or retire anything.
 | api | Mos-iMac | build `./api` | 8000 (internal) | FastAPI → GPU |
 | postgres | Mos-iMac | postgres:16-alpine | internal | Chat logs |
 | redis | Mos-iMac | redis:7-alpine | internal | Counters / queue |
-| caddy | Mos-iMac | caddy:2-alpine | 80, 443 | Reverse proxy |
+| web | Mos-iMac | homelab-services-web | **3080** | Next.js UI |
+| caddy | Mos-iMac | caddy:2-alpine | 80, 443 | → web:3000 |
 | qdrant | Mos-iMac | qdrant/qdrant | 6333 | Vectors / RAG |
+| imac-worker | Mos-iMac | build worker | — | RAG ingest/embed |
 | prometheus | Mos-iMac | prom/prometheus | 9090 | Metrics |
 | grafana | Mos-iMac | grafana/grafana | 3000 | Dashboards |
 
@@ -40,7 +42,7 @@ Hardware and logical resources. Update when we add, rename, or retire anything.
 
 | Pool / share | Backend | Size | Mount / export | Used for |
 |--------------|---------|------|----------------|----------|
-| 1TB drive | External/USB | ~1 TB | `/Volumes/1tb drive` | `homelab/`, `homelab-services/`, `homelab-gpu/`, `homelab-runtime/`, `Personal/` — [DRIVE-LAYOUT](DRIVE-LAYOUT.md) |
+| 1TB drive | External/USB | ~1 TB | `/Volumes/1tb drive` | `homelab/`, `homelab-services/`, `homelab-web/`, `homelab-gpu/`, `homelab-runtime/`, `Personal/` — [DRIVE-LAYOUT](DRIVE-LAYOUT.md) |
 
 ## Domains & DNS (internal)
 

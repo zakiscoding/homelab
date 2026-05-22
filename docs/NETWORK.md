@@ -36,14 +36,16 @@ Internal records: see [Inventory — Domains](INVENTORY.md#domains--dns-internal
 
 | Rule / service | WAN exposed? | Port forward / reverse proxy | Notes |
 |----------------|--------------|------------------------------|-------|
-| Caddy (web UI) | Yes (optional) | WAN 80, 443 → iMac | Only when `DOMAIN` set — [public-internet.md](deploy/public-internet.md) |
-| FastAPI, Grafana, Qdrant, Redis | **No** | — | Tailscale / LAN only |
+| Web UI | No (default) | — | Tailscale `100.91.113.98:3080` or `:80` |
+| Caddy HTTPS | Yes (optional) | WAN 80, 443 → iMac | Only when `DOMAIN` set — [public-internet.md](deploy/public-internet.md) |
+| GPU Ollama | **No** | — | Tailscale `100.88.71.33:11434` only |
+| Grafana, Qdrant, Redis, raw API | **No** | — | Tailscale / LAN only |
 
 ## VPN / remote access
 
 | Method | Endpoint | Auth | Notes |
 |--------|----------|------|-------|
-| Tailscale | GPU `100.88.71.33`, iMac `100.91.113.98` | Tailscale account | Ollama :11434; iMac API :80, Grafana :3000, etc. |
+| Tailscale | GPU `100.88.71.33`, iMac `100.91.113.98`, laptop `100.73.132.95` | Tailscale account | GPU Ollama `:11434`; iMac web `:3080` / `:80`; Grafana `:3000` |
 
 ## Wi‑Fi
 

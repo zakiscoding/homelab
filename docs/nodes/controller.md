@@ -5,8 +5,8 @@
 | **Machine** | Laptop (not the GPU desktop) |
 | **OS** | Windows |
 | **Login** | **`cashh`** |
-| **Repo (git clone)** | `C:\Users\cashh\homelab` |
-| **Role** | Docs, `git pull`/`push`, `curl` tests, SSH into GPU PC |
+| **Repos** | `C:\Users\cashh\homelab`, `homelab-web`, `homelab-services` (optional) |
+| **Role** | Docs, UI dev, `curl` tests, SSH to iMac + GPU |
 
 Do not confuse with the **GPU PC** — that machine logs in as **`zakar`** (`zak_pc`). See [gpu-node.md](gpu-node.md).
 
@@ -33,6 +33,27 @@ git push
 
 See [GIT.md](../GIT.md). GitHub: **zakiscoding/homelab** (private).
 
+## Web UI (browser)
+
+| URL | Notes |
+|-----|-------|
+| http://100.91.113.98:3080 | Production UI on iMac |
+| http://100.91.113.98/ | Same via Caddy |
+| http://localhost:3000 | Local dev (`npm run dev` in `homelab-web`) |
+
+See [web-ui.md](../services/web-ui.md).
+
+## Deploy to iMac via SSH
+
+```powershell
+ssh imac-ts
+cd ~/1tb-drive/homelab-services
+git pull && ./scripts/ensure-homelab-web.sh
+source ./scripts/docker-1tb-env.sh
+./scripts/render-caddyfile.sh
+docker-compose up -d --build web caddy
+```
+
 ## Test GPU Ollama from this laptop
 
 Use the **GPU node IP** — not `127.0.0.1` (that would be laptop-local only).
@@ -55,9 +76,8 @@ Invoke-RestMethod -Uri "http://100.88.71.33:11434/api/generate" -Method Post -Bo
 ## SSH to GPU PC (`zakar`)
 
 ```powershell
-ssh zakar@10.0.0.156
-# or over Tailscale:
-ssh zakar@100.88.71.33
+ssh zak-ts          # GPU — recommended (~/.ssh/config)
+ssh imac-ts         # iMac
 ```
 
 Prompt will be `PS C:\Users\zakar>` on the **GPU** machine.

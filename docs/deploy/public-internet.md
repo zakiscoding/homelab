@@ -1,6 +1,8 @@
-# Public internet access (your nodes only)
+# Public internet access (optional)
 
-Expose the **web UI** from the **iMac** using **Caddy** on ports **80/443**. No Cloudflare Tunnel, ngrok, or other hosted proxy — only your router, domain DNS, and the homelab stack.
+**Default homelab access is Tailscale only** — see [services/web-ui.md](../services/web-ui.md) (`http://100.91.113.98:3080`). Use this guide only if you want a **public domain** on your own router (no Cloudflare Tunnel / ngrok).
+
+Expose the **web UI** from the **iMac** using **Caddy** on ports **80/443**. Only your router, domain DNS, and the homelab stack.
 
 ## What is exposed
 

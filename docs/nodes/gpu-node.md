@@ -228,9 +228,37 @@ SSH from laptop: `ssh zak-ts`.
 
 ---
 
+## Homelab persistent Ollama (recommended)
+
+The iMac UI and API need Ollama on **`0.0.0.0:11434`** over Tailscale. Use the scheduled task in **homelab-gpu**:
+
+| Script | When |
+|--------|------|
+| `scripts/install-ollama-serve-task.ps1` | **Once**, Admin PowerShell — creates `HomelabOllamaServe` + firewall |
+| `scripts/serve-ollama.bat` | Wrapper: `OLLAMA_HOST=0.0.0.0:11434` + `ollama serve` |
+| `scripts/start-ollama.ps1` | Quick start or `schtasks /Run /TN HomelabOllamaServe` |
+
+```powershell
+cd C:\Users\zakar\homelab-gpu
+git pull
+.\scripts\install-ollama-serve-task.ps1   # Admin, first time
+# After reboot or if chat hangs:
+schtasks /Run /TN HomelabOllamaServe
+```
+
+Verify from **laptop** (`cashh`):
+
+```powershell
+curl.exe http://100.88.71.33:11434/api/tags
+```
+
+Expect JSON including `llama3.2:latest`. If this fails, chat in the web UI stays on **Thinking…**.
+
+---
+
 ## Remote-only setup (SSH — no monitor / no tray)
 
-Use this when you only have PowerShell over SSH (e.g. OpenSSH), not the physical PC.
+Use this when you only have PowerShell over SSH (e.g. OpenSSH), not the physical PC. Prefer **HomelabOllamaServe** above when possible.
 
 ### 1. Find Ollama and fix `netstat`
 

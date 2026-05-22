@@ -10,6 +10,7 @@ Canonical paths on the iMac external volume **`/Volumes/1tb drive`**.
 ├── homelab/                  ← git: documentation
 ├── homelab-services/         ← git: iMac Docker stack
 ├── homelab-gpu/              ← git: GPU training (mirror; also on zak_pc)
+├── homelab-web/              ← git: Next.js UI (sibling of homelab-services)
 ├── homelab-runtime/          ← Colima + docker CLI (not git)
 │   ├── colima/               ← COLIMA_HOME
 │   └── docker-config/        ← DOCKER_CONFIG
@@ -29,6 +30,7 @@ Canonical paths on the iMac external volume **`/Volumes/1tb drive`**.
 | `homelab/` | `zakiscoding/homelab` | Docker compose, `.env`, service code |
 | `homelab-services/` | `zakiscoding/homelab-services` | Long markdown runbooks (use `homelab/docs`) |
 | `homelab-gpu/` | `zakiscoding/homelab-gpu` | Checkpoints, datasets, Ollama models |
+| `homelab-web/` | `zakiscoding/homelab-web` | Built by compose `../homelab-web` |
 
 ## Runtime (not git)
 

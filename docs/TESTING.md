@@ -5,10 +5,14 @@ Run after changes or from a new machine on Tailscale.
 ## From controller laptop (`cashh`)
 
 ```powershell
-# GPU Ollama
+# GPU Ollama (required for chat)
 curl.exe http://100.88.71.33:11434/api/tags
 
-# iMac stack
+# Web UI
+curl.exe -s -o NUL -w "%{http_code}" http://100.91.113.98:3080/
+curl.exe -s -o NUL -w "%{http_code}" http://100.91.113.98/
+
+# iMac stack (ops)
 curl.exe http://100.91.113.98/health
 curl.exe http://100.91.113.98:9090/-/healthy
 curl.exe http://100.91.113.98:6333/
@@ -30,13 +34,23 @@ cd C:\Users\zakar\homelab-gpu
 .\scripts\verify-gpu.ps1
 ```
 
-## Expected (2026-05-21)
+## Web UI chat (via BFF)
+
+```powershell
+$key = "YOUR_API_KEY"   # iMac homelab-services/.env
+$h = @{ "x-api-key" = $key; "Content-Type" = "application/json" }
+$body = @{ prompt = "say hi"; model = "llama3.2:latest" } | ConvertTo-Json -Compress
+Invoke-RestMethod -Uri "http://100.91.113.98:3080/api/homelab/chat" -Method Post -Headers $h -Body $body
+```
+
+## Expected
 
 | Check | Expected |
 |-------|----------|
 | GPU tags | JSON with `llama3.2:latest` |
-| iMac health | 200 OK |
-| iMac /chat | JSON with GPU-backed reply |
+| Web UI `:3080` / `/` | HTTP 200 |
+| Web chat | JSON with `response`, `duration_ms` |
+| iMac `/health` | 200 OK (direct API; optional) |
 | verify-gpu | `cuda True`, RTX 5070 |
 
 ## Phase 2 — RAG

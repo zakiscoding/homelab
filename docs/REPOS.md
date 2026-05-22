@@ -20,6 +20,7 @@ Full tree: [DRIVE-LAYOUT.md](DRIVE-LAYOUT.md)
 | `homelab/` | `homelab` |
 | `homelab-services/` | `homelab-services` |
 | `homelab-gpu/` | `homelab-gpu` |
+| `homelab-web/` | `homelab-web` |
 | `homelab-runtime/` | _(not git — Colima)_ |
 | `Personal/` | _(not git — school/resumes)_ |
 
@@ -43,7 +44,7 @@ GPU PC keeps large artifacts **local** (Ollama models, checkpoints, datasets) �
 
 | Node | User | Clone `homelab` | Clone `homelab-services` |
 |------|------|-----------------|--------------------------|
-| Laptop (controller) | `cashh` | Yes — edit & push docs | Optional — deploy/debug |
+| Laptop (controller) | `cashh` | Yes — edit & push docs | `homelab-web` dev; SSH deploy to iMac |
 | iMac | `momo` | Yes — `git pull` for docs | Yes — **canonical** working copy on 1TB |
 | GPU PC | `zakar` | Optional — runbooks | Yes — **`homelab-gpu`** (training code) |
 
@@ -71,8 +72,21 @@ git pull && edit docs/ && git commit -m "..." && git push
 ```bash
 cd "/Volumes/1tb drive/homelab-services"
 git pull && edit && git commit -m "..." && git push
-# on iMac: docker compose up -d --build
+source ./scripts/docker-1tb-env.sh
+docker-compose up -d --build
 ```
+
+### Web UI deploy (iMac)
+
+```bash
+cd ~/1tb-drive/homelab-services
+git pull
+./scripts/ensure-homelab-web.sh
+./scripts/render-caddyfile.sh
+docker-compose up -d --build web caddy
+```
+
+See [services/web-ui.md](services/web-ui.md).
 
 Log major changes in [SETUP-LOG](SETUP-LOG.md).
 
@@ -82,6 +96,8 @@ Log major changes in [SETUP-LOG](SETUP-LOG.md).
 |------|------|------------|
 | `homelab-services/.env` | homelab-services | **Never** |
 | `homelab-services/.env.example` | homelab-services | Yes (placeholders) |
+| `homelab-web/.env.local` | homelab-web | **Never** |
+| `homelab-web/.env.local.example` | homelab-web | Yes |
 
 ## Clone commands
 

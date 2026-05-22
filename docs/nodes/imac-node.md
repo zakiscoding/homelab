@@ -23,6 +23,7 @@ Application platform and data services. GPU node runs Ollama; iMac proxies and p
 |------|---------|
 | `homelab/` | This documentation repo |
 | `homelab-services/` | Docker compose + API code |
+| `homelab-web/` | Next.js UI (sibling repo) |
 | `homelab-runtime/` | Colima + `docker-config` |
 | `~/1tb-drive` | Symlink to volume (Colima mounts) |
 
@@ -37,10 +38,12 @@ Application platform and data services. GPU node runs Ollama; iMac proxies and p
 
 | Port | Service |
 |------|---------|
-| 80 | Caddy → FastAPI |
+| **3080** | **Web UI** (homelab-web) |
+| 80 | Caddy → web UI |
 | 3000 | Grafana |
 | 6333 | Qdrant |
 | 9090 | Prometheus |
+| 8000 | FastAPI (internal only) |
 
 ## Install (one-time)
 
@@ -54,15 +57,18 @@ brew install colima docker docker-compose
 ```bash
 source ~/1tb-drive/homelab-services/scripts/docker-1tb-env.sh
 colima start    # if VM not running
-cd ~/1tb-drive/homelab-services && docker-compose up -d
-curl http://localhost/health
+cd ~/1tb-drive/homelab-services && ./scripts/start-stack.sh
+curl -s -o /dev/null -w "%{http_code}\n" http://localhost:3080/
 ```
 
-Full runbook: [services/imac-stack.md](../services/imac-stack.md)
+Full runbook: [services/imac-stack.md](../services/imac-stack.md) · UI: [services/web-ui.md](../services/web-ui.md)
 
 ## Test from controller (`cashh`)
 
 ```powershell
+curl.exe http://100.91.113.98:3080/
+curl.exe http://100.88.71.33:11434/api/tags
+# API direct (optional):
 curl.exe http://100.91.113.98/health
 curl.exe -X POST http://100.91.113.98/chat `
   -H "Content-Type: application/json" `

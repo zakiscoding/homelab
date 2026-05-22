@@ -4,13 +4,14 @@ Three-node homelab split by role. GPU node first; iMac and API layer connected a
 
 ```text
          [ Laptop — Windows, user cashh (controller) ]
-              git / curl.exe / SSH ─────────────────────┐
+              git / browser / SSH ───────────────────────┐
                                 |                        |
                     +-----------+-----------+            |
                     |                       |            |
-      [ GPU PC — Windows, user zakar ]   [ iMac — momo ] |
-      zak_pc · Ollama · RTX 5070         homelab-services │
-      inference + training (Phase 1)     (Phase 2)        │
+      [ GPU PC — zakar / zak_pc ]      [ iMac — momo ]   |
+      Ollama :11434 · training         homelab-services  │
+      homelab-gpu                      homelab-web :3080 │
+                                       Caddy :80 → web   │
 ```
 
 ## Node roles
@@ -19,16 +20,17 @@ Three-node homelab split by role. GPU node first; iMac and API layer connected a
 |------|-------------------|------|-------------------|-------|
 | **GPU PC** | **`zakar`** (`zak_pc`) | Inference + **training** | Ollama; future `homelab-gpu` for train code | **1 — inference done** |
 | **iMac** | **`momo`** (`Mos-iMac`) | App / data plane | [`homelab-services`](https://github.com/zakiscoding/homelab-services) | **2 — done** (Colima) |
-| **Laptop** | **`cashh`** | Controller | SSH to GPU, `git pull`/`push`, remote tests | Ongoing |
+| **Laptop** | **`cashh`** | Controller | Docs, web dev, `ssh imac-ts` / `ssh zak-ts` | Ongoing |
 
-## Traffic flow (target)
+## Traffic flow
 
-1. **Controller** hits GPU node at `http://<GPU_IP>:11434` for model inference (Ollama API).
-2. **Now:** clients hit **iMac** `homelab-services` (Caddy → FastAPI) → GPU Ollama; Postgres/Redis on iMac.
+1. **Browser** → iMac **homelab-web** (`:3080` or Caddy `:80`) — chat, RAG, status.
+2. **Web BFF** → iMac **FastAPI** (internal `:8000`, `x-api-key` server-side) → GPU **Ollama** `:11434`.
+3. **Training** → GPU worker polls iMac; artifacts on `zak_pc` disk ([homelab-gpu](https://github.com/zakiscoding/homelab-gpu)).
 
-**Paths (iMac 1TB):** docs → `homelab/` · runtime → `homelab-services/`
+**Paths (iMac 1TB):** `homelab/` · `homelab-services/` · `homelab-web/` (sibling clone)
 
-**Git:** [REPOS.md](REPOS.md) — `homelab` (docs) + `homelab-services` (iMac stack) + planned `homelab-gpu` (training scripts).
+**Git:** [REPOS.md](REPOS.md) — four repos: docs, services, gpu, web.
 
 ## Principles
 
@@ -44,3 +46,4 @@ Three-node homelab split by role. GPU node first; iMac and API layer connected a
 | iMac | [nodes/imac-node.md](nodes/imac-node.md) · [services/imac-stack.md](services/imac-stack.md) |
 | Repos | [REPOS.md](REPOS.md) |
 | Controller | [nodes/controller.md](nodes/controller.md) |
+| Web UI | [services/web-ui.md](services/web-ui.md) |

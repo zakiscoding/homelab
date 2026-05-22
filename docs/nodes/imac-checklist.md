@@ -23,7 +23,8 @@
 | Container | Status | Role |
 |-----------|--------|------|
 | **API** (FastAPI) | [x] | Gateway to Ollama |
-| **Caddy** | [x] | Reverse proxy |
+| **Web UI** (`homelab-web`) | [x] | `:3080`, Caddy `:80` |
+| **Caddy** | [x] | `:80` → `web:3000` |
 | **PostgreSQL** | [x] | Persistent data |
 | **Redis** | [x] | Cache / counters |
 | **Qdrant** | [x] | Vector DB (RAG-ready) |
@@ -46,7 +47,7 @@ Start: `homelab-services/scripts/start-stack.sh`
 | Calling Ollama | [x] | `GPU_URL` → `/api/generate` |
 | Returning responses | [x] | JSON to client |
 
-Endpoints: `/health`, `/health/gpu`, `/chat`, `/stats`
+Endpoints: `/health`, `/health/gpu`, `/chat`, `/rag/*`, `/jobs`, `/system/status` — UI at [web-ui.md](../services/web-ui.md)
 
 ---
 
@@ -54,10 +55,10 @@ Endpoints: `/health`, `/health/gpu`, `/chat`, `/stats`
 
 | Responsibility | Status | Today |
 |----------------|--------|-------|
-| Routing | [x] | `:80` → `api:8000` |
-| HTTPS | [ ] | Later (domain + TLS) |
+| Routing | [x] | `:80` → `web:3000` (UI); API internal only |
+| HTTPS | [ ] | Optional — [public-internet.md](../deploy/public-internet.md) |
 | Rate limiting | [ ] | Not configured |
-| Public endpoint management | [~] | Tailscale/LAN only; no WAN expose |
+| Public endpoint management | [~] | Tailscale/LAN; no WAN by default |
 
 ---
 
@@ -128,7 +129,7 @@ Port **6333** exposed for when RAG is built.
 | **6333** | Qdrant |
 | **9090** | Prometheus |
 
-API is **not** public on 8000 — only via Caddy on 80.
+API is **internal** on 8000 — browser uses **web UI** on `:3080` / Caddy `:80` (BFF proxy).
 
 ---
 
