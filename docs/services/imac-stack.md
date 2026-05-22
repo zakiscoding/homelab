@@ -33,6 +33,7 @@ Use `~/1tb-drive/homelab-services` if Colima has trouble with spaces in `/Volume
 | Stop containers | `docker-compose down` |
 | Stop Colima VM | `colima stop` |
 | Rebuild API | `docker-compose up -d --build api` |
+| Web UI | `./scripts/ensure-homelab-web.sh` then `docker-compose up -d --build web` → `:3080` |
 
 Source env before manual docker commands:
 
