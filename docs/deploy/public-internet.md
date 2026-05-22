@@ -24,8 +24,9 @@ cd ~/1tb-drive/homelab-services
 git pull
 ./scripts/ensure-homelab-web.sh
 
-# Password for the public site (save the hash output)
-./scripts/hash-web-password.sh 'choose-a-strong-password'
+# First time only — creates .env with random secrets (or copy from laptop)
+./scripts/bootstrap-env.sh
+# Or: scp from laptop — see below
 
 # Edit .env — use a hostname YOU own (not the docs placeholder):
 # DOMAIN=ml.example.com
