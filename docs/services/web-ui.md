@@ -33,7 +33,11 @@ source ./scripts/docker-1tb-env.sh
 docker-compose up -d --build web
 ```
 
-Open http://100.91.113.98:3080
+Open http://100.91.113.98:3080 (or http://100.91.113.98/ via Caddy)
+
+## Public internet (your domain, no tunnel vendor)
+
+See [deploy/public-internet.md](../deploy/public-internet.md) — port-forward **80/443** to the iMac, set `DOMAIN` + basic auth in `.env`, run `render-caddyfile.sh`.
 
 ## Surfaces
 

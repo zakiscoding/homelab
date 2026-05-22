@@ -36,7 +36,8 @@ Internal records: see [Inventory — Domains](INVENTORY.md#domains--dns-internal
 
 | Rule / service | WAN exposed? | Port forward / reverse proxy | Notes |
 |----------------|--------------|------------------------------|-------|
-| | | | |
+| Caddy (web UI) | Yes (optional) | WAN 80, 443 → iMac | Only when `DOMAIN` set — [public-internet.md](deploy/public-internet.md) |
+| FastAPI, Grafana, Qdrant, Redis | **No** | — | Tailscale / LAN only |
 
 ## VPN / remote access
 
