@@ -9,7 +9,7 @@ How homelab code and docs are split across GitHub. **Do not put Docker/services 
 | **homelab** | [zakiscoding/homelab](https://github.com/zakiscoding/homelab) | All nodes (read) | Markdown docs, setup log, runbooks |
 | **homelab-services** | [zakiscoding/homelab-services](https://github.com/zakiscoding/homelab-services) | **iMac** (`Mos-iMac`) | Docker Compose (via **Colima**), FastAPI, Caddy, DB stack |
 | **homelab-gpu** | [zakiscoding/homelab-gpu](https://github.com/zakiscoding/homelab-gpu) | **GPU PC** (`zak_pc`) | Training scripts, configs (not inference models) |
-| **homelab-web** | _(local / push when ready)_ | **Laptop** (dev), **iMac** `:3080` (prod) | Next.js UI — chat, RAG, status |
+| **homelab-web** | [zakiscoding/homelab-web](https://github.com/zakiscoding/homelab-web) | **Laptop** (dev), **iMac** `:3080` (prod) | Next.js UI — chat, RAG, status |
 
 ## Paths on the 1TB drive (iMac)
 
@@ -101,6 +101,6 @@ git clone https://github.com/zakiscoding/homelab-services.git C:\Users\cashh\hom
 git clone https://github.com/zakiscoding/homelab-web.git C:\Users\cashh\homelab-web
 ```
 
-(`homelab-web` — init/push to GitHub when ready; see [services/web-ui.md](services/web-ui.md).)
+See [services/web-ui.md](services/web-ui.md).
 
 See also [GIT.md](GIT.md) (docs repo) and [services/imac-stack.md](services/imac-stack.md).
