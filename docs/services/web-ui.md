@@ -1,13 +1,13 @@
 # Web UI (homelab-web)
 
-Next.js app for **chat**, **RAG**, and **platform overview**. Repo: [zakiscoding/homelab-web](https://github.com/zakiscoding/homelab-web).
+Next.js app for **chat**, **RAG**, **reactions** (vision), and **platform overview**. Repo: [zakiscoding/homelab-web](https://github.com/zakiscoding/homelab-web).
 
 ## Traffic flow
 
 ```text
 Browser (Tailscale)
     │
-    ├─ http://100.91.113.98:3080  ──► homelab-web (Docker)
+    ├─ http://100.91.113.98:3081  ──► homelab-web (Docker)
     └─ http://100.91.113.98/      ──► Caddy :80 ──► homelab-web
               │
               │  /api/homelab/*  (Next.js BFF, server-side API key)
@@ -19,13 +19,14 @@ Browser (Tailscale)
          GPU Ollama :11434
 ```
 
-The browser **never** holds `API_KEY`. Grafana stays on **`:3000`**; the web UI uses **`:3080`** so ports do not clash.
+The browser **never** holds `API_KEY`. Grafana stays on **`:3000`**; the web UI uses **`:3081`** (`:3080` may be used by SSH/Tailscale on the iMac).
 
 ## URLs (Tailscale)
 
 | URL | What |
 |-----|------|
-| http://100.91.113.98:3080 | Web UI (direct) |
+| http://100.91.113.98:3081 | Web UI (direct) |
+| http://100.91.113.98:3081/reactions | Reactions / vision |
 | http://100.91.113.98/ | Same UI via Caddy |
 | http://100.91.113.98:3000 | Grafana (not the ML UI) |
 | http://100.88.71.33:11434/api/tags | GPU Ollama health |
@@ -39,6 +40,7 @@ The browser **never** holds `API_KEY`. Grafana stays on **`:3000`**; the web UI 
 | `/` | `/health`, `/health/gpu`, `/system/status` |
 | `/chat` | `POST /chat` → Ollama |
 | `/rag` | `POST /rag/ingest`, `POST /rag/query`, `GET /rag/status` |
+| `/reactions` | `GET /vision/status`, `POST /vision/reaction` — see [vision-reactions.md](vision-reactions.md) |
 
 ## iMac deploy (production)
 
@@ -66,7 +68,7 @@ docker-compose up -d --build web caddy
 Verify:
 
 ```bash
-curl -s -o /dev/null -w "%{http_code}\n" http://localhost:3080/
+curl -s -o /dev/null -w "%{http_code}\n" http://localhost:3081/
 curl -s -o /dev/null -w "%{http_code}\n" http://localhost/
 ```
 
@@ -134,7 +136,9 @@ Scripts: `serve-ollama.bat`, `start-ollama.ps1`, `install-ollama-serve-task.ps1`
 
 | Symptom | Fix |
 |---------|-----|
-| `:3080` connection refused | `docker-compose up -d web` on iMac; `source docker-1tb-env.sh` |
+| `:3081` connection refused | `docker-compose up -d web` on iMac; `source docker-1tb-env.sh` |
+| Reactions **vision down** | Start GPU reaction serve `:8100` — [vision-reactions.md](vision-reactions.md) |
+| Webcam blocked | Use upload on `/reactions` or HTTPS tunnel to localhost |
 | Chat **Thinking…** forever | `curl.exe http://100.88.71.33:11434/api/tags`; start Ollama on GPU |
 | Chat **502** | GPU Ollama unreachable from iMac; check `GPU_URL` in `.env` |
 | `/` 404, `/health` works | Old Caddy → API; `git pull`, rebuild `web` + `caddy` |

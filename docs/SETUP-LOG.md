@@ -4,6 +4,23 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 ---
 
+## 2026-05-27 — Phase 6, vision/reactions, MLflow, web UI :3081
+
+**Goal:** Align all four repos with production stack: reactions UI, vision API proxy, distributed train plans, MLflow, Grafana Homelab Stack dashboard.
+
+**Repos:**
+
+| Repo | Changes |
+|------|---------|
+| **homelab-services** | `vision_routes.py`, MLflow compose `:5001`, web `:3081`, `006`/`007` migrations, train_prep worker, homelab-stack Grafana JSON |
+| **homelab-web** | `/reactions` page, `vision/*` in BFF allowlist, nav + parse-api-response helper |
+| **homelab** | `PHASE-6.md`, `vision-reactions.md`, updated overview + web-ui docs |
+| **homelab-gpu** | README notes for reaction serve `:8100` (scripts TBD in repo) |
+
+**URLs:** Web `http://100.91.113.98:3081`, reactions `/reactions`, MLflow `:5001`, API `:8000`, GPU vision `http://100.88.71.33:8100`.
+
+**Deploy (iMac):** `git pull` → migrations → `docker-compose up -d --build`.
+
 ## 2026-05-22 — Web UI (homelab-web) + Ollama persistence
 
 **Goal:** Browser UI for chat, RAG, and status over Tailscale (no public domain).

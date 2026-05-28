@@ -23,7 +23,7 @@ See **[docs/DRIVE-LAYOUT.md](docs/DRIVE-LAYOUT.md)** for the full tree.
 | **`homelab/`** | This repo — docs only |
 | **`homelab-services/`** | Docker stack, API, databases, `data/` |
 | **`homelab-gpu/`** | GPU training code (mirror) |
-| **`homelab-web/`** | Next.js UI (mirror; prod on iMac `:3080`) |
+| **`homelab-web/`** | Next.js UI (mirror; prod on iMac `:3081`) |
 | **`homelab-runtime/`** | Colima + Docker CLI config |
 | **`Personal/`** | School, resumes, projects (not homelab) |
 
@@ -55,7 +55,9 @@ See **[docs/DRIVE-LAYOUT.md](docs/DRIVE-LAYOUT.md)** for the full tree.
 | [GPU node checklist](docs/nodes/GPU-NODE-CHECKLIST.md) | Install ✅, ports, ML-only rule |
 | [Git workflow](docs/GIT.md) | Clone, pull, push — GitHub `zakiscoding/homelab` |
 | [Repositories](docs/REPOS.md) | Four repos: docs, services, gpu, web |
-| [**Web UI**](docs/services/web-ui.md) | Chat, RAG, status — `:3080` on iMac |
+| [**Phase 6**](docs/PHASE-6.md) | Distributed train + MLflow |
+| [**Web UI**](docs/services/web-ui.md) | Chat, RAG, reactions — `:3081` on iMac |
+| [**Vision / reactions**](docs/services/vision-reactions.md) | FER CNN on GPU `:8100` |
 | [Backups](docs/BACKUPS.md) | Postgres dumps, checkpoints, restic |
 | [1TB layout](docs/DRIVE-LAYOUT.md) | iMac volume folder map |
 | [Testing](docs/TESTING.md) | Tailscale curl checklist |

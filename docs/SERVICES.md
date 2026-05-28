@@ -7,7 +7,9 @@ What runs in the lab and how to operate it. One row per service; link to config 
 | Service | Runs on | URL / access | Config path (1TB) | Backup |
 |---------|---------|--------------|-------------------|--------|
 | Caddy | imac-node | `http://100.91.113.98/` (Tailscale) | `homelab-services` compose | `:80` → **homelab-web** |
-| **Web UI** | imac-node | `http://100.91.113.98:3080` | [homelab-web](https://github.com/zakiscoding/homelab-web) | Chat, RAG, status — [web-ui.md](services/web-ui.md) |
+| **Web UI** | imac-node | `http://100.91.113.98:3081` | [homelab-web](https://github.com/zakiscoding/homelab-web) | Chat, RAG, reactions — [web-ui.md](services/web-ui.md) |
+| MLflow | imac-node | `http://100.91.113.98:5001` | homelab-services compose | Phase [6](PHASE-6.md) |
+| Reaction vision API | imac-node | `/vision/*` on API `:8000` | `homelab-services/api/vision_routes.py` | Proxies GPU `:8100` |
 | Prometheus | imac-node | `http://100.91.113.98:9090` | `homelab-services/prometheus/config` | Scrapes API, Qdrant, Pushgateway |
 | Pushgateway | imac-node | `http://100.91.113.98:9091` | ephemeral | GPU metrics push target |
 | Grafana | imac-node | `http://100.91.113.98:3000` | `homelab-services/grafana/` | Dashboard: Homelab ML Platform |
@@ -34,6 +36,8 @@ Stack doc: [services/imac-stack.md](services/imac-stack.md)
 | [services/web-ui.md](services/web-ui.md) | homelab-web |
 | [services/imac-stack.md](services/imac-stack.md) | Docker stack |
 | [services/rag.md](services/rag.md) | RAG pipeline |
+| [services/vision-reactions.md](services/vision-reactions.md) | FER / reactions |
+| [PHASE-6.md](PHASE-6.md) | Distributed train + MLflow |
 
 Create `docs/services/<name>.md` when a service needs more than a table row.
 

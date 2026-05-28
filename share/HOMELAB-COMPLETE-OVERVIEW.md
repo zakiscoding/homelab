@@ -2,7 +2,7 @@
 
 **Document purpose:** Standalone description of the homelab for collaborators, reviewers, or future you.  
 **No access required** to other files in the repository — everything essential is here.  
-**Last updated:** May 27, 2026  
+**Last updated:** May 27, 2026 (Phase 6, vision/reactions, MLflow, web UI :3081)  
 **Owner / GitHub:** [zakiscoding](https://github.com/zakiscoding) (private repositories)
 
 ---
@@ -21,12 +21,14 @@ Machines connect over **home LAN** and **Tailscale**. **Default access is Tailsc
 
 | Capability | How |
 |------------|-----|
-| **Web UI** | Chat, RAG ingest/query, platform status at `http://100.91.113.98:3080` |
+| **Web UI** | Chat, RAG, reactions, status at `http://100.91.113.98:3081` (or `:80` via Caddy) |
 | **Chat inference** | Browser → iMac web → API → GPU Ollama → response |
 | **RAG** | Ingest text → iMac worker embeds → Qdrant → query with citations |
+| **Reactions** | Webcam/upload → API `/vision/reaction` → GPU CNN serve `:8100` |
 | **Jobs** | Postgres SSOT; GPU + iMac workers; Redis wake on job create |
-| **Training** | QLoRA smoke train on GPU; artifacts under `homelab-data/checkpoints/` |
-| **Monitoring** | Prometheus + Grafana (“Homelab ML Platform” dashboard) |
+| **Training** | QLoRA on GPU; optional **distributed** shard plans (Phase 6) |
+| **MLflow** | Experiment UI on iMac `:5001` |
+| **Monitoring** | Prometheus + Grafana (“Homelab Stack” dashboard) |
 | **GPU metrics** | Pushgateway from GPU PC every minute |
 
 **What is intentionally not in public Git:** model weights, datasets, API keys, database passwords, checkpoints, and `.env` files.
@@ -48,17 +50,18 @@ Machines connect over **home LAN** and **Tailscale**. **Default access is Tailsc
         │  GPU PC (Windows)   │              │  iMac (macOS, M1)         │
         │  zak_pc · zakar       │              │  Mos-iMac · momo            │
         │                       │              │                           │
-        │  • Ollama :11434      │◄── HTTP ─────│  • Web UI :3080 / Caddy :80 │
-        │  • RTX 5070 12GB      │   inference  │  • FastAPI (internal :8000)│
-        │  • homelab-gpu        │              │  • Postgres, Redis, Qdrant│
-        │  • GPU train worker   │── poll jobs ─│  • imac-worker (RAG)      │
+        │  • Ollama :11434      │◄── HTTP ─────│  • Web UI :3081 / Caddy :80│
+        │  • Reaction CNN :8100 │◄── vision ───│  • FastAPI :8000          │
+        │  • RTX 5070 12GB      │   inference  │  • Postgres, Redis, Qdrant│
+        │  • homelab-gpu        │              │  • MLflow :5001           │
+        │  • GPU train worker   │── poll jobs ─│  • imac-worker (RAG/prep) │
         │  • Jupyter :8888      │              │  • Prometheus, Grafana    │
         └─────────────────────┘              └───────────────────────────┘
 ```
 
 ### Request flow (chat via web UI)
 
-1. User opens **http://100.91.113.98:3080** (or `http://100.91.113.98/` via Caddy).
+1. User opens **http://100.91.113.98:3081** (or `http://100.91.113.98/` via Caddy).
 2. **homelab-web** (Next.js) proxies `/api/homelab/chat` to **FastAPI** with `x-api-key` on the server (key never in the browser).
 3. FastAPI calls **Ollama** on the GPU (`http://100.88.71.33:11434`).
 4. Response returns to the UI; chat may be logged in **Postgres**.
@@ -68,6 +71,13 @@ Machines connect over **home LAN** and **Tailscale**. **Default access is Tailsc
 1. User ingests text in the **RAG** tab → API creates ingest + embed jobs.
 2. **imac-worker** chunks, embeds via GPU/Ollama path, stores vectors in **Qdrant**.
 3. User queries → API searches Qdrant → LLM answer with citations.
+
+### Request flow (reactions / vision)
+
+1. User opens **/reactions** in homelab-web → captures frame or uploads image.
+2. Next.js BFF calls **`POST /vision/reaction`** on the iMac API.
+3. FastAPI forwards to **GPU reaction serve** (`:8100`).
+4. Label + confidence return to the UI (FER-style classes).
 
 ### Design principles
 
@@ -101,15 +111,15 @@ Machines connect over **home LAN** and **Tailscale**. **Default access is Tailsc
 | Node | LAN IPv4 | Notes |
 |------|----------|-------|
 | GPU PC | `10.0.0.156` | Ollama `11434`, Jupyter `8888` |
-| iMac | (DHCP) | Web `3080`, Caddy `80`, Grafana `3000` |
+| iMac | (DHCP) | Web `3081`, Caddy `80`, API `8000`, Grafana `3000`, MLflow `5001` |
 | Home gateway | `10.0.0.1` | Typical |
 
 ### Tailscale (primary remote access)
 
 | Node | Tailscale IPv4 | Key services |
 |------|----------------|--------------|
-| GPU PC | `100.88.71.33` | Ollama `:11434` |
-| iMac | `100.91.113.98` | Web UI `:3080`, Caddy `:80`, Grafana `:3000` |
+| GPU PC | `100.88.71.33` | Ollama `:11434`, reaction serve `:8100` |
+| iMac | `100.91.113.98` | Web UI `:3081`, Caddy `:80`, API `:8000`, Grafana `:3000`, MLflow `:5001` |
 | Laptop | `100.73.132.95` | Controller |
 
 ### Security posture
@@ -208,10 +218,11 @@ Key scripts: `setup-1tb.sh`, `start-stack.sh`, `ensure-homelab-web.sh`, `render-
 
 | Container | Purpose | Tailscale port |
 |-----------|---------|----------------|
-| **web** | Next.js UI (homelab-web) | **3080** |
+| **web** | Next.js UI (homelab-web) | **3081** |
 | **caddy** | Reverse proxy → `web:3000` | **80**, 443 |
-| **api** | FastAPI — chat, RAG, jobs, metrics | internal 8000 |
-| **imac-worker** | RAG ingest + embed | internal |
+| **api** | FastAPI — chat, RAG, vision, jobs, metrics | **8000** |
+| **imac-worker** | RAG ingest/embed + train_prep | internal |
+| **mlflow** | Experiment tracking UI | **5001** |
 | **postgres** | Jobs, chat logs, RAG metadata | internal |
 | **redis** | Counters, job wake queues | **6379** (GPU worker) |
 | **qdrant** | Vector search | **6333** |
@@ -226,7 +237,9 @@ Key scripts: `setup-1tb.sh`, `start-stack.sh`, `ensure-homelab-web.sh`, `render-
 | Health | `/health`, `/health/gpu` | None / LAN |
 | Chat | `POST /chat` | `x-api-key` |
 | RAG | `POST /rag/ingest`, `POST /rag/query`, `GET /rag/status` | `x-api-key` |
+| Vision | `GET /vision/status`, `POST /vision/reaction` | `x-api-key` |
 | Jobs | `POST /jobs`, `GET /jobs/{id}` | `x-api-key` |
+| Models | `GET /models` (Ollama tags on GPU) | `x-api-key` |
 | Workers | `/internal/worker/*` | `X-Worker-Key` |
 | Metrics | `GET /metrics` | LAN/Tailscale |
 | System | `GET /system/status` | `x-api-key` |
@@ -238,8 +251,8 @@ The **web UI** calls these through `/api/homelab/*` on the Next.js server (brows
 | Item | Detail |
 |------|--------|
 | Repo | [github.com/zakiscoding/homelab-web](https://github.com/zakiscoding/homelab-web) |
-| Production URL | http://100.91.113.98:3080 or http://100.91.113.98/ |
-| Pages | `/` overview, `/chat`, `/rag` |
+| Production URL | http://100.91.113.98:3081 or http://100.91.113.98/ |
+| Pages | `/` overview, `/chat`, `/rag`, `/reactions` |
 | Chat UX | GPU health banner; 2-minute client timeout; clearer 502 when Ollama is down |
 | Dev | `npm run dev` on laptop → `http://localhost:3000` |
 | Deploy | `ensure-homelab-web.sh` then `docker-compose up -d --build web caddy` on iMac |
@@ -298,9 +311,10 @@ Persistent service data: `homelab-services/data/` (Postgres, Grafana, Qdrant, et
 | **3** | QLoRA training smoke on GPU | Done |
 | **4** | Redis job wake (LPUSH / BLPOP) | Done |
 | **5** | Prometheus, Pushgateway, Grafana dashboards | Done |
-| **Web UI** | homelab-web on `:3080` | Done (May 2026) |
+| **Web UI** | homelab-web on `:3081` | Done (May 2026) |
+| **6** | Distributed train plans, MLflow, vision/reactions API | Done (May 2026) |
 
-**Not in MVP yet (optional):** served LoRA adapter in Ollama, MLflow, public domain HTTPS, full user auth in UI.
+**Not in MVP yet (optional):** served LoRA adapter in Ollama, public domain HTTPS, full user auth in UI, GPU reaction-serve install scripts in homelab-gpu repo.
 
 ---
 
@@ -311,8 +325,10 @@ Persistent service data: `homelab-services/data/` (Postgres, Grafana, Qdrant, et
 - [x] Four-repo layout on GitHub (private)  
 - [x] GPU: Ollama, Tailscale, `HomelabOllamaServe`, training env, QLoRA smoke  
 - [x] iMac: full compose stack + web UI + RAG worker  
-- [x] Tailscale E2E: UI, chat, RAG, Grafana  
+- [x] Tailscale E2E: UI, chat, RAG, reactions, Grafana  
 - [x] Job plane + Redis wake + observability  
+- [x] Vision proxy + reactions page; MLflow `:5001`  
+- [x] Phase 6 distributed train schema + train_prep worker  
 
 ### Sensible next steps
 
@@ -327,10 +343,13 @@ Persistent service data: `homelab-services/data/` (Postgres, Grafana, Qdrant, et
 
 | Service | URL |
 |---------|-----|
-| **Web UI (primary)** | http://100.91.113.98:3080 |
+| **Web UI (primary)** | http://100.91.113.98:3081 |
+| **Reactions UI** | http://100.91.113.98:3081/reactions |
 | **Web UI (Caddy)** | http://100.91.113.98/ |
 | GPU Ollama health | http://100.88.71.33:11434/api/tags |
-| iMac API health (ops) | http://100.91.113.98/health |
+| GPU reaction health | http://100.88.71.33:8100/health |
+| iMac API health (ops) | http://100.91.113.98:8000/health |
+| MLflow | http://100.91.113.98:5001 |
 | Grafana | http://100.91.113.98:3000 |
 | Prometheus | http://100.91.113.98:9090 |
 | Pushgateway | http://100.91.113.98:9091 |
@@ -343,7 +362,9 @@ Persistent service data: `homelab-services/data/` (Postgres, Grafana, Qdrant, et
 
 | Symptom | Likely cause | Fix |
 |---------|--------------|-----|
-| `:3080` connection refused | `web` container down on iMac | `docker-compose up -d web` (+ `source docker-1tb-env.sh`) |
+| `:3081` connection refused | `web` container down on iMac | `docker-compose up -d web` (+ `source docker-1tb-env.sh`) |
+| Reactions “vision down” | GPU reaction serve not on `:8100` | Start serve on zak_pc; check `GPU_VISION_URL` in `.env` |
+| Webcam blocked on Tailscale | HTTP lacks secure context | Use **Upload photo** or SSH tunnel to `https://localhost:3081` |
 | Chat “Thinking…” forever | GPU Ollama not running | `curl` GPU tags; `schtasks /Run /TN HomelabOllamaServe` on GPU |
 | Chat 502 | iMac cannot reach GPU `:11434` | Check `GPU_URL` in `.env`, firewall, Ollama bind |
 | RAG query empty | Embed not finished | Wait 30–90s after ingest; check `imac-worker` logs |
@@ -365,6 +386,9 @@ Persistent service data: `homelab-services/data/` (Postgres, Grafana, Qdrant, et
 | **Caddy** | Reverse proxy; LAN mode forwards `:80` → web UI |
 | **Qdrant** | Vector DB for RAG |
 | **Pushgateway** | Prometheus target for GPU-pushed metrics |
+| **MLflow** | Experiment tracking server on iMac |
+| **train_prep** | iMac job that builds shard plan before GPU train |
+| **Reaction serve** | GPU FastAPI/CNN on port 8100 for `/vision/reaction` |
 
 ---
 
@@ -374,7 +398,7 @@ Persistent service data: `homelab-services/data/` (Postgres, Grafana, Qdrant, et
 - Private repo access must be granted by the owner.  
 - This document contains **no** passwords, API keys, or tokens.
 
-After joining the project: clone **homelab**, read `docs/SETUP-LOG.md` for build history, and `docs/services/web-ui.md` for the browser UI.
+After joining the project: clone **homelab**, read `docs/SETUP-LOG.md` for build history, `docs/services/web-ui.md` for the browser UI, and `docs/services/vision-reactions.md` for the reactions pipeline.
 
 ---
 
