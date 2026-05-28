@@ -2,7 +2,7 @@
 
 **Document purpose:** Standalone description of the homelab for collaborators, reviewers, or future you.  
 **No access required** to other files in the repository — everything essential is here.  
-**Last updated:** May 22, 2026  
+**Last updated:** May 27, 2026  
 **Owner / GitHub:** [zakiscoding](https://github.com/zakiscoding) (private repositories)
 
 ---
@@ -124,12 +124,12 @@ Machines connect over **home LAN** and **Tailscale**. **Default access is Tailsc
 
 ## 5. GitHub repositories (four-repo model)
 
-| Repository | Runs on | Contains |
-|------------|---------|----------|
-| **homelab** | All nodes (docs) | Markdown, architecture, phases, setup log |
-| **homelab-services** | **iMac** | Docker Compose, FastAPI, Caddy, workers, DB migrations |
-| **homelab-gpu** | **GPU PC** | Training scripts, GPU worker, Ollama helpers, notebooks |
-| **homelab-web** | **Laptop dev**, **iMac prod** | Next.js UI — chat, RAG, status |
+| Repository | GitHub | Runs on | Contains |
+|------------|--------|---------|----------|
+| **homelab** | [zakiscoding/homelab](https://github.com/zakiscoding/homelab) | All nodes (docs) | Markdown, architecture, phases, setup log |
+| **homelab-services** | [zakiscoding/homelab-services](https://github.com/zakiscoding/homelab-services) | **iMac** | Docker Compose, FastAPI, Caddy, workers, DB migrations |
+| **homelab-gpu** | [zakiscoding/homelab-gpu](https://github.com/zakiscoding/homelab-gpu) | **GPU PC** | Training scripts, GPU worker, Ollama helpers, notebooks |
+| **homelab-web** | [zakiscoding/homelab-web](https://github.com/zakiscoding/homelab-web) | **Laptop dev**, **iMac prod** | Next.js UI — chat, RAG, status |
 
 ### Local paths (canonical copies)
 
@@ -237,11 +237,12 @@ The **web UI** calls these through `/api/homelab/*` on the Next.js server (brows
 
 | Item | Detail |
 |------|--------|
-| Repo | github.com/zakiscoding/homelab-web |
+| Repo | [github.com/zakiscoding/homelab-web](https://github.com/zakiscoding/homelab-web) |
 | Production URL | http://100.91.113.98:3080 or http://100.91.113.98/ |
 | Pages | `/` overview, `/chat`, `/rag` |
+| Chat UX | GPU health banner; 2-minute client timeout; clearer 502 when Ollama is down |
 | Dev | `npm run dev` on laptop → `http://localhost:3000` |
-| Deploy | `docker-compose up -d --build web caddy` on iMac |
+| Deploy | `ensure-homelab-web.sh` then `docker-compose up -d --build web caddy` on iMac |
 
 ---
 
