@@ -8,19 +8,22 @@ Three-node homelab split by role. GPU node first; iMac and API layer connected a
                                 |                        |
                     +-----------+-----------+            |
                     |                       |            |
-      [ GPU PC — zakar / zak_pc ]      [ iMac — momo ]   |
-      Ollama :11434 · training         homelab-services  │
-      homelab-gpu                      homelab-web :3080 │
-                                       Caddy :80 → web   │
+      [ Dual-boot GPU PC ]             [ iMac — momo ]   |
+      Windows: zakar / zak_pc          homelab-services  │
+        Ollama :11434 · homelab-gpu    homelab-web       │
+      Ubuntu: zak-gpu-node             Caddy → web       │
+        ~/projects (CUDA track)                          │
 ```
 
 ## Node roles
 
-| Node | Windows/macOS user | Role | Primary workloads | Phase |
-|------|-------------------|------|-------------------|-------|
-| **GPU PC** | **`zakar`** (`zak_pc`) | Inference + **training** | Ollama; future `homelab-gpu` for train code | **1 — inference done** |
+| Node | User / OS | Role | Primary workloads | Phase |
+|------|-----------|------|-------------------|-------|
+| **GPU PC (Windows boot)** | **`zakar`** (`zak_pc` / Tailscale `zakar`) | Inference + **training** | Ollama; `homelab-gpu` | **1 — inference done** |
+| **GPU PC (Ubuntu boot)** | OS+Tailscale **`zak-gpu-node`** | Ubuntu CUDA / hybrid lab | PyTorch wheels under `~/projects` — [ubuntu-gpu](ubuntu-gpu/) | Phase 1 smoke **PASS**; Docker/Modal later |
 | **iMac** | **`momo`** (`Mos-iMac`) | App / data plane | [`homelab-services`](https://github.com/zakiscoding/homelab-services) | **2 — done** (Colima) |
 | **Laptop** | **`cashh`** | Controller | Docs, web dev, `ssh imac-ts` / `ssh zak-ts` | Ongoing |
+| **Cursor VM** | Tailscale `cursor-cloud` | Cloud agent host | **No GPU** — not the dual-boot PC | — |
 
 ## Traffic flow
 
@@ -42,7 +45,8 @@ Three-node homelab split by role. GPU node first; iMac and API layer connected a
 
 | Node | Doc |
 |------|-----|
-| GPU PC | [nodes/gpu-node.md](nodes/gpu-node.md) |
+| GPU PC (Windows) | [nodes/gpu-node.md](nodes/gpu-node.md) |
+| GPU PC (Ubuntu / hybrid) | [ubuntu-gpu/](ubuntu-gpu/) |
 | iMac | [nodes/imac-node.md](nodes/imac-node.md) · [services/imac-stack.md](services/imac-stack.md) |
 | Repos | [REPOS.md](REPOS.md) |
 | Controller | [nodes/controller.md](nodes/controller.md) |
