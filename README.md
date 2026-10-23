@@ -52,6 +52,10 @@ See **[docs/DRIVE-LAYOUT.md](docs/DRIVE-LAYOUT.md)** for the full tree.
 | [**Phase 1**](docs/PHASE-1.md) | Inference pipeline — `/chat` + infer jobs |
 | [**Phase 2**](docs/PHASE-2.md) | RAG — ingest, embed, `/rag/query` |
 | [**Phase 3**](docs/PHASE-3.md) | QLoRA training + experiments + ML-STORE sync |
+| [**Phase 3b**](docs/PHASE-3-LORA-SERVE.md) | Publish LoRA → Ollama (`homelab-*` models in chat) |
+| [**CNN fine-tune**](docs/CNN-FINETUNE.md) | ResNet18 image classifier (CIFAR-10 or custom folders) |
+| [**GPU-only train**](docs/GPU-TRAIN.md) | **Default** — AMP + grad accum on RTX 5070 (`run-cnn-local.ps1`) |
+| [**Reaction vision**](docs/REACTION-VISION.md) | FER / expressions — Barsoum FER+, ResNet |
 | [Execution model](docs/EXECUTION-MODEL.md) | Postgres SSOT, GPU worker, SSH aliases |
 | [GPU node runbook](docs/nodes/gpu-node.md) | Ollama on Windows |
 | [GPU node checklist](docs/nodes/GPU-NODE-CHECKLIST.md) | Install ✅, ports, ML-only rule |
@@ -89,18 +93,19 @@ Runtime compose and API code: **`homelab-services/`** — document from `docs/se
 | GPU Ollama (persistent) | **Done** | `HomelabOllamaServe` on `zak_pc` |
 | Docs on 1TB drive | Done | `/Volumes/1tb drive/homelab` |
 | Services on 1TB drive | Done | `/Volumes/1tb drive/homelab-services` |
-| GitHub repos | **Done** | `homelab` + `homelab-services` + `homelab-gpu` (all private) |
+| GitHub repos | **Done** | Four private repos: `homelab`, `homelab-services`, `homelab-gpu`, `homelab-web` |
 | Monitoring | Running | Prometheus :9090, Grafana :3000 on iMac |
-| Tailscale E2E tests | **Done** | GPU + iMac health from `zak_pc` |
+| Tailscale E2E tests | **Done** | GPU + iMac health; web UI chat/RAG from laptop |
 | GPU training prep | **Done** | `homelab-gpu` cloned, Python, torch, data dirs |
-| Backups | Documented | [BACKUPS.md](docs/BACKUPS.md) + `backup-postgres.sh` on iMac |
-| First LoRA run | **Next** | Add dataset + `train.py` in `homelab-gpu/training/` |
+| QLoRA smoke train | **Done** | Phase 3 — `training/lora_quickstart/train.py` via GPU worker |
+| Backups | Documented | [BACKUPS.md](docs/BACKUPS.md) + `backup-postgres.sh` on iMac (schedule **Next**) |
+| LoRA → Ollama inference | **Ready** | `publish-lora-to-ollama.ps1` — see [PHASE-3-LORA-SERVE.md](docs/PHASE-3-LORA-SERVE.md) |
 | GPU node — Ubuntu boot | **Done** | `zak-gpu-node` `100.121.51.35`; CUDA 13.2, Docker, Open MPI — [gpu-node-ubuntu.md](docs/nodes/gpu-node-ubuntu.md) |
 | GPU monitoring (DCGM) | **Running** | Grafana `100.121.51.35:3000/d/gpu-node`, Prometheus `:9090` (Ubuntu boot) |
 | k3s GPU scheduling | **Running** | single node, NVIDIA device plugin, GPU admission policy |
 | vLLM serving | **Done** | Qwen2.5-1.5B: 4.4k tok/s on RTX 5070 (on demand, localhost) |
 | Cloud GPU burst (Modal) | **Done** | H100 / 2x H100; **$10** usage limit |
-| Ubuntu node hardening | **Pending (owner)** | run `gpu-systems-lab/scripts/harden_node.sh` with sudo |
+| Ubuntu node hardening | **Done** | `harden_node.sh`: LAN blocked for 22/6443/10250 (verified), sudo cleanup; reboot pending for Nsight counters |
 | Chat on vLLM (dual-boot aware) | **Done** | `LLM_BACKEND=auto`: vLLM on Ubuntu, Ollama on Windows |
 | Unified Grafana | **Done** | GPU node dashboard + datasource in the iMac Grafana |
 | Router → job queue | **Done** | `route` jobs claimed by the router worker; local RTX or Modal |

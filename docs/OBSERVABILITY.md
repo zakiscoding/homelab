@@ -12,6 +12,7 @@ Postgres `jobs` and worker heartbeats drive operational signals — not log file
 | http://100.91.113.98:9090 | None | Prometheus UI |
 | http://100.91.113.98:9091 | None | Pushgateway (GPU metrics) |
 | http://100.91.113.98:3000 | Grafana login | Dashboards |
+| http://100.91.113.98:5001 | None (LAN/Tailscale) | MLflow experiment tracking |
 | http://100.91.113.98/system/status | `x-api-key` | JSON situational summary |
 
 ## Metric families
@@ -26,8 +27,13 @@ Postgres `jobs` and worker heartbeats drive operational signals — not log file
 | `homelab_redis_requests_total` | Redis | Cumulative `/chat` counter |
 | `homelab_job_notify_*` | Redis | Phase 4 wake queue health |
 | `homelab_gpu_*` | GPU → Pushgateway | Utilization, VRAM, temperature |
+| `homelab_host_*` | GPU → Pushgateway | Host CPU %, RAM MiB |
+| `homelab_reaction_serve_up` / `homelab_ollama_up` | GPU → Pushgateway | Service health on zak_pc |
+| `homelab_vision_*` | API vision proxy | Reaction `/vision` request rate & latency |
 
-Qdrant exposes its own metrics at `:6333/metrics` (scraped as job `qdrant`).
+Dashboard **Homelab Stack** (`homelab-stack.json`) adds GPU PC CPU/RAM, vision latency, and quick links to MLflow and `/reactions`.
+
+See [MLFLOW.md](MLFLOW.md) for experiment tracking on `:5001` (macOS reserves `:5000` for AirPlay).
 
 ## Health rules (operator)
 
