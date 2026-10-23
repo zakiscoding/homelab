@@ -4,6 +4,35 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 ---
 
+## 2026-10-23 (evening) — Job-queue fixes and documentation across all repos
+
+**Goal:** Fix bugs found while documenting the code, then make the docs of all five repos consistent.
+
+**Fixed (deployed on the iMac; Windows worker picks them up on its next `git pull`):**
+
+| Bug | Fix | Verified live |
+|-----|-----|---------------|
+| Every RAG ingest job crashed (`run_ingest_job` never imported) | import in `worker/poll_imac.py` | ingest + embed jobs succeeded |
+| Restarting any worker force-reset **all** running jobs, incl. live training | `reset-stale` resets only the caller's own jobs (`X-Worker-Id`) | worker B reset 0 of worker A's jobs |
+| No lease renewal: jobs > 15 min could be requeued and run twice | `POST /internal/worker/jobs/{id}/renew`; iMac (2 min), router (5 min) and Windows QLoRA (5 min) workers renew | owner 200, other worker 409 |
+| Failed `/chat` and `/rag/query` jobs stayed `pending` forever | inline jobs fail without retry; sweep closes any stranded > 10 min | — |
+| `/chat` returned `gpu_busy` while a routed (Modal) job ran | `gpu_busy` ignores routed jobs | chat 200 during a routed job |
+| Workers crashed if they started before the API / Tailscale | wait for `/health` with backoff | 0 restarts on a simultaneous restart |
+
+Also: `backups/` (pg_dump files with real data) added to homelab-services `.gitignore`.
+
+**Docs:** docstrings for all code (gpu-systems-lab, homelab-services), `homelab-services/docs/API.md`,
+`OPERATIONS.md`, `JOBS.md`, `gpu-systems-lab/docs/CODE-GUIDE.md`, and a consistent README (centered
+header, verified badges, shared nav bar, Mermaid diagrams) in every repo. This repo's
+[ARCHITECTURE.md](ARCHITECTURE.md) holds the infrastructure diagrams. All 19 Mermaid diagrams were
+render-tested before pushing.
+
+**Gotchas:**
+- homelab-web's GitHub **default branch is the stale `master`**; the live code is on `main`.
+  Switch the default branch in GitHub settings.
+- The earlier entry's note that routed-job leases are "not renewed" is superseded by the renew
+  endpoint above.
+
 ## 2026-10-23 (later) — One platform: vLLM chat, unified Grafana, router → job queue
 
 **Goal:** Connect the homelab (iMac control plane, web UI) to the gpu-systems-lab work on the
