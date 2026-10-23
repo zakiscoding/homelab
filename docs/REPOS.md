@@ -10,6 +10,7 @@ How homelab code and docs are split across GitHub. **Do not put Docker/services 
 | **homelab-services** | [zakiscoding/homelab-services](https://github.com/zakiscoding/homelab-services) | **iMac** (`Mos-iMac`) | Docker Compose (via **Colima**), FastAPI, Caddy, DB stack |
 | **homelab-gpu** | [zakiscoding/homelab-gpu](https://github.com/zakiscoding/homelab-gpu) | **GPU PC** (`zak_pc`) | Training scripts, configs (not inference models) |
 | **homelab-web** | [zakiscoding/homelab-web](https://github.com/zakiscoding/homelab-web) | **Laptop** (dev), **iMac** `:3080` (prod) | Next.js UI — chat, RAG, status |
+| **gpu-systems-lab** | [zakiscoding/gpu-systems-lab](https://github.com/zakiscoding/gpu-systems-lab) | **GPU PC on Ubuntu** (`zak-gpu-node`), **Modal**, laptop | CUDA kernels, MPI/NCCL, FSDP, vLLM serving, k3s scheduling, DCGM monitoring, job router — [gpu-node-ubuntu.md](nodes/gpu-node-ubuntu.md) |
 
 ## Paths on the 1TB drive (iMac)
 
@@ -25,6 +26,9 @@ Full tree: [DRIVE-LAYOUT.md](DRIVE-LAYOUT.md)
 | `Personal/` | _(not git — school/resumes)_ |
 
 **GPU PC (Windows):** clone `homelab-gpu` to `C:\Users\zakar\homelab-gpu` (canonical on GPU machine).
+
+**GPU PC (Ubuntu boot):** `gpu-systems-lab` at `~/gpu-systems-lab` on `zak-gpu-node`; the
+canonical working copy is on the laptop (`OneDrive\Desktop\gpu-systems-lab`), synced to the node.
 
 GPU PC keeps large artifacts **local** (Ollama models, checkpoints, datasets) — documented in `homelab`, not committed.
 

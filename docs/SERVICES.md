@@ -29,6 +29,19 @@ What runs in the lab and how to operate it. One row per service; link to config 
 
 Stack doc: [services/imac-stack.md](services/imac-stack.md)
 
+## GPU node — Ubuntu boot (`zak-gpu-node`, `gpu-systems-lab`)
+
+Only up while the PC is booted into Ubuntu (the Windows services above are down then).
+
+| Service | Runs on | URL / access | Config | Notes |
+|---------|---------|--------------|--------|-------|
+| Grafana (GPU) | zak-gpu-node | `http://100.121.51.35:3000/d/gpu-node` | `gpu-systems-lab/observability/` | tailnet only; anonymous view |
+| Prometheus (GPU) | zak-gpu-node | `http://100.121.51.35:9090` | `gpu-systems-lab/observability/prometheus/` | alerts: GPU temp > 85 °C, VRAM > 95%, XID, exporter down |
+| dcgm-exporter | zak-gpu-node | `127.0.0.1:9400/metrics` | `observability/dcgm/counters.csv` | SM active, tensor pipe, power, temp, PCIe |
+| k3s + GPU queue | zak-gpu-node | `kubectl` (kubeconfig on node) | `gpu-systems-lab/scheduling/` | `submit.py`; admission policy enforces GPU limits |
+| vLLM | zak-gpu-node | `127.0.0.1:8000` (OpenAI API) | `gpu-systems-lab/serving/` | on demand: `serving/launch_server.sh` |
+| Job router | laptop | `python -m router route/run` | `gpu-systems-lab/router/` | local RTX vs Modal by VRAM, deadline, cost |
+
 ## Per-service detail (optional)
 
 | Doc | Service |

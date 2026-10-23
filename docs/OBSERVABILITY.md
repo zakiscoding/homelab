@@ -54,6 +54,25 @@ cd C:\Users\zakar\homelab-gpu
 
 Requires `PUSHGATEWAY_URL=http://100.91.113.98:9091` (default).
 
+## GPU metrics (Ubuntu boot — DCGM)
+
+When the GPU PC runs Ubuntu (`zak-gpu-node`), it has its own stack
+([gpu-systems-lab/observability](https://github.com/zakiscoding/gpu-systems-lab/tree/main/observability)):
+**dcgm-exporter → Prometheus → Grafana**, plus node-exporter. Docker Compose; ports bound to the
+tailnet.
+
+| URL | Purpose |
+|-----|---------|
+| http://100.121.51.35:3000/d/gpu-node | Grafana GPU dashboard (21 panels, anonymous view) |
+| http://100.121.51.35:9090 | Prometheus (5 s scrape, 15-day retention) |
+
+DCGM works on this GeForce card, including the profiling fields (SM active, occupancy, tensor-pipe,
+DRAM activity, PCIe bytes). There are no NVLink, ECC or MIG metrics, and memory temperature reads 0.
+Measured under load: GPU 0 → 100%, power 2 → 229 W, 36 → 63 °C, SM clock 180 → 2,820 MHz.
+
+**Later:** add `100.121.51.35:9090` as a second Grafana datasource on the iMac (or federate) for
+one pane across both boots.
+
 ## Deploy
 
 See [PHASE-5.md](PHASE-5.md).

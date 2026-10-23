@@ -4,6 +4,43 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 ---
 
+## 2026-10-23 — GPU node Ubuntu boot: AI-infra lab (gpu-systems-lab)
+
+**Goal:** Turn the RTX 5070 PC's Ubuntu boot into a measured AI-infra lab: CUDA, MPI/NCCL,
+distributed training, serving, monitoring and scheduling, with Modal for cloud bursts.
+
+**Done** (code + results in [gpu-systems-lab](https://github.com/zakiscoding/gpu-systems-lab), summary in its `docs/RESULTS.md`):
+
+| Area | Result |
+|------|--------|
+| Node | `zak-gpu-node` (Ubuntu 24.04.5 on external HDD, Tailscale 100.121.51.35), `ssh gpu-ts` via Tailscale SSH — [gpu-node-ubuntu.md](nodes/gpu-node-ubuntu.md) |
+| Toolchain | CUDA 13.2, LLVM 21, Docker 29 + NVIDIA Container Toolkit, PyTorch 2.11 (cu128) |
+| Baseline | RTX 5070 BF16 67.7 TFLOPS; H100 on Modal 677.8 (10x) |
+| CUDA | kernels + PTX/LLVM IR; Nsight Systems profiles |
+| MPI | 1 node (MPS: 3x), 2x H100 (1.38x), CUDA-aware, and **RTX node + iMac over Tailscale** (heterogeneous Open MPI 4.1.6 in `~/opt` on both) |
+| NCCL / DDP | 2x H100 all-reduce 329 GB/s; DDP 1.57x at batch 4096 (2x L4: 6.65 GB/s, slower than 1 GPU) |
+| FSDP | 5.6B model OOMs under DDP, trains under FSDP2 on 2x H100; elastic restart recovers in 11–14 s |
+| Serving | vLLM 0.32: Qwen2.5-1.5B 4.4k tok/s (5070) vs 16.8k (H100) |
+| Monitoring | dcgm-exporter + Prometheus + Grafana on the node (tailnet `:3000`, `:9090`) |
+| Scheduling | k3s v1.36.5 + NVIDIA device plugin; GPU jobs queue one at a time; admission policy blocks GPU use without a limit |
+| Router | `python -m router`: local RTX vs Modal by VRAM / deadline / cost / NVLink |
+
+**Cloud:** Modal workspace `zakiscoding`, usage limit **$10**, ~$3.20 spent.
+
+**Access changes:**
+- `id_mpi` key on the GPU node is authorized on the iMac (`momo`) for 2-machine MPI.
+- Passwordless sudo for `zak` was added during setup; it is removed by `harden_node.sh`.
+
+**Rollback / gotchas:**
+- The PC runs Windows **or** Ubuntu: Ollama/worker/vision (`100.88.71.33`) are down while on Ubuntu.
+- Tailscale SSH check mode needs a browser re-approval every ~12 h; queued SSH commands wait for it.
+- `/usr/local/bin/k3s-uninstall.sh` removes k3s; `docker compose down -v` in `observability/` removes monitoring.
+- Observed: the iMac's Colima VM was **Stopped** on 2026-10-23, so the iMac stack was down.
+
+**Next:**
+- Owner runs `sudo bash scripts/harden_node.sh` on the node (LAN firewall for 22/6443/10250, Nsight counters, sudo cleanup), then reboots.
+- Start Colima on the iMac; add the GPU node's Prometheus as a Grafana datasource there.
+
 ## 2026-05-27 — Phase 6, vision/reactions, MLflow, web UI :3081
 
 **Goal:** Align all four repos with production stack: reactions UI, vision API proxy, distributed train plans, MLflow, Grafana Homelab Stack dashboard.
