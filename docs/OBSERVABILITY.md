@@ -70,8 +70,10 @@ DCGM works on this GeForce card, including the profiling fields (SM active, occu
 DRAM activity, PCIe bytes). There are no NVLink, ECC or MIG metrics, and memory temperature reads 0.
 Measured under load: GPU 0 → 100%, power 2 → 229 W, 36 → 63 °C, SM clock 180 → 2,820 MHz.
 
-**Later:** add `100.121.51.35:9090` as a second Grafana datasource on the iMac (or federate) for
-one pane across both boots.
+**One pane (done 2026-10-23):** the iMac Grafana (`:3000`) has `100.121.51.35:9090` as a second
+datasource, **"GPU node (zak-gpu-node)"** (uid `gpu-node-prom`), and the GPU dashboard
+**"GPU node (RTX 5070, zak-gpu-node)"** sits in the Homelab folder next to the platform dashboards.
+Provisioned from `homelab-services/grafana/`. It shows no data while the PC runs Windows.
 
 ## Deploy
 

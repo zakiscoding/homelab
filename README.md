@@ -101,3 +101,7 @@ Runtime compose and API code: **`homelab-services/`** — document from `docs/se
 | vLLM serving | **Done** | Qwen2.5-1.5B: 4.4k tok/s on RTX 5070 (on demand, localhost) |
 | Cloud GPU burst (Modal) | **Done** | H100 / 2x H100; **$10** usage limit |
 | Ubuntu node hardening | **Pending (owner)** | run `gpu-systems-lab/scripts/harden_node.sh` with sudo |
+| Chat on vLLM (dual-boot aware) | **Done** | `LLM_BACKEND=auto`: vLLM on Ubuntu, Ollama on Windows |
+| Unified Grafana | **Done** | GPU node dashboard + datasource in the iMac Grafana |
+| Router → job queue | **Done** | `route` jobs claimed by the router worker; local RTX or Modal |
+| Postgres migrations | **Done** | DB was at 003; 004–007 applied 2026-10-23 (`scripts/migrate-all.sh`) |

@@ -20,9 +20,12 @@ What runs in the lab and how to operate it. One row per service; link to config 
 
 | Service | Runs on | URL / access | Config path (1TB) | Notes |
 |---------|---------|--------------|-------------------|-------|
-| Ollama | gpu-node | `http://100.88.71.33:11434` | [gpu-node.md](nodes/gpu-node.md) | `llama3.2:latest`; task `HomelabOllamaServe` |
+| **LLM backend** (chat + RAG) | iMac API → GPU PC | `LLM_BACKEND=auto` in `homelab-services/.env` | `homelab-services/api/llm.py` | vLLM when the PC runs Ubuntu, else Ollama (re-checked every 30 s) |
+| vLLM (Ubuntu boot) | zak-gpu-node | `http://100.121.51.35:8000/v1` (API key) | `gpu-systems-lab/serving/compose.yml` | `qwen2.5-1.5b-instruct`; chat ~0.3–0.5 s |
+| Ollama (Windows boot) | gpu-node | `http://100.88.71.33:11434` | [gpu-node.md](nodes/gpu-node.md) | `llama3.2:latest`; task `HomelabOllamaServe` |
 | Homelab API | imac-node | internal `:8000`; `/health` via Caddy only for ops | `homelab-services/api/` | `x-api-key`; UI uses BFF proxy |
-| GPU train worker | gpu-node | Polls iMac internal worker API | `homelab-gpu/worker/` | `WORKER_API_KEY`; Phase [0A](PHASE-0A.md) |
+| GPU train worker | gpu-node | Polls iMac internal worker API | `homelab-gpu/worker/` | `WORKER_API_KEY`; Phase [0A](PHASE-0A.md); skips routed jobs |
+| **Router worker** | laptop (controller) | `python -m router.homelab_worker` | `gpu-systems-lab/router/` | claims `route` jobs only; runs on local RTX or Modal; decision → `experiments` |
 | PostgreSQL | imac-node | internal | `homelab-services/data/postgres` | Chat logs |
 | Redis | imac-node | internal | `homelab-services/data/redis` | Request counters |
 | Qdrant | imac-node | `http://100.91.113.98:6333` | `homelab-services/data/qdrant` | v1.18 — RAG |

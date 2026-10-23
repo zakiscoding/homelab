@@ -4,6 +4,35 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 ---
 
+## 2026-10-23 (later) — One platform: vLLM chat, unified Grafana, router → job queue
+
+**Goal:** Connect the homelab (iMac control plane, web UI) to the gpu-systems-lab work on the
+GPU PC's Ubuntu boot.
+
+**Done:**
+
+| Change | Where | Result |
+|--------|-------|--------|
+| vLLM always-on chat backend | `gpu-systems-lab/serving/compose.yml` on zak-gpu-node | tailnet `:8000`, API key (401 without it; LAN refused), 0.45 of VRAM |
+| Pluggable LLM backend | `homelab-services/api/llm.py`, `LLM_BACKEND=auto` | `/chat` 0.24–0.44 s on vLLM; falls back to Ollama on the Windows boot |
+| One Grafana | `homelab-services/grafana/` | GPU node datasource + 21-panel GPU dashboard in the iMac Grafana |
+| Routed jobs | `POST /jobs {"route": {...}}`, `claim?routed=true` | Windows worker skips them; the router worker runs them locally or on Modal |
+| Router worker | `gpu-systems-lab/router/homelab_worker.py` (laptop) | E2E: smoke job → local RTX in 21 s; decision stored in `experiments` |
+| DB migrations | `homelab-services/scripts/migrate-all.sh` | DB was at **003**: no `jobs.payload`, no `chat_logs`. 004–007 applied after a `pg_dump` backup |
+| Stack restart | `scripts/start-stack.sh` | Colima was stopped. The old API image (May) crash-looped on `NameError: rag_router`; the rebuild fixed it |
+
+**Commits:** homelab-services `f48d346`, `c877d8f`, `778466a`, `4a9ec2f`, `2866000`, `ddad1ff`;
+gpu-systems-lab `ef6532a`, `1a2446d`.
+
+**Gotchas:**
+- The always-on vLLM holds ~5 GB of GPU memory. The router treats it as "resident" (not busy);
+  stop it (`docker compose stop` in `serving/`) before large k3s or training jobs.
+- Routed jobs share the single-running-train-job lock and the 15-min lease (not renewed).
+- `.env` on the iMac was backed up to `.env.bak-20261023-155154` before adding `LLM_*`;
+  the DB backup is `backups/homelab-pre-migrate-20261023-161055.sql`.
+
+**Next:** run the router worker as a background service on the laptop if routed jobs become routine.
+
 ## 2026-10-23 — GPU node Ubuntu boot: AI-infra lab (gpu-systems-lab)
 
 **Goal:** Turn the RTX 5070 PC's Ubuntu boot into a measured AI-infra lab: CUDA, MPI/NCCL,
