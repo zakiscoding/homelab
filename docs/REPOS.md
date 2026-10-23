@@ -6,7 +6,7 @@ How homelab code and docs are split across GitHub. **Do not put Docker/services 
 
 | Repo | GitHub | Runs on | Contents |
 |------|--------|---------|----------|
-| **homelab** | [zakiscoding/homelab](https://github.com/zakiscoding/homelab) | All nodes (read) | Markdown docs, setup log, runbooks |
+| **homelab** | [zakiscoding/homelab](https://github.com/zakiscoding/homelab) | All nodes (read) | Markdown docs, setup log, runbooks; Ubuntu track under [`docs/ubuntu-gpu/`](ubuntu-gpu/) |
 | **homelab-services** | [zakiscoding/homelab-services](https://github.com/zakiscoding/homelab-services) | **iMac** (`Mos-iMac`) | Docker Compose (via **Colima**), FastAPI, Caddy, DB stack |
 | **homelab-gpu** | [zakiscoding/homelab-gpu](https://github.com/zakiscoding/homelab-gpu) | **GPU PC** (`zak_pc`) | Training scripts, configs (not inference models) |
 | **homelab-web** | [zakiscoding/homelab-web](https://github.com/zakiscoding/homelab-web) | **Laptop** (dev), **iMac** `:3080` (prod) | Next.js UI — chat, RAG, status |

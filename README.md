@@ -6,13 +6,14 @@
 
 ## Who is what
 
-| Node | Machine | Windows user | Hostname | Role |
-|------|---------|--------------|----------|------|
-| **Controller** | Laptop | **`cashh`** | — | Docs, `git`, `curl` tests, SSH to GPU |
-| **GPU node** | Desktop PC | **`zakar`** | `zak_pc` | Ollama + RTX 5070 |
-| **App / DB** | iMac | **`momo`** | `Mos-iMac` | API stack in `homelab-services/` |
+| Node | Machine | User / OS | Hostname / Tailscale | Role |
+|------|---------|-----------|----------------------|------|
+| **Controller** | Laptop | Windows **`cashh`** | Tailscale `hp-laptop` | Docs, `git`, `curl` tests, SSH |
+| **GPU node (dual-boot)** | Desktop PC (one RTX 5070) | Windows **`zakar`** **or** Ubuntu | Windows: `zak_pc` / Tailscale `zakar` `100.88.71.33` · Ubuntu: OS+Tailscale `zak-gpu-node` `100.121.51.35` | Windows: Ollama + `homelab-gpu` · Ubuntu: CUDA/`~/projects` track — [docs/ubuntu-gpu/](docs/ubuntu-gpu/) |
+| **App / DB** | iMac | macOS **`momo`** | `Mos-iMac` / `mos-imac` | API stack in `homelab-services/` |
+| **Cursor cloud VM** | Cloud | — | Tailscale `cursor-cloud` `100.124.163.68` | **No GPU** — not the dual-boot PC |
 
-Both homelab Windows boxes run **Windows** (PowerShell). `cashh` = laptop only; `zakar` = GPU PC only.
+Windows boxes (`cashh`, `zakar`) use **PowerShell**. Ubuntu boot of the GPU PC is a separate OS on the same machine (external disk); never touch the Windows NVMe from Ubuntu.
 
 ## Paths on the 1TB drive
 
@@ -64,6 +65,7 @@ See **[docs/DRIVE-LAYOUT.md](docs/DRIVE-LAYOUT.md)** for the full tree.
 | [1TB drive layout](docs/DRIVE-LAYOUT.md) | Folder structure on external volume |
 | [iMac checklist](docs/nodes/imac-checklist.md) | M1 services role — done vs planned |
 | [iMac stack](docs/services/imac-stack.md) | Docker — `homelab-services` repo |
+| [**Ubuntu GPU / hybrid AI lab**](docs/ubuntu-gpu/) | Dual-boot Ubuntu track: Phase 0A/0B, PyTorch smoke, inventories |
 
 ## How we use this repo
 
@@ -92,3 +94,5 @@ Runtime compose and API code: **`homelab-services/`** — document from `docs/se
 | GPU training prep | **Done** | `homelab-gpu` cloned, Python, torch, data dirs |
 | Backups | Documented | [BACKUPS.md](docs/BACKUPS.md) + `backup-postgres.sh` on iMac |
 | First LoRA run | **Next** | Add dataset + `train.py` in `homelab-gpu/training/` |
+| Ubuntu GPU track | **Phase 1 PASS** | Dual-boot docs + `torch==2.11.0+cu128` smoke on host — [docs/ubuntu-gpu/](docs/ubuntu-gpu/) |
+| Modal | **Not set up** | Later phase only; do not install until asked |
