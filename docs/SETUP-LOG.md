@@ -4,6 +4,19 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 ---
 
+## 2026-10-23 — Ubuntu dual-boot track docs (`docs/ubuntu-gpu/`)
+
+**Goal:** Check into GitHub SSOT the Ubuntu hybrid AI lab docs (dual-boot identity, Phase 0A/0B split, Phase 1 PyTorch smoke, inventories).
+
+**Facts recorded:**
+
+- Same PC: Ubuntu `zak-gpu-node` ≡ Windows `zakar`/`zak_pc` (one RTX 5070); Ubuntu on external `/dev/sda`; Windows NVMe — verify unmounted before work.
+- Tailscale: Ubuntu `zak-gpu-node` @ `100.121.51.35`; Cursor VM `cursor-cloud` @ `100.124.163.68` (no GPU).
+- Phase 0A complete; Phase 1 **PASS** — host-local `~/projects/pytorch-cuda-smoke`, `torch==2.11.0+cu128` (no full CUDA Toolkit).
+- Docker / Modal **not** installed or set up.
+
+**Docs:** [ubuntu-gpu/](ubuntu-gpu/) · smoke note [ubuntu-gpu/pytorch-cuda-smoke.md](ubuntu-gpu/pytorch-cuda-smoke.md).
+
 ## 2026-05-27 — Phase 6, vision/reactions, MLflow, web UI :3081
 
 **Goal:** Align all four repos with production stack: reactions UI, vision API proxy, distributed train plans, MLflow, Grafana Homelab Stack dashboard.

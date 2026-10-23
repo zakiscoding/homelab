@@ -96,11 +96,11 @@ Machines connect over **home LAN** and **Tailscale**. **Default access is Tailsc
 
 | Machine | Hostname | OS | Primary user | Hardware notes |
 |---------|----------|-----|--------------|----------------|
-| **GPU desktop** | `zak_pc` | Windows | `zakar` | NVIDIA GeForce **RTX 5070**, 12 GB VRAM |
+| **GPU desktop (dual-boot)** | Windows `zak_pc` · Ubuntu `zak-gpu-node` | Windows **or** Ubuntu 24.04 | Windows `zakar` | One NVIDIA GeForce **RTX 5070**, 12 GB VRAM — same PC, two boots |
 | **iMac** | `Mos-iMac` | macOS 15.7 | `momo` | **Apple M1** |
 | **Laptop** | — | Windows | `cashh` | Controller — no homelab services required |
 
-**Important:** GPU PC is **`zakar`**; laptop is **`cashh`**. They are different machines.
+**Important:** GPU Windows user is **`zakar`**; laptop is **`cashh`**. Ubuntu OS+Tailscale name **`zak-gpu-node`** is the **same physical GPU PC** (external disk); Cursor Tailscale **`cursor-cloud`** (`100.124.163.68`) is a different machine with **no GPU**. Ubuntu track docs: `docs/ubuntu-gpu/` in the `homelab` repo.
 
 ---
 
@@ -118,9 +118,11 @@ Machines connect over **home LAN** and **Tailscale**. **Default access is Tailsc
 
 | Node | Tailscale IPv4 | Key services |
 |------|----------------|--------------|
-| GPU PC | `100.88.71.33` | Ollama `:11434`, reaction serve `:8100` |
+| GPU PC (Windows `zakar`) | `100.88.71.33` | Ollama `:11434`, reaction serve `:8100` (when Windows booted) |
+| GPU PC (Ubuntu `zak-gpu-node`) | `100.121.51.35` | Ubuntu CUDA / `~/projects` track (when Ubuntu booted) |
 | iMac | `100.91.113.98` | Web UI `:3081`, Caddy `:80`, API `:8000`, Grafana `:3000`, MLflow `:5001` |
 | Laptop | `100.73.132.95` | Controller |
+| Cursor cloud VM (`cursor-cloud`) | `100.124.163.68` | Agent host — **no GPU** |
 
 ### Security posture
 

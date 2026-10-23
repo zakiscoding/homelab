@@ -2,12 +2,15 @@
 
 | | |
 |--|--|
-| **Machine** | Desktop GPU PC |
+| **Machine** | Desktop GPU PC (**dual-boot** — same hardware as Ubuntu `zak-gpu-node`) |
 | **Hostname** | `zak_pc` |
 | **Windows login** | **`zakar`** (`PS C:\Users\zakar>`) |
+| **Tailscale (Windows boot)** | `zakar` @ `100.88.71.33` |
 | **Controller laptop** | **`cashh`** — runs `curl` / `ssh zakar@...` from elsewhere |
 
-Physical GPU PC runs **Windows**. Two roles on one machine:
+**Ubuntu boot of this same PC** (external disk, OS+Tailscale `zak-gpu-node` @ `100.121.51.35`, PyTorch CUDA track): **[docs/ubuntu-gpu/](../ubuntu-gpu/)**. From Ubuntu, never modify the Windows NVMe; verify it is unmounted before work. Cursor Tailscale `cursor-cloud` @ `100.124.163.68` is a different machine (no GPU).
+
+Physical GPU PC **Windows boot**. Two roles on that OS:
 
 | Role | Stack | Versioned in |
 |------|-------|--------------|
