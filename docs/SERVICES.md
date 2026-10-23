@@ -10,7 +10,8 @@ What runs in the lab and how to operate it. One row per service; link to config 
 | **Web UI** | imac-node | `http://100.91.113.98:3080` | [homelab-web](https://github.com/zakiscoding/homelab-web) | Chat, RAG, status — [web-ui.md](services/web-ui.md) |
 | Prometheus | imac-node | `http://100.91.113.98:9090` | `homelab-services/prometheus/config` | Scrapes API, Qdrant, Pushgateway |
 | Pushgateway | imac-node | `http://100.91.113.98:9091` | ephemeral | GPU metrics push target |
-| Grafana | imac-node | `http://100.91.113.98:3000` | `homelab-services/grafana/` | Dashboard: Homelab ML Platform |
+| Grafana | imac-node | `http://100.91.113.98:3000` | `homelab-services/grafana/` | Dashboards: Homelab Stack |
+| MLflow | imac-node | `http://100.91.113.98:5001` | `homelab-services/data/mlflow` | Training experiments — [MLFLOW.md](MLFLOW.md) |
 | API `/metrics` | imac-node | `http://100.91.113.98/metrics` | `homelab-services/api/metrics.py` | Phase [5](PHASE-5.md) |
 | Backups | — | — | — | TBD `pg_dump` → external |
 

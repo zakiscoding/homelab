@@ -94,6 +94,16 @@ checkpoints/{job_id}/
 └── trainer_out/       # HF Trainer checkpoints (ephemeral)
 ```
 
+## Serve in Ollama (Phase 3b)
+
+After `succeeded`, publish on GPU:
+
+```powershell
+.\scripts\publish-lora-to-ollama.ps1 -JobId "<job-uuid>"
+```
+
+Full runbook: [PHASE-3-LORA-SERVE.md](PHASE-3-LORA-SERVE.md).
+
 ## Next
 
-[Phase 4](PHASE-4.md) Redis job notify, Phase 5 ops (Grafana GPU metrics), Ollama adapter load for inference.
+[Phase 4](PHASE-4.md) Redis job notify, Phase 5 ops (Grafana GPU metrics).

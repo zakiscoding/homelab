@@ -50,6 +50,10 @@ See **[docs/DRIVE-LAYOUT.md](docs/DRIVE-LAYOUT.md)** for the full tree.
 | [**Phase 1**](docs/PHASE-1.md) | Inference pipeline — `/chat` + infer jobs |
 | [**Phase 2**](docs/PHASE-2.md) | RAG — ingest, embed, `/rag/query` |
 | [**Phase 3**](docs/PHASE-3.md) | QLoRA training + experiments + ML-STORE sync |
+| [**Phase 3b**](docs/PHASE-3-LORA-SERVE.md) | Publish LoRA → Ollama (`homelab-*` models in chat) |
+| [**CNN fine-tune**](docs/CNN-FINETUNE.md) | ResNet18 image classifier (CIFAR-10 or custom folders) |
+| [**GPU-only train**](docs/GPU-TRAIN.md) | **Default** — AMP + grad accum on RTX 5070 (`run-cnn-local.ps1`) |
+| [**Reaction vision**](docs/REACTION-VISION.md) | FER / expressions — Barsoum FER+, ResNet |
 | [Execution model](docs/EXECUTION-MODEL.md) | Postgres SSOT, GPU worker, SSH aliases |
 | [GPU node runbook](docs/nodes/gpu-node.md) | Ollama on Windows |
 | [GPU node checklist](docs/nodes/GPU-NODE-CHECKLIST.md) | Install ✅, ports, ML-only rule |
@@ -84,9 +88,10 @@ Runtime compose and API code: **`homelab-services/`** — document from `docs/se
 | GPU Ollama (persistent) | **Done** | `HomelabOllamaServe` on `zak_pc` |
 | Docs on 1TB drive | Done | `/Volumes/1tb drive/homelab` |
 | Services on 1TB drive | Done | `/Volumes/1tb drive/homelab-services` |
-| GitHub repos | **Done** | `homelab` + `homelab-services` + `homelab-gpu` (all private) |
+| GitHub repos | **Done** | Four private repos: `homelab`, `homelab-services`, `homelab-gpu`, `homelab-web` |
 | Monitoring | Running | Prometheus :9090, Grafana :3000 on iMac |
-| Tailscale E2E tests | **Done** | GPU + iMac health from `zak_pc` |
+| Tailscale E2E tests | **Done** | GPU + iMac health; web UI chat/RAG from laptop |
 | GPU training prep | **Done** | `homelab-gpu` cloned, Python, torch, data dirs |
-| Backups | Documented | [BACKUPS.md](docs/BACKUPS.md) + `backup-postgres.sh` on iMac |
-| First LoRA run | **Next** | Add dataset + `train.py` in `homelab-gpu/training/` |
+| QLoRA smoke train | **Done** | Phase 3 — `training/lora_quickstart/train.py` via GPU worker |
+| Backups | Documented | [BACKUPS.md](docs/BACKUPS.md) + `backup-postgres.sh` on iMac (schedule **Next**) |
+| LoRA → Ollama inference | **Ready** | `publish-lora-to-ollama.ps1` — see [PHASE-3-LORA-SERVE.md](docs/PHASE-3-LORA-SERVE.md) |

@@ -26,7 +26,7 @@ Machines connect over **home LAN** and **Tailscale**. **Default access is Tailsc
 | **RAG** | Ingest text → iMac worker embeds → Qdrant → query with citations |
 | **Jobs** | Postgres SSOT; GPU + iMac workers; Redis wake on job create |
 | **Training** | QLoRA smoke train on GPU; artifacts under `homelab-data/checkpoints/` |
-| **Monitoring** | Prometheus + Grafana (“Homelab ML Platform” dashboard) |
+| **Monitoring** | Prometheus + Grafana + MLflow (`:5001`) |
 | **GPU metrics** | Pushgateway from GPU PC every minute |
 
 **What is intentionally not in public Git:** model weights, datasets, API keys, database passwords, checkpoints, and `.env` files.
@@ -303,20 +303,36 @@ Persistent service data: `homelab-services/data/` (Postgres, Grafana, Qdrant, et
 
 ---
 
-## 11. What is complete vs. what is next
+## 11. Status snapshot
 
-### Complete
+| Area | Status | Notes |
+|------|--------|-------|
+| Documentation scaffold | Done | 2026-05-21 |
+| Architecture (3 nodes) | Documented | GPU + iMac live |
+| GPU node — Ollama | Done | RTX 5070; `100.88.71.33:11434` |
+| iMac — API/DB (Colima) | Done | Stack + web UI `:3080`; `100.91.113.98` |
+| Web UI (homelab-web) | Done | Chat, RAG, overview over Tailscale |
+| GPU Ollama (persistent) | Done | `HomelabOllamaServe` on `zak_pc` |
+| Docs on 1TB drive | Done | `/Volumes/1tb drive/homelab` |
+| Services on 1TB drive | Done | `/Volumes/1tb drive/homelab-services` |
+| GitHub repos | Done | Four private: homelab, homelab-services, homelab-gpu, homelab-web |
+| Monitoring | Running | Prometheus `:9090`, Grafana `:3000` on iMac |
+| Tailscale E2E tests | Done | GPU + iMac health; UI chat/RAG from laptop |
+| GPU training prep | Done | homelab-gpu cloned, Python, torch, data dirs |
+| QLoRA smoke train | Done | Phase 3 via GPU worker (`lora_quickstart/train.py`) |
+| Backups | Documented | `BACKUPS.md` + `backup-postgres.sh` (cron **Next**) |
+| LoRA → Ollama inference | **Ready** | `homelab-gpu/scripts/publish-lora-to-ollama.ps1` → Chat model `homelab-*` |
+| CNN image fine-tune | **Ready** | CIFAR-10 or FER2013 — [CNN-FINETUNE.md](../docs/CNN-FINETUNE.md) |
+| Reaction vision (FER) | **Live in web UI** | `/reactions` on `:3081` (web UI; `:3080` may be stale on iMac) — [GPU-TRAIN.md](../docs/GPU-TRAIN.md) |
 
-- [x] Four-repo layout on GitHub (private)  
-- [x] GPU: Ollama, Tailscale, `HomelabOllamaServe`, training env, QLoRA smoke  
-- [x] iMac: full compose stack + web UI + RAG worker  
-- [x] Tailscale E2E: UI, chat, RAG, Grafana  
-- [x] Job plane + Redis wake + observability  
+Canonical copy also lives in [README.md](../README.md#status) in the homelab repo.
 
 ### Sensible next steps
 
 - [ ] Scheduled Postgres backups on iMac (`backup-postgres.sh`)  
-- [ ] Sync LoRA adapter to ML-STORE / load in Ollama for inference  
+- [ ] Publish latest train job: `publish-lora-to-ollama.ps1 -JobId <uuid>` on GPU  
+- [ ] Optional: sync adapter archive to iMac ML-STORE  
+- [ ] Redeploy web + API on iMac after BFF/error-handling fixes (if not yet pulled)  
 - [ ] Optional: public domain + HTTPS (homelab deploy doc)  
 - [ ] After GPU reboot: confirm `schtasks /Run /TN HomelabOllamaServe`  
 
@@ -331,6 +347,7 @@ Persistent service data: `homelab-services/data/` (Postgres, Grafana, Qdrant, et
 | GPU Ollama health | http://100.88.71.33:11434/api/tags |
 | iMac API health (ops) | http://100.91.113.98/health |
 | Grafana | http://100.91.113.98:3000 |
+| MLflow | http://100.91.113.98:5001 |
 | Prometheus | http://100.91.113.98:9090 |
 | Pushgateway | http://100.91.113.98:9091 |
 | Qdrant | http://100.91.113.98:6333 |
