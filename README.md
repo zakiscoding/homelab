@@ -1,112 +1,137 @@
-# HOMELAB
+# homelab
 
-**Documentation only** — hardware, network, services, setup logs. No Docker code here.
+**[homelab](https://github.com/zakiscoding/homelab)** (docs hub) · [homelab-services](https://github.com/zakiscoding/homelab-services) · [homelab-web](https://github.com/zakiscoding/homelab-web) · [homelab-gpu](https://github.com/zakiscoding/homelab-gpu) · [gpu-systems-lab](https://github.com/zakiscoding/gpu-systems-lab)
 
-**Share with someone else (one file):** [share/HOMELAB-COMPLETE-OVERVIEW.md](share/HOMELAB-COMPLETE-OVERVIEW.md) — full standalone overview, no other docs required.
+**A self-hosted AI platform across three home machines plus cloud GPUs, joined by Tailscale. This repo is its documentation hub.**
 
-## Who is what
+## What's inside
 
-| Node | Machine | Windows user | Hostname | Role |
-|------|---------|--------------|----------|------|
-| **Controller** | Laptop | **`cashh`** | — | Docs, `git`, `curl` tests, SSH to GPU |
-| **GPU node** | Desktop PC | **`zakar`** | `zak_pc` | Ollama + RTX 5070 |
-| **GPU node (Ubuntu boot)** | same Desktop PC | Linux **`zak`** | `zak-gpu-node` | CUDA / k3s / vLLM / GPU monitoring — [gpu-node-ubuntu.md](docs/nodes/gpu-node-ubuntu.md) |
-| **App / DB** | iMac | **`momo`** | `Mos-iMac` | API stack in `homelab-services/` |
+- **Architecture** with diagrams of the whole platform: topology, chat path, job lifecycle, job routing, monitoring — [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- **Node runbooks** for the iMac, the dual-boot GPU PC (Windows and Ubuntu) and the controller laptop
+- **Service docs**: web UI, iMac stack, RAG, vision/reactions, observability, MLflow
+- **Phase docs** (0A to 6) describing how each capability was built and tested
+- **[Setup log](docs/SETUP-LOG.md)**: dated record of every change
+- No code and no secrets. Code lives in the four other repos; credentials stay in `.env` files on each machine.
 
-`cashh` = laptop only; `zakar` = GPU PC on Windows. The GPU PC **dual-boots**: Windows (`zak_pc`,
-Ollama) **or** Ubuntu (`zak-gpu-node`), never both at once.
+## Architecture
 
-## Paths on the 1TB drive
+```mermaid
+flowchart LR
+  subgraph TAILNET["Tailscale tailnet"]
+    LAPTOP["Laptop, controller<br/>browser, git, SSH<br/>router worker"]
+    subgraph IMAC["iMac, control plane · 100.91.113.98"]
+      WEB["Web UI :3081<br/>Caddy :80"]
+      API["FastAPI :8000"]
+      DATA[("Postgres jobs · Redis<br/>Qdrant :6333")]
+      MON["Prometheus :9090 · Grafana :3000<br/>MLflow :5001"]
+    end
+    subgraph GPUPC["GPU PC, RTX 5070 · one OS at a time"]
+      WIN["Windows · 100.88.71.33<br/>Ollama :11434, QLoRA worker<br/>reaction CNN :8100"]
+      UBU["Ubuntu · 100.121.51.35<br/>vLLM :8000, k3s :6443<br/>DCGM, Prometheus, Grafana"]
+    end
+  end
+  MODAL["Modal cloud<br/>H100 burst"]
 
-See **[docs/DRIVE-LAYOUT.md](docs/DRIVE-LAYOUT.md)** for the full tree.
+  LAPTOP -->|"HTTP"| WEB
+  WEB --> API
+  API --> DATA
+  API -->|"chat, primary"| UBU
+  API -.->|"chat, fallback"| WIN
+  WIN -->|"claim train jobs"| API
+  LAPTOP -->|"claim routed jobs"| API
+  LAPTOP -->|"SSH"| UBU
+  LAPTOP -->|"modal run"| MODAL
+  MON -.->|"scrape"| API
+  MON -.->|"GPU datasource"| UBU
+```
 
-| Folder | Purpose |
-|--------|---------|
-| **`homelab/`** | This repo — docs only |
-| **`homelab-services/`** | Docker stack, API, databases, `data/` |
-| **`homelab-gpu/`** | GPU training code (mirror) |
-| **`homelab-web/`** | Next.js UI (mirror; prod on iMac `:3081`) |
-| **`homelab-runtime/`** | Colima + Docker CLI config |
-| **`Personal/`** | School, resumes, projects (not homelab) |
+Full diagrams and explanations: **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**.
 
-| Machine | Docs | Services |
-|---------|------|----------|
-| **iMac** | `homelab/` | `homelab-services/` |
-| **Controller (`cashh`)** | `C:\Users\cashh\homelab` (git clone) | `homelab-web`, `homelab-services` clones |
-| **GPU PC (`zakar`)** | Optional clone of `homelab` | — |
+## Start here
 
-**GitHub:** [homelab](https://github.com/zakiscoding/homelab) (docs) · [homelab-services](https://github.com/zakiscoding/homelab-services) (iMac) · [homelab-gpu](https://github.com/zakiscoding/homelab-gpu) (GPU) · [homelab-web](https://github.com/zakiscoding/homelab-web) (UI) — all **private** · [gpu-systems-lab](https://github.com/zakiscoding/gpu-systems-lab) (Ubuntu GPU node: CUDA, MPI/NCCL, serving, k3s) — [docs/REPOS.md](docs/REPOS.md)
+1. **[Architecture](docs/ARCHITECTURE.md)**: the five diagrams, node and port table, design principles.
+2. **[Repositories](docs/REPOS.md)**: which repo runs where and how they are cloned.
+3. **[Services](docs/SERVICES.md)**: every running service, URL and config path.
+4. **The node you are working on**: [iMac](docs/nodes/imac-node.md) · [GPU PC, Windows](docs/nodes/gpu-node.md) · [GPU PC, Ubuntu](docs/nodes/gpu-node-ubuntu.md) · [Laptop](docs/nodes/controller.md)
+5. **[Setup log](docs/SETUP-LOG.md)**: skim the latest entries before changing anything.
 
-## Quick links
+Sharing with someone outside the project? Send the standalone **[share/HOMELAB-COMPLETE-OVERVIEW.md](share/HOMELAB-COMPLETE-OVERVIEW.md)**.
 
-| Doc | Purpose |
-|-----|---------|
-| [Setup log](docs/SETUP-LOG.md) | Chronological record of what we did and when |
-| [Inventory](docs/INVENTORY.md) | Hosts, VMs, containers, hardware |
-| [Network](docs/NETWORK.md) | VLANs, subnets, DNS, firewall, VPN |
-| [Services](docs/SERVICES.md) | Running apps and how to reach/manage services |
-| [Secrets & access](docs/ACCESS.md) | Where credentials live (not the secrets themselves) |
-| [Architecture](docs/ARCHITECTURE.md) | Three-node layout (GPU / iMac / controller) |
-| [**Phase 0A**](docs/PHASE-0A.md) | Job control plane — deploy + gate test |
-| [**Phase 0B**](docs/PHASE-0B.md) | Leases, retry, `/system/status`, ML-STORE |
-| [**Phase 1**](docs/PHASE-1.md) | Inference pipeline — `/chat` + infer jobs |
-| [**Phase 2**](docs/PHASE-2.md) | RAG — ingest, embed, `/rag/query` |
-| [**Phase 3**](docs/PHASE-3.md) | QLoRA training + experiments + ML-STORE sync |
-| [**Phase 3b**](docs/PHASE-3-LORA-SERVE.md) | Publish LoRA → Ollama (`homelab-*` models in chat) |
-| [**CNN fine-tune**](docs/CNN-FINETUNE.md) | ResNet18 image classifier (CIFAR-10 or custom folders) |
-| [**GPU-only train**](docs/GPU-TRAIN.md) | **Default** — AMP + grad accum on RTX 5070 (`run-cnn-local.ps1`) |
-| [**Reaction vision**](docs/REACTION-VISION.md) | FER / expressions — Barsoum FER+, ResNet |
-| [Execution model](docs/EXECUTION-MODEL.md) | Postgres SSOT, GPU worker, SSH aliases |
-| [GPU node runbook](docs/nodes/gpu-node.md) | Ollama on Windows |
-| [GPU node checklist](docs/nodes/GPU-NODE-CHECKLIST.md) | Install ✅, ports, ML-only rule |
-| [**GPU node — Ubuntu**](docs/nodes/gpu-node-ubuntu.md) | `zak-gpu-node`: CUDA 13.2, k3s, vLLM, DCGM/Grafana, Modal burst |
-| [Git workflow](docs/GIT.md) | Clone, pull, push — GitHub `zakiscoding/homelab` |
-| [Repositories](docs/REPOS.md) | Five repos: docs, services, gpu, web, gpu-systems-lab |
-| [**Phase 6**](docs/PHASE-6.md) | Distributed train + MLflow |
-| [**Web UI**](docs/services/web-ui.md) | Chat, RAG, reactions — `:3081` on iMac |
-| [**Vision / reactions**](docs/services/vision-reactions.md) | FER CNN on GPU `:8100` |
-| [Backups](docs/BACKUPS.md) | Postgres dumps, checkpoints, restic |
-| [1TB layout](docs/DRIVE-LAYOUT.md) | iMac volume folder map |
-| [Testing](docs/TESTING.md) | Tailscale curl checklist |
-| [1TB drive layout](docs/DRIVE-LAYOUT.md) | Folder structure on external volume |
-| [iMac checklist](docs/nodes/imac-checklist.md) | M1 services role — done vs planned |
-| [iMac stack](docs/services/imac-stack.md) | Docker — `homelab-services` repo |
+## Repo map
 
-## How we use this repo
+| Repo | Role | Runs on |
+|------|------|---------|
+| **homelab** (this repo) | Docs hub: architecture, nodes, services, setup log, runbooks | Read everywhere |
+| [homelab-services](https://github.com/zakiscoding/homelab-services) | iMac stack: FastAPI, Postgres job queue, Redis, Qdrant RAG, Caddy, Prometheus/Grafana, MLflow, iMac worker | iMac (Colima) |
+| [homelab-web](https://github.com/zakiscoding/homelab-web) | Next.js 16 / React 19 / Tailwind 4 UI: chat, RAG, reactions, status; BFF keeps the API key server-side | iMac `:3081` (prod), laptop (dev) |
+| [homelab-gpu](https://github.com/zakiscoding/homelab-gpu) | Windows GPU PC: Ollama, QLoRA training, GPU job worker, reaction CNN `:8100`, metrics push | GPU PC on Windows |
+| [gpu-systems-lab](https://github.com/zakiscoding/gpu-systems-lab) | Ubuntu GPU node + Modal: CUDA kernels, MPI/NCCL, FSDP, vLLM, k3s, DCGM observability, job router | GPU PC on Ubuntu, Modal, laptop |
 
-1. **`git pull`** — GitHub is canonical for docs.
-2. **Before a change** — skim [SETUP-LOG](docs/SETUP-LOG.md).
-3. **During setup** — log commands and paths; service config lives in **`homelab-services/`**.
-4. **After it works** — update inventory/services, then **`git commit` + `git push`**.
+All five repos are private. Details: [docs/REPOS.md](docs/REPOS.md).
 
-Runtime compose and API code: **`homelab-services/`** — document from `docs/services/` and the setup log.
+## Machines
+
+| Node | Hostname | Tailscale IP | OS | User | Runbook |
+|------|----------|--------------|----|------|---------|
+| Laptop (controller) | `hp-laptop` | 100.73.132.95 | Windows | `cashh` | [controller.md](docs/nodes/controller.md) |
+| iMac (control plane) | `Mos-iMac` | 100.91.113.98 | macOS 15.7, Apple M1 | `momo` | [imac-node.md](docs/nodes/imac-node.md) |
+| GPU PC, Windows boot | `zak_pc` | 100.88.71.33 | Windows | `zakar` | [gpu-node.md](docs/nodes/gpu-node.md) |
+| GPU PC, Ubuntu boot | `zak-gpu-node` | 100.121.51.35 | Ubuntu 24.04 (external HDD) | `zak` | [gpu-node-ubuntu.md](docs/nodes/gpu-node-ubuntu.md) |
+| Cloud | Modal `zakiscoding` | — | gVisor containers | — | [gpu-node-ubuntu.md](docs/nodes/gpu-node-ubuntu.md#cloud-burst-modal) |
+
+The GPU PC (RTX 5070 12 GB, i7-14700F) runs **Windows or Ubuntu, never both**. `cashh` is the
+laptop; `zakar` is the GPU PC on Windows.
 
 ## Status
 
 | Area | Status | Notes |
 |------|--------|-------|
-| Documentation scaffold | Done | 2026-05-21 |
-| Architecture (3 nodes) | Documented | GPU + iMac live |
-| GPU node — Ollama | **Done** | RTX 5070; `100.88.71.33:11434` |
-| iMac — API/DB (Colima) | **Done** | Stack + web UI `:3080`; `100.91.113.98` |
-| Web UI (homelab-web) | **Done** | Chat, RAG, overview over Tailscale |
-| GPU Ollama (persistent) | **Done** | `HomelabOllamaServe` on `zak_pc` |
-| Docs on 1TB drive | Done | `/Volumes/1tb drive/homelab` |
-| Services on 1TB drive | Done | `/Volumes/1tb drive/homelab-services` |
-| GitHub repos | **Done** | Four private repos: `homelab`, `homelab-services`, `homelab-gpu`, `homelab-web` |
-| Monitoring | Running | Prometheus :9090, Grafana :3000 on iMac |
-| Tailscale E2E tests | **Done** | GPU + iMac health; web UI chat/RAG from laptop |
-| GPU training prep | **Done** | `homelab-gpu` cloned, Python, torch, data dirs |
-| QLoRA smoke train | **Done** | Phase 3 — `training/lora_quickstart/train.py` via GPU worker |
-| Backups | Documented | [BACKUPS.md](docs/BACKUPS.md) + `backup-postgres.sh` on iMac (schedule **Next**) |
-| LoRA → Ollama inference | **Ready** | `publish-lora-to-ollama.ps1` — see [PHASE-3-LORA-SERVE.md](docs/PHASE-3-LORA-SERVE.md) |
-| GPU node — Ubuntu boot | **Done** | `zak-gpu-node` `100.121.51.35`; CUDA 13.2, Docker, Open MPI — [gpu-node-ubuntu.md](docs/nodes/gpu-node-ubuntu.md) |
-| GPU monitoring (DCGM) | **Running** | Grafana `100.121.51.35:3000/d/gpu-node`, Prometheus `:9090` (Ubuntu boot) |
-| k3s GPU scheduling | **Running** | single node, NVIDIA device plugin, GPU admission policy |
-| vLLM serving | **Done** | Qwen2.5-1.5B: 4.4k tok/s on RTX 5070 (on demand, localhost) |
-| Cloud GPU burst (Modal) | **Done** | H100 / 2x H100; **$10** usage limit |
-| Ubuntu node hardening | **Done** | `harden_node.sh`: LAN blocked for 22/6443/10250 (verified), sudo cleanup; reboot pending for Nsight counters |
-| Chat on vLLM (dual-boot aware) | **Done** | `LLM_BACKEND=auto`: vLLM on Ubuntu, Ollama on Windows |
-| Unified Grafana | **Done** | GPU node dashboard + datasource in the iMac Grafana |
-| Router → job queue | **Done** | `route` jobs claimed by the router worker; local RTX or Modal |
-| Postgres migrations | **Done** | DB was at 003; 004–007 applied 2026-10-23 (`scripts/migrate-all.sh`) |
+| iMac stack (Colima) | **Running** | API, Postgres, Redis, Qdrant, Caddy, MLflow on `100.91.113.98` |
+| Web UI (homelab-web) | **Running** | Chat, RAG, reactions, status at `:3081` (and `:80` via Caddy) |
+| Chat backend | **Running** | `LLM_BACKEND=auto`: vLLM on the Ubuntu boot, Ollama on the Windows boot |
+| GPU PC, Windows: Ollama | **Done** | `100.88.71.33:11434`, task `HomelabOllamaServe` |
+| GPU PC, Ubuntu boot | **Done** | `zak-gpu-node`, CUDA 13.2, Docker, Open MPI — [gpu-node-ubuntu.md](docs/nodes/gpu-node-ubuntu.md) |
+| vLLM serving | **Running** | Always-on, tailnet `:8000/v1`, API key; Qwen2.5-1.5B 4.4k tok/s on RTX 5070 |
+| Job queue | **Done** | Postgres SSOT, leases with renew, retry backoff, Redis wake |
+| Router worker | **Done** | Routed jobs → local RTX 5070 or Modal; decision stored in `experiments` |
+| Cloud GPU burst (Modal) | **Done** | H100 / 2x H100 / L4; **$10** usage limit |
+| k3s GPU scheduling | **Running** | Single node, NVIDIA device plugin, GPU admission policy |
+| Monitoring | **Running** | iMac Prometheus `:9090` + Grafana `:3000`; GPU node DCGM dashboard as a second datasource |
+| Ubuntu node hardening | **Done** | LAN blocked for 22/6443/10250 (verified); reboot pending for Nsight counters |
+| Postgres migrations | **Done** | 004–007 applied 2026-10-23 (`scripts/migrate-all.sh`) |
+| GPU training env (Windows) | **Done** | `homelab-gpu` cloned, Python, PyTorch, data dirs |
+| QLoRA training | **Done** | Smoke train via the GPU worker (Phase 3) |
+| LoRA → Ollama | **Ready** | `publish-lora-to-ollama.ps1` — [PHASE-3-LORA-SERVE.md](docs/PHASE-3-LORA-SERVE.md) |
+| Tailscale end-to-end tests | **Done** | GPU + iMac health; web UI chat/RAG from the laptop |
+| GitHub repos | **Done** | Five private repos (see Repo map) |
+| 1 TB drive layout | **Done** | Docs and services under `/Volumes/1tb drive` on the iMac |
+| Backups | **Partial** | `backup-postgres.sh` on the iMac; schedule is next — [BACKUPS.md](docs/BACKUPS.md) |
+
+## Docs
+
+| Topic | Docs |
+|-------|------|
+| Overview | [Architecture](docs/ARCHITECTURE.md) · [Repositories](docs/REPOS.md) · [Docs index](docs/README.md) · [Shareable overview](share/HOMELAB-COMPLETE-OVERVIEW.md) |
+| Inventory and network | [Inventory](docs/INVENTORY.md) · [Network](docs/NETWORK.md) · [1 TB drive layout](docs/DRIVE-LAYOUT.md) · [Secrets and access](docs/ACCESS.md) (where credentials live, not the values) |
+| Nodes | [iMac](docs/nodes/imac-node.md) · [iMac checklist](docs/nodes/imac-checklist.md) · [GPU PC, Windows](docs/nodes/gpu-node.md) · [GPU checklist](docs/nodes/GPU-NODE-CHECKLIST.md) · [GPU PC, Ubuntu](docs/nodes/gpu-node-ubuntu.md) · [Laptop](docs/nodes/controller.md) |
+| Services | [Services](docs/SERVICES.md) · [iMac stack](docs/services/imac-stack.md) · [Web UI](docs/services/web-ui.md) · [RAG](docs/services/rag.md) · [Vision / reactions](docs/services/vision-reactions.md) |
+| Jobs and ML | [Execution model](docs/EXECUTION-MODEL.md) · [GPU training](docs/GPU-TRAIN.md) · [CNN fine-tune](docs/CNN-FINETUNE.md) · [Distributed train](docs/DISTRIBUTED-TRAIN.md) · [Reaction vision](docs/REACTION-VISION.md) · [MLflow](docs/MLFLOW.md) |
+| Operations | [Observability](docs/OBSERVABILITY.md) · [Testing](docs/TESTING.md) · [Backups](docs/BACKUPS.md) · [Public internet (optional)](docs/deploy/public-internet.md) · [Git workflow](docs/GIT.md) · [Setup log](docs/SETUP-LOG.md) |
+| Build phases | [0A](docs/PHASE-0A.md) · [0B](docs/PHASE-0B.md) · [1](docs/PHASE-1.md) · [2](docs/PHASE-2.md) · [3](docs/PHASE-3.md) · [3b](docs/PHASE-3-LORA-SERVE.md) · [4](docs/PHASE-4.md) · [5](docs/PHASE-5.md) · [6](docs/PHASE-6.md) |
+
+## How we use this repo
+
+1. `git pull` — GitHub is canonical for docs.
+2. Before a change, skim the latest [setup log](docs/SETUP-LOG.md) entries.
+3. During setup, note commands and paths; service config lives in the code repos, not here.
+4. After it works, add a dated setup-log entry, update inventory/services, then commit and push.
+
+On the iMac the docs live at `/Volumes/1tb drive/homelab`, next to `homelab-services/` and
+`homelab-web/` ([DRIVE-LAYOUT.md](docs/DRIVE-LAYOUT.md)). On the laptop: `C:\Users\cashh\homelab`.
+
+## Related repos
+
+- [homelab-services](https://github.com/zakiscoding/homelab-services) — iMac control plane
+- [homelab-web](https://github.com/zakiscoding/homelab-web) — web UI
+- [homelab-gpu](https://github.com/zakiscoding/homelab-gpu) — GPU PC, Windows boot
+- [gpu-systems-lab](https://github.com/zakiscoding/gpu-systems-lab) — GPU PC, Ubuntu boot, Modal, router

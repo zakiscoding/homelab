@@ -100,7 +100,7 @@ $body = @{
   grad_accum_steps = 4
   use_amp = $true
 } | ConvertTo-Json -Compress
-Invoke-RestMethod -Uri "http://100.91.113.98:3080/api/homelab/jobs" -Method Post `
+Invoke-RestMethod -Uri "http://100.91.113.98:3081/api/homelab/jobs" -Method Post `
   -Headers @{ "x-api-key" = $key; "Content-Type" = "application/json" } -Body $body
 ```
 
@@ -121,7 +121,7 @@ Reaction model goals: [REACTION-VISION.md](REACTION-VISION.md) (Barsoum FER+, Re
 |---------|-----|
 | Train stays `pending` | `train_prep` not done — check imac-worker logs |
 | GPU `404` on plan | Plan not ready; wait for train_prep |
-| GPU cannot reach API | Set `API_BASE_URL` to reachable FastAPI (not only web :3080 for internal routes) |
+| GPU cannot reach API | Set `API_BASE_URL` to reachable FastAPI (not only web :3081 for internal routes) |
 | OOM | Lower `batch_size` or `grad_accum`; `stop-ollama.ps1` |
 
 ## API note

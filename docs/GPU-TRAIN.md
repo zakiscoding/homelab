@@ -104,7 +104,7 @@ Uses `train_reaction_gpu.py` — ResNet18, AMP, 7 FER classes. Expect **~60–85
 
 2. iMac `.env`: `GPU_VISION_URL=http://100.88.71.33:8100`
 
-3. Open **http://100.91.113.98:3081/reactions** — live webcam + expression bars (use `:3081`; `:3080` may serve a stale build on iMac).
+3. Open **http://100.91.113.98:3081/reactions** — live webcam + expression bars.
 
 ## Webcam inference (local script)
 
@@ -135,7 +135,7 @@ $body = @{
   grad_accum_steps = 4
   use_amp = $true
 } | ConvertTo-Json -Compress
-# POST http://100.91.113.98:3080/api/homelab/jobs
+# POST http://100.91.113.98:3081/api/homelab/jobs
 # GPU worker: .\scripts\start-gpu-worker.ps1
 ```
 

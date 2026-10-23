@@ -14,12 +14,13 @@ Browser (Tailscale)
               ▼
          iMac FastAPI :8000 (internal)
               │
-              │  Tailscale
+              │  Tailscale, LLM_BACKEND=auto
               ▼
-         GPU Ollama :11434
+         vLLM :8000/v1 (GPU PC on Ubuntu)
+         or Ollama :11434 (GPU PC on Windows, fallback)
 ```
 
-The browser **never** holds `API_KEY`. Grafana stays on **`:3000`**; the web UI uses **`:3081`** (`:3080` may be used by SSH/Tailscale on the iMac).
+The browser **never** holds `API_KEY`. Grafana stays on **`:3000`**; the web UI uses **`:3081`**.
 
 ## URLs (Tailscale)
 
@@ -38,7 +39,7 @@ The browser **never** holds `API_KEY`. Grafana stays on **`:3000`**; the web UI 
 | Path | API |
 |------|-----|
 | `/` | `/health`, `/health/gpu`, `/system/status` |
-| `/chat` | `POST /chat` → Ollama |
+| `/chat` | `POST /chat` → vLLM (Ubuntu boot) or Ollama (Windows boot) |
 | `/rag` | `POST /rag/ingest`, `POST /rag/query`, `GET /rag/status` |
 | `/reactions` | `GET /vision/status`, `POST /vision/reaction` — see [vision-reactions.md](vision-reactions.md) |
 
@@ -139,8 +140,8 @@ Scripts: `serve-ollama.bat`, `start-ollama.ps1`, `install-ollama-serve-task.ps1`
 | `:3081` connection refused | `docker-compose up -d web` on iMac; `source docker-1tb-env.sh` |
 | Reactions **vision down** | Start GPU reaction serve `:8100` — [vision-reactions.md](vision-reactions.md) |
 | Webcam blocked | Use upload on `/reactions` or HTTPS tunnel to localhost |
-| Chat **Thinking…** forever | `curl.exe http://100.88.71.33:11434/api/tags`; start Ollama on GPU |
-| Chat **502** | GPU Ollama unreachable from iMac; check `GPU_URL` in `.env` |
+| Chat **Thinking…** forever | No LLM backend up: on Ubuntu check vLLM (`docker compose ps` in `gpu-systems-lab/serving`); on Windows `curl.exe http://100.88.71.33:11434/api/tags` and start Ollama |
+| Chat **502** | Neither vLLM nor Ollama reachable from iMac; check `LLM_*` / `GPU_URL` in `.env` |
 | `/` 404, `/health` works | Old Caddy → API; `git pull`, rebuild `web` + `caddy` |
 | API errors in UI | `HOMELAB_API_KEY` in web container must match iMac `API_KEY`; recreate `web` |
 | Caddy mount error | Colima quirk — use compose `reverse-proxy` command (see `docker-compose.yml`) |

@@ -6,7 +6,8 @@ external drive for CUDA/HPC/AI-infra work. Code and results live in
 
 > **One OS at a time.** When the PC is on Ubuntu, the Windows side (`zak_pc`, Tailscale `zakar`
 > 100.88.71.33) is **offline**: no Ollama `:11434`, no Windows GPU worker, no vision API `:8100`.
-> Boot back into Windows for those.
+> Homelab chat keeps working: the iMac API (`LLM_BACKEND=auto`) switches to vLLM on this boot.
+> Boot back into Windows for the rest.
 
 | | |
 |--|--|
@@ -25,7 +26,7 @@ external drive for CUDA/HPC/AI-infra work. Code and results live in
 | CUDA toolkit | 13.2 (`/usr/local/cuda`) | toolkit only, driver unchanged |
 | LLVM / Clang | 21 | CUDA → LLVM IR for sm_120 |
 | PyTorch | 2.11.0+cu128 in `~/gpu-systems-lab/.venv` | 67.7 TFLOPS BF16 |
-| vLLM | 0.32 in `~/venvs/vllm` | served on **127.0.0.1:8000** only, on demand |
+| vLLM | 0.32 (Docker, `serving/compose.yml`; venv `~/venvs/vllm` for benchmarks) | always-on on the tailnet **:8000/v1**, API key; homelab chat backend |
 | Docker + NVIDIA Container Toolkit | Docker 29 | `docker run --gpus all` |
 | Open MPI | 4.1.6 (apt) + `~/opt/openmpi-4.1.6-het` (source, heterogeneous) | the source build pairs with the iMac for 2-machine MPI |
 | **k3s** | v1.36.5 (systemd `k3s`) | single node, NVIDIA device plugin v0.19.3, GPU admission policy |
@@ -40,13 +41,13 @@ external drive for CUDA/HPC/AI-infra work. Code and results live in
 | dcgm-exporter | 127.0.0.1:9400 | node only |
 | k3s API | :6443 | TLS client cert (kubeconfig `~/.kube/config`, mode 600) |
 | kubelet | :10250 | TLS client cert |
-| vLLM | 127.0.0.1:8000 | node only, when started |
+| vLLM | http://100.121.51.35:8000/v1 | tailnet only, API key (LAN refused); ~5 GB VRAM resident |
 | SSH | :22 | Tailscale SSH on the tailnet |
 
-**Hardening:** `gpu-systems-lab/scripts/harden_node.sh`, run once by the owner with sudo, blocks
-22/6443/10250 on the LAN interfaces (Wi-Fi `wlp5s0` 10.0.0.21 + Ethernet). It also enables Nsight
-Compute counters after a reboot and removes the setup-time passwordless sudo rule. Until it runs,
-those three ports are reachable from the home LAN (all require auth).
+**Hardening (done):** `gpu-systems-lab/scripts/harden_node.sh` blocks 22/6443/10250 on the LAN
+interfaces (Wi-Fi `wlp5s0` 10.0.0.21 + Ethernet) with ufw, enables Nsight Compute counters after a
+reboot and removes the setup-time passwordless sudo rule. LAN blocking is verified; the reboot for
+Nsight counters is pending.
 
 ## Common operations
 

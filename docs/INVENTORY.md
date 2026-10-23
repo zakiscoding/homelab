@@ -17,7 +17,7 @@ Hardware and logical resources. Update when we add, rename, or retire anything.
 | gpu-node (`zak_pc`) | Bare metal | **Windows**, login **`zakar`** | RTX 5070, driver 596.x | **10.0.0.156**, **100.88.71.33** (Tailscale) | Ollama :11434; `homelab-gpu`; data `C:\Users\zakar\homelab-data\` |
 | gpu-node Ubuntu (`zak-gpu-node`) | Bare metal (same PC) | **Ubuntu 24.04.5**, login **`zak`** | RTX 5070, driver 595.99.02, CUDA 13.2 | 10.0.0.21 (Wi-Fi), **100.121.51.35** (Tailscale) | Docker, k3s, vLLM, DCGM/Grafana — [gpu-node-ubuntu](nodes/gpu-node-ubuntu.md) |
 | imac-node (`Mos-iMac`) | Bare metal | **macOS** 15.7.3, **Apple M1**, **`momo`** | iMac | **100.91.113.98** (Tailscale) | Colima on 1TB; stack **running** — [SERVICES](SERVICES.md) |
-| controller (laptop) | Laptop | **Windows**, login **`cashh`** | — | N/A | `C:\Users\cashh\homelab`; Tailscale to GPU |
+| controller (laptop) | Laptop | **Windows**, login **`cashh`** | — | **100.73.132.95** (Tailscale) | `C:\Users\cashh\homelab`; Tailscale to GPU; runs the router worker |
 
 ## Virtual machines
 
@@ -29,15 +29,17 @@ Hardware and logical resources. Update when we add, rename, or retire anything.
 
 | Name | Host | Image / stack | Ports | Purpose |
 |------|------|---------------|-------|---------|
-| api | Mos-iMac | build `./api` | 8000 (internal) | FastAPI → GPU |
+| api | Mos-iMac | build `./api` | 8000 (internal) | FastAPI → vLLM / Ollama |
 | postgres | Mos-iMac | postgres:16-alpine | internal | Chat logs |
 | redis | Mos-iMac | redis:7-alpine | internal | Counters / queue |
-| web | Mos-iMac | homelab-services-web | **3080** | Next.js UI |
+| web | Mos-iMac | homelab-services-web | **3081** | Next.js UI |
 | caddy | Mos-iMac | caddy:2-alpine | 80, 443 | → web:3000 |
 | qdrant | Mos-iMac | qdrant/qdrant | 6333 | Vectors / RAG |
 | imac-worker | Mos-iMac | build worker | — | RAG ingest/embed |
 | prometheus | Mos-iMac | prom/prometheus | 9090 | Metrics |
+| pushgateway | Mos-iMac | prom/pushgateway | 9091 | Windows GPU metric push |
 | grafana | Mos-iMac | grafana/grafana | 3000 | Dashboards |
+| mlflow | Mos-iMac | MLflow | 5001 | Experiment tracking |
 
 ## Containers & cluster (GPU node, Ubuntu — `gpu-systems-lab`)
 
@@ -47,6 +49,7 @@ Hardware and logical resources. Update when we add, rename, or retire anything.
 | obs-prometheus | zak-gpu-node | prom/prometheus:v3.5.0 | 100.121.51.35:9090 | GPU node metrics, 15-day retention |
 | obs-grafana | zak-gpu-node | grafana/grafana:12.1.1 | 100.121.51.35:3000 | GPU dashboard `gpu-node` |
 | obs-node-exporter | zak-gpu-node | prom/node-exporter:v1.9.1 | internal | CPU / RAM / disk |
+| vllm | zak-gpu-node | vLLM 0.32 (Docker, `serving/compose.yml`) | 100.121.51.35:8000 | Always-on chat backend, `qwen2.5-1.5b-instruct`, API key |
 | k3s | zak-gpu-node | k3s v1.36.5 (systemd) | 6443, 10250 | single-node Kubernetes |
 | nvidia-device-plugin | k3s `kube-system` | nvcr.io/nvidia/k8s-device-plugin:v0.19.3 | — | advertises `nvidia.com/gpu: 1` |
 

@@ -8,14 +8,13 @@ What runs in the lab and how to operate it. One row per service; link to config 
 |---------|---------|--------------|-------------------|--------|
 | Caddy | imac-node | `http://100.91.113.98/` (Tailscale) | `homelab-services` compose | `:80` → **homelab-web** |
 | **Web UI** | imac-node | `http://100.91.113.98:3081` | [homelab-web](https://github.com/zakiscoding/homelab-web) | Chat, RAG, reactions — [web-ui.md](services/web-ui.md) |
-| MLflow | imac-node | `http://100.91.113.98:5001` | homelab-services compose | Phase [6](PHASE-6.md) |
 | Reaction vision API | imac-node | `/vision/*` on API `:8000` | `homelab-services/api/vision_routes.py` | Proxies GPU `:8100` |
 | Prometheus | imac-node | `http://100.91.113.98:9090` | `homelab-services/prometheus/config` | Scrapes API, Qdrant, Pushgateway |
 | Pushgateway | imac-node | `http://100.91.113.98:9091` | ephemeral | GPU metrics push target |
-| Grafana | imac-node | `http://100.91.113.98:3000` | `homelab-services/grafana/` | Dashboards: Homelab Stack |
+| Grafana | imac-node | `http://100.91.113.98:3000` | `homelab-services/grafana/` | Dashboards: Homelab ML Platform, Homelab Stack, GPU node |
 | MLflow | imac-node | `http://100.91.113.98:5001` | `homelab-services/data/mlflow` | Training experiments — [MLFLOW.md](MLFLOW.md) |
 | API `/metrics` | imac-node | `http://100.91.113.98/metrics` | `homelab-services/api/metrics.py` | Phase [5](PHASE-5.md) |
-| Backups | — | — | — | TBD `pg_dump` → external |
+| Backups | imac-node | — | `homelab-services/scripts/backup-postgres.sh` | Manual `pg_dump`; schedule pending — [BACKUPS.md](BACKUPS.md) |
 
 ## Applications
 
@@ -27,8 +26,8 @@ What runs in the lab and how to operate it. One row per service; link to config 
 | Homelab API | imac-node | internal `:8000`; `/health` via Caddy only for ops | `homelab-services/api/` | `x-api-key`; UI uses BFF proxy |
 | GPU train worker | gpu-node | Polls iMac internal worker API | `homelab-gpu/worker/` | `WORKER_API_KEY`; Phase [0A](PHASE-0A.md); skips routed jobs |
 | **Router worker** | laptop (controller) | `python -m router.homelab_worker` | `gpu-systems-lab/router/` | claims `route` jobs only; runs on local RTX or Modal; decision → `experiments` |
-| PostgreSQL | imac-node | internal | `homelab-services/data/postgres` | Chat logs |
-| Redis | imac-node | internal | `homelab-services/data/redis` | Request counters |
+| PostgreSQL | imac-node | internal | `homelab-services/data/postgres` | Job queue (single source of truth), chat logs, RAG metadata |
+| Redis | imac-node | internal | `homelab-services/data/redis` | Request counters, job wake queues |
 | Qdrant | imac-node | `http://100.91.113.98:6333` | `homelab-services/data/qdrant` | v1.18 — RAG |
 
 Stack doc: [services/imac-stack.md](services/imac-stack.md)
@@ -43,7 +42,7 @@ Only up while the PC is booted into Ubuntu (the Windows services above are down 
 | Prometheus (GPU) | zak-gpu-node | `http://100.121.51.35:9090` | `gpu-systems-lab/observability/prometheus/` | alerts: GPU temp > 85 °C, VRAM > 95%, XID, exporter down |
 | dcgm-exporter | zak-gpu-node | `127.0.0.1:9400/metrics` | `observability/dcgm/counters.csv` | SM active, tensor pipe, power, temp, PCIe |
 | k3s + GPU queue | zak-gpu-node | `kubectl` (kubeconfig on node) | `gpu-systems-lab/scheduling/` | `submit.py`; admission policy enforces GPU limits |
-| vLLM | zak-gpu-node | `127.0.0.1:8000` (OpenAI API) | `gpu-systems-lab/serving/` | on demand: `serving/launch_server.sh` |
+| vLLM | zak-gpu-node | `http://100.121.51.35:8000/v1` (OpenAI API, API key) | `gpu-systems-lab/serving/compose.yml` | always-on Docker; homelab chat backend (see Applications) |
 | Job router | laptop | `python -m router route/run` | `gpu-systems-lab/router/` | local RTX vs Modal by VRAM, deadline, cost |
 
 ## Per-service detail (optional)

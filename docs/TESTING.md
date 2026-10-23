@@ -9,7 +9,7 @@ Run after changes or from a new machine on Tailscale.
 curl.exe http://100.88.71.33:11434/api/tags
 
 # Web UI
-curl.exe -s -o NUL -w "%{http_code}" http://100.91.113.98:3080/
+curl.exe -s -o NUL -w "%{http_code}" http://100.91.113.98:3081/
 curl.exe -s -o NUL -w "%{http_code}" http://100.91.113.98/
 
 # iMac stack (ops)
@@ -40,7 +40,7 @@ cd C:\Users\zakar\homelab-gpu
 $key = "YOUR_API_KEY"   # iMac homelab-services/.env
 $h = @{ "x-api-key" = $key; "Content-Type" = "application/json" }
 $body = @{ prompt = "say hi"; model = "llama3.2:latest" } | ConvertTo-Json -Compress
-Invoke-RestMethod -Uri "http://100.91.113.98:3080/api/homelab/chat" -Method Post -Headers $h -Body $body
+Invoke-RestMethod -Uri "http://100.91.113.98:3081/api/homelab/chat" -Method Post -Headers $h -Body $body
 ```
 
 ## Expected
@@ -48,7 +48,7 @@ Invoke-RestMethod -Uri "http://100.91.113.98:3080/api/homelab/chat" -Method Post
 | Check | Expected |
 |-------|----------|
 | GPU tags | JSON with `llama3.2:latest` |
-| Web UI `:3080` / `/` | HTTP 200 |
+| Web UI `:3081` / `/` | HTTP 200 |
 | Web chat | JSON with `response`, `duration_ms` |
 | iMac `/health` | 200 OK (direct API; optional) |
 | verify-gpu | `cuda True`, RTX 5070 |

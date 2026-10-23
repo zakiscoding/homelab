@@ -69,7 +69,7 @@ Archive only — inference still runs on GPU Ollama:
 $key = "YOUR_API_KEY"
 $h = @{ "x-api-key" = $key; "Content-Type" = "application/json" }
 $body = @{ prompt = "Hello"; model = "homelab-smoke-lora-v1" } | ConvertTo-Json -Compress
-Invoke-RestMethod -Uri "http://100.91.113.98:3080/api/homelab/chat" -Method Post -Headers $h -Body $body
+Invoke-RestMethod -Uri "http://100.91.113.98:3081/api/homelab/chat" -Method Post -Headers $h -Body $body
 ```
 
 **List models:**

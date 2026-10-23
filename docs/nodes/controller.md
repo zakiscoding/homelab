@@ -5,8 +5,9 @@
 | **Machine** | Laptop (not the GPU desktop) |
 | **OS** | Windows |
 | **Login** | **`cashh`** |
-| **Repos** | `C:\Users\cashh\homelab`, `homelab-web`, `homelab-services` (optional) |
-| **Role** | Docs, UI dev, `curl` tests, SSH to iMac + GPU |
+| **Repos** | `C:\Users\cashh\homelab`, `homelab-web`, `homelab-services` (optional), `OneDrive\Desktop\gpu-systems-lab` |
+| **Tailscale** | `hp-laptop`, 100.73.132.95 |
+| **Role** | Docs, UI dev, `curl` tests, SSH to iMac + GPU, router worker + Modal client (`gpu-systems-lab`) |
 
 Do not confuse with the **GPU PC** — that machine logs in as **`zakar`** (`zak_pc`). See [gpu-node.md](gpu-node.md).
 
@@ -14,7 +15,8 @@ Do not confuse with the **GPU PC** — that machine logs in as **`zakar`** (`zak
 
 | Node | User / host | SSH alias (laptop `~/.ssh/config`) |
 |------|-------------|--------------------------------------|
-| **GPU PC** | **`zakar`** @ `zak_pc` | `ssh zak-ts` → `100.88.71.33` |
+| **GPU PC (Windows boot)** | **`zakar`** @ `zak_pc` | `ssh zak-ts` → `100.88.71.33` |
+| **GPU PC (Ubuntu boot)** | **`zak`** @ `zak-gpu-node` | `ssh gpu-ts` → `100.121.51.35` (Tailscale SSH) |
 | **iMac** | **`momo`** @ `Mos-iMac` | `ssh imac-ts` |
 | **This laptop** | **`cashh`** | Local PowerShell + `C:\Users\cashh\homelab` |
 
@@ -37,7 +39,7 @@ See [GIT.md](../GIT.md). GitHub: **zakiscoding/homelab** (private).
 
 | URL | Notes |
 |-----|-------|
-| http://100.91.113.98:3080 | Production UI on iMac |
+| http://100.91.113.98:3081 | Production UI on iMac |
 | http://100.91.113.98/ | Same via Caddy |
 | http://localhost:3000 | Local dev (`npm run dev` in `homelab-web`) |
 

@@ -20,7 +20,7 @@ cd "/Volumes/1tb drive/homelab-services"
 ./scripts/setup-1tb.sh      # .env, data dirs, start Colima
 ./scripts/render-caddyfile.sh
 ./scripts/start-stack.sh    # pull + docker-compose up
-curl -s -o /dev/null -w "%{http_code}\n" http://localhost:3080/   # expect 200
+curl -s -o /dev/null -w "%{http_code}\n" http://localhost:3081/   # expect 200
 ```
 
 Use `~/1tb-drive/homelab-services` if Colima has trouble with spaces in `/Volumes/1tb drive` (symlink created by scripts).
@@ -35,9 +35,9 @@ source ./scripts/docker-1tb-env.sh
 
 | Service | Host port | Purpose |
 |---------|-----------|---------|
-| **web** | **3080** | Next.js UI ([web-ui.md](web-ui.md)) |
+| **web** | **3081** | Next.js UI ([web-ui.md](web-ui.md)) |
 | **caddy** | 80, 443 | Reverse proxy → `web:3000` (LAN mode) |
-| **api** | internal 8000 | FastAPI → GPU Ollama |
+| **api** | internal 8000 | FastAPI → vLLM or Ollama (`LLM_BACKEND=auto`) |
 | **postgres** | internal | Jobs, chat, RAG metadata |
 | **redis** | 6379 | Counters, job wake |
 | **qdrant** | 6333 | Vectors |
@@ -69,7 +69,8 @@ See `homelab-services/.env.example`. Copy to `.env` on the iMac only — never c
 | Variable | Used by |
 |----------|---------|
 | `API_KEY` | API + web container (`HOMELAB_API_KEY`) |
-| `GPU_URL` | API → Ollama (default `http://100.88.71.33:11434`) |
+| `LLM_BACKEND` | `auto`: vLLM if reachable, else Ollama; re-checked every 30 s |
+| `GPU_URL` | API → Ollama fallback (default `http://100.88.71.33:11434`) |
 | `WORKER_API_KEY` | GPU + iMac workers |
 | `DOMAIN` | Optional public HTTPS only |
 
@@ -91,7 +92,7 @@ See `homelab-services/.env.example`. Copy to `.env` on the iMac only — never c
 | `docker ps` empty | Run `source ./scripts/docker-1tb-env.sh` (Colima context) |
 | Bind mount “is a directory” | Compose from `~/1tb-drive/`; sync scripts for Prometheus/Grafana |
 | Grafana permission denied | `sudo chown -R 472:472 data/grafana` |
-| Web `:3080` refused | `docker-compose up -d web` |
+| Web `:3081` refused | `docker-compose up -d web` |
 | `/chat` 401 | `x-api-key` / `HOMELAB_API_KEY` mismatch |
 | `/chat` 502 or UI “Thinking…” | GPU Ollama down — `curl http://100.88.71.33:11434/api/tags`; [gpu-node.md](../nodes/gpu-node.md) |
 | Caddy file mount error | Use compose `reverse-proxy` command; optional `sync-caddy-config.sh` for `DOMAIN` |

@@ -23,7 +23,7 @@
 | Container | Status | Role |
 |-----------|--------|------|
 | **API** (FastAPI) | [x] | Gateway to Ollama |
-| **Web UI** (`homelab-web`) | [x] | `:3080`, Caddy `:80` |
+| **Web UI** (`homelab-web`) | [x] | `:3081`, Caddy `:80` |
 | **Caddy** | [x] | `:80` → `web:3000` |
 | **PostgreSQL** | [x] | Persistent data |
 | **Redis** | [x] | Cache / counters |
@@ -44,7 +44,7 @@ Start: `homelab-services/scripts/start-stack.sh`
 | Authentication | [~] | `x-api-key` on `/chat`, `/stats` — not full user auth |
 | Request validation | [x] | Pydantic models on `/chat` |
 | Logging | [~] | Chat rows in Postgres — no structured app log yet |
-| Calling Ollama | [x] | `GPU_URL` → `/api/generate` |
+| Calling the LLM | [x] | `api/llm.py`, `LLM_BACKEND=auto`: vLLM (Ubuntu boot) else Ollama via `GPU_URL` |
 | Returning responses | [x] | JSON to client |
 
 Endpoints: `/health`, `/health/gpu`, `/chat`, `/rag/*`, `/jobs`, `/system/status` — UI at [web-ui.md](../services/web-ui.md)
@@ -129,7 +129,7 @@ Port **6333** exposed for when RAG is built.
 | **6333** | Qdrant |
 | **9090** | Prometheus |
 
-API is **internal** on 8000 — browser uses **web UI** on `:3080` / Caddy `:80` (BFF proxy).
+API is **internal** on 8000 — browser uses **web UI** on `:3081` / Caddy `:80` (BFF proxy).
 
 ---
 

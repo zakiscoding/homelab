@@ -1,6 +1,6 @@
 # Public internet access (optional)
 
-**Default homelab access is Tailscale only** — see [services/web-ui.md](../services/web-ui.md) (`http://100.91.113.98:3080`). Use this guide only if you want a **public domain** on your own router (no Cloudflare Tunnel / ngrok).
+**Default homelab access is Tailscale only** — see [services/web-ui.md](../services/web-ui.md) (`http://100.91.113.98:3081`). Use this guide only if you want a **public domain** on your own router (no Cloudflare Tunnel / ngrok).
 
 Expose the **web UI** from the **iMac** using **Caddy** on ports **80/443**. Only your router, domain DNS, and the homelab stack.
 
@@ -49,7 +49,7 @@ TLS certificates are issued automatically by **Let's Encrypt** via Caddy (outbou
 
 ## LAN / Tailscale without a domain
 
-Leave `DOMAIN` unset in `.env`. Run `./scripts/render-caddyfile.sh` — Caddy serves **http://:80 → web** (and **http://100.91.113.98:3080** for direct UI).
+Leave `DOMAIN` unset in `.env`. Run `./scripts/render-caddyfile.sh` — Caddy serves **http://:80 → web** (and **http://100.91.113.98:3081** for direct UI).
 
 ## Security checklist
 

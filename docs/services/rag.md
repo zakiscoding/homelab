@@ -12,7 +12,7 @@ Phase 2 homelab RAG — engineered behavior, not ad-hoc scripts.
 | `imac-worker` | Executes `ingest` + `embed` jobs |
 | FastAPI | `/rag/ingest`, `/rag/query` (sync executor for query) |
 | Redis | Query result cache keyed by `collection_version` + query hash |
-| Ollama (GPU) | Generation only |
+| LLM (GPU PC) | Generation only: vLLM on the Ubuntu boot, Ollama on the Windows boot (`LLM_BACKEND=auto`) |
 
 ## Ingest flow
 
@@ -32,7 +32,7 @@ Phase 2 homelab RAG — engineered behavior, not ad-hoc scripts.
 4. Load `collection_aliases.active`
 5. Embed query + Qdrant search
 6. Filter hits with `score < 0.35` → `no_context`
-7. Build prompt with top chunks → Ollama `/api/generate`
+7. Build prompt with top chunks → LLM backend (vLLM or Ollama, via `api/llm.py`)
 8. Return `answer`, `citations[]`, `job_id`
 
 ## Chunk schema (v1)

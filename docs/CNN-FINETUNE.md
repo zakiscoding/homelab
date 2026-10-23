@@ -73,14 +73,14 @@ $body = @{
   batch_size      = 32
 } | ConvertTo-Json -Compress
 
-$job = Invoke-RestMethod -Uri "http://100.91.113.98:3080/api/homelab/jobs" -Method Post -Headers $h -Body $body
+$job = Invoke-RestMethod -Uri "http://100.91.113.98:3081/api/homelab/jobs" -Method Post -Headers $h -Body $body
 $job.id
 ```
 
 ### 3. Poll until succeeded
 
 ```powershell
-Invoke-RestMethod -Uri "http://100.91.113.98:3080/api/homelab/jobs/$($job.id)" -Headers @{ "x-api-key" = $key }
+Invoke-RestMethod -Uri "http://100.91.113.98:3081/api/homelab/jobs/$($job.id)" -Headers @{ "x-api-key" = $key }
 ```
 
 ### 4. Artifacts on GPU

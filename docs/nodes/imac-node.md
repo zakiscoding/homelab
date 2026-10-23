@@ -5,7 +5,7 @@
 **Stack:** `/Volumes/1tb drive/homelab-services`  
 **Docker:** [Colima](https://github.com/abiosoft/colima) — VM at `homelab-runtime/colima/`
 
-Application platform and data services. GPU node runs Ollama; iMac proxies and persists.
+Application platform and data services. The GPU PC serves the LLM (vLLM on Ubuntu, Ollama on Windows); iMac proxies and persists.
 
 **Quick checklist:** [imac-checklist.md](imac-checklist.md) — responsibilities, ports, done vs planned.
 
@@ -13,7 +13,7 @@ Application platform and data services. GPU node runs Ollama; iMac proxies and p
 
 | Do on iMac | Do on GPU PC |
 |------------|----------------|
-| FastAPI, Caddy, Postgres, Redis, Qdrant | Ollama inference |
+| FastAPI, Caddy, Postgres, Redis, Qdrant | LLM inference (vLLM / Ollama) |
 | Prometheus, Grafana | Model training (`homelab-gpu`) |
 | Auth, routing, storage (growing) | CUDA / large models |
 
@@ -32,17 +32,20 @@ Application platform and data services. GPU node runs Ollama; iMac proxies and p
 | Interface | IP |
 |-----------|-----|
 | Tailscale | **100.91.113.98** |
-| GPU Ollama (via Tailscale) | `http://100.88.71.33:11434` |
+| GPU Ollama (Windows boot) | `http://100.88.71.33:11434` |
+| GPU vLLM (Ubuntu boot) | `http://100.121.51.35:8000/v1` (API key) |
 
 ## Exposed ports
 
 | Port | Service |
 |------|---------|
-| **3080** | **Web UI** (homelab-web) |
+| **3081** | **Web UI** (homelab-web) |
 | 80 | Caddy → web UI |
 | 3000 | Grafana |
 | 6333 | Qdrant |
 | 9090 | Prometheus |
+| 9091 | Pushgateway |
+| 5001 | MLflow |
 | 8000 | FastAPI (internal only) |
 
 ## Install (one-time)
@@ -58,7 +61,7 @@ brew install colima docker docker-compose
 source ~/1tb-drive/homelab-services/scripts/docker-1tb-env.sh
 colima start    # if VM not running
 cd ~/1tb-drive/homelab-services && ./scripts/start-stack.sh
-curl -s -o /dev/null -w "%{http_code}\n" http://localhost:3080/
+curl -s -o /dev/null -w "%{http_code}\n" http://localhost:3081/
 ```
 
 Full runbook: [services/imac-stack.md](../services/imac-stack.md) · UI: [services/web-ui.md](../services/web-ui.md)
@@ -66,7 +69,7 @@ Full runbook: [services/imac-stack.md](../services/imac-stack.md) · UI: [servic
 ## Test from controller (`cashh`)
 
 ```powershell
-curl.exe http://100.91.113.98:3080/
+curl.exe http://100.91.113.98:3081/
 curl.exe http://100.88.71.33:11434/api/tags
 # API direct (optional):
 curl.exe http://100.91.113.98/health
