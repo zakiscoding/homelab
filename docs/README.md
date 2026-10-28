@@ -43,6 +43,7 @@ Back to the [repo README](../README.md).
 | [services/vision-reactions.md](services/vision-reactions.md) | Reaction CNN on the GPU PC |
 | [OBSERVABILITY.md](OBSERVABILITY.md) | Prometheus, Pushgateway, Grafana, DCGM |
 | [MLFLOW.md](MLFLOW.md) | Experiment tracking on the iMac |
+| [MARKET-DATA-GPU.md](MARKET-DATA-GPU.md) | EduFS and limit-order capture experiment |
 
 ## Jobs and ML
 

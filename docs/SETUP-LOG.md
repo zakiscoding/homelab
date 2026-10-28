@@ -4,6 +4,21 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 ---
 
+## 2026-10-28 — Market-data capture bridge, week 1
+
+**Goal:** Start the EduFS plus limit-order experiment and record it outside the five homelab repos.
+
+**Repo:** [zakiscoding/market-data-gpu-systems](https://github.com/zakiscoding/market-data-gpu-systems) (private). Local checkout: `Desktop\master\market-data-gpu-systems`, next to the EduFS and limit-order clones.
+
+**Verified on the Windows boot of `zak_pc`:**
+
+- Seed 42, 4,096 `LOBREPV1` events, 131,104 bytes, SHA-256 `5a6ab4a1f0f98cabbd37965e13f7b8259da931bce8a9573d295f51bbe901e40e` before and after `edufs put` / `check` / `get`.
+- QEMU guest (Linux 6.12.114, existing WSL build at `/root/projects/edufs`) printed `WEEK1 GUEST PASS` after a mount, compare, remount, and second compare.
+- C++ and Python replay agreed on 5 fingerprints. Book `2ab9a19740a8d99a`, trade hash `46c573b945a6f797`.
+- `nvidia-smi`: RTX 5070, driver 616.56, 12,227 MiB. `homelab-gpu` venv: PyTorch 2.11.0+cu128, CUDA available. That probe is inventory, not the week-6 timing table.
+
+Open work is issues 1–5 on that repo (segmented million-event capture through the CPU/GPU timing table). EduFS still caps a file at 4,243,456 bytes, so the million-event run is multiple segments.
+
 ## 2026-10-23 (evening) — Job-queue fixes and documentation across all repos
 
 **Goal:** Fix bugs found while documenting the code, then make the docs of all five repos consistent.
