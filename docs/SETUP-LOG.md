@@ -4,6 +4,18 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 ---
 
+## 2026-10-27 — Market-data weeks 2 through 6
+
+**Repo:** [zakiscoding/market-data-gpu-systems](https://github.com/zakiscoding/market-data-gpu-systems). Measurements: `docs/results.md` in that repo.
+
+**On the Windows boot of `zak_pc`:**
+
+- 1,000,000 `LOBREPV1` events stored as eight EduFS files. Largest file is the 4,243,456-byte cap. QEMU remount compared every file twice (`WEEK2 GUEST PASS`). Disk-full put left the image unchanged.
+- Checker rejected 11 damaged images. The million-event image passed.
+- Offline tool, local temp disk: write 3.02M verified records/s, read 2.03M, C++ file replay 6.04M. The 17.18M events/s book figure stays a different timer.
+- BTCUSDT 1-minute bars, Jan–Mar 2024. Test ROC AUC 0.524 logistic and 0.524 MLP. The MLP does not beat logistic regression. MLflow run `57a218a5bedc4d9599835b7929ca70e3` on the iMac (`:5001`).
+- Same checkpoint, CUDA events: CPU forward is faster than the RTX 5070 at batches 1, 8, 64, and 256. Max probability difference `5.96e-8` against a `1e-4` tolerance.
+
 ## 2026-10-28 — Market-data capture bridge, week 1
 
 **Goal:** Start the EduFS plus limit-order experiment and record it outside the five homelab repos.
