@@ -19,6 +19,7 @@
 - **Service docs**: web UI, iMac stack, RAG, vision/reactions, observability, MLflow
 - **Phase docs** (0A to 6) describing how each capability was built and tested
 - **[Setup log](docs/SETUP-LOG.md)**: dated record of every change
+- **Public edge on Cloudflare**: an OpenAI-compatible API for the home GPU with per-client keys, a strict rate limit and a hosted fallback, reached through a tunnel with no open ports, plus a public [results page](https://gpu-systems-lab-results.vllm-gateway.workers.dev) — [docs/deploy/public-internet.md](docs/deploy/public-internet.md)
 - No code and no secrets. Code lives in the four other repos; credentials stay in `.env` files on each machine.
 
 ## Architecture
@@ -34,11 +35,13 @@ flowchart LR
       MON["Prometheus :9090 · Grafana :3000<br/>MLflow :5001"]
     end
     subgraph GPUPC["GPU PC, RTX 5070 · one OS at a time"]
-      WIN["Windows · 100.88.71.33<br/>Ollama :11434, QLoRA worker<br/>reaction CNN :8100"]
+      WIN["Windows · 100.88.71.33<br/>Ollama :11434, QLoRA worker<br/>reaction CNN :8100<br/>WSL2: vLLM, Grafana, cloudflared"]
       UBU["Ubuntu · 100.121.51.35<br/>vLLM :8000, k3s :6443<br/>DCGM, Prometheus, Grafana"]
     end
   end
   MODAL["Modal cloud<br/>H100 burst"]
+  CF["Cloudflare<br/>Workers gateway, Workers AI<br/>results site"]
+  CLIENT["API clients"]
 
   LAPTOP -->|"HTTP"| WEB
   WEB --> API
@@ -51,6 +54,8 @@ flowchart LR
   LAPTOP -->|"modal run"| MODAL
   MON -.->|"scrape"| API
   MON -.->|"GPU datasource"| UBU
+  CLIENT -->|"API key"| CF
+  CF -->|"tunnel, outbound only"| WIN
 ```
 
 Full diagrams and explanations: **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**.
@@ -73,9 +78,9 @@ Sharing with someone outside the project? Send the standalone **[share/HOMELAB-C
 | [homelab-services](https://github.com/zakiscoding/homelab-services) | iMac stack: FastAPI, Postgres job queue, Redis, Qdrant RAG, Caddy, Prometheus/Grafana, MLflow, iMac worker | iMac (Colima) |
 | [homelab-web](https://github.com/zakiscoding/homelab-web) | Next.js 16 / React 19 / Tailwind 4 UI: chat, RAG, reactions, status; BFF keeps the API key server-side | iMac `:3081` (prod), laptop (dev) |
 | [homelab-gpu](https://github.com/zakiscoding/homelab-gpu) | Windows GPU PC: Ollama, QLoRA training, GPU job worker, reaction CNN `:8100`, metrics push | GPU PC on Windows |
-| [gpu-systems-lab](https://github.com/zakiscoding/gpu-systems-lab) | Ubuntu GPU node + Modal: CUDA kernels, MPI/NCCL, FSDP, vLLM, k3s, DCGM observability, job router | GPU PC on Ubuntu, Modal, laptop |
+| [gpu-systems-lab](https://github.com/zakiscoding/gpu-systems-lab) | Ubuntu GPU node + Modal: CUDA kernels, MPI/NCCL, FSDP, vLLM, k3s, DCGM observability, job router, Cloudflare gateway | GPU PC (Ubuntu, or WSL2 on Windows), Modal, Cloudflare, laptop |
 
-All five repos are private. Details: [docs/REPOS.md](docs/REPOS.md).
+**homelab** and **gpu-systems-lab** are public. The other three are private, so their links open only for the owner. Details: [docs/REPOS.md](docs/REPOS.md).
 
 ## Machines
 
@@ -105,13 +110,18 @@ laptop; `zakar` is the GPU PC on Windows.
 | Cloud GPU burst (Modal) | **Done** | H100 / 2x H100 / L4; **$10** usage limit |
 | k3s GPU scheduling | **Running** | Single node, NVIDIA device plugin, GPU admission policy |
 | Monitoring | **Running** | iMac Prometheus `:9090` + Grafana `:3000`; GPU node DCGM dashboard as a second datasource |
+| Cloudflare LLM gateway | **Running** | Public OpenAI-compatible API on Workers: per-client keys, 60 requests/min per client (Durable Object), Workers AI fallback when the GPU is unreachable. Reaches vLLM through a tunnel with no open ports — [details](https://github.com/zakiscoding/gpu-systems-lab/blob/main/docs/CLOUDFLARE.md) |
+| GPU PC, Windows: WSL2 | **Running** | vLLM, Prometheus, Grafana, DCGM and `cloudflared` in Ubuntu on WSL2, kept up by the `WSL Keep Alive` task. Localhost only; the iMac can't reach this vLLM |
+| Results site | **Live** | [gpu-systems-lab-results.vllm-gateway.workers.dev](https://gpu-systems-lab-results.vllm-gateway.workers.dev): benchmark results and charts, built from gpu-systems-lab |
+| Grafana via Cloudflare Access | **Waiting** | Proxy deployed; it refuses every request until Access is enabled |
+| R2 results storage | **Waiting** | Upload script ready; R2 isn't enabled on the account |
 | Ubuntu node hardening | **Done** | LAN blocked for 22/6443/10250 (verified); reboot pending for Nsight counters |
 | Postgres migrations | **Done** | 004–007 applied 2026-10-23 (`scripts/migrate-all.sh`) |
 | GPU training env (Windows) | **Done** | `homelab-gpu` cloned, Python, PyTorch, data dirs |
 | QLoRA training | **Done** | Smoke train via the GPU worker (Phase 3) |
 | LoRA → Ollama | **Ready** | `publish-lora-to-ollama.ps1` — [PHASE-3-LORA-SERVE.md](docs/PHASE-3-LORA-SERVE.md) |
 | Tailscale end-to-end tests | **Done** | GPU + iMac health; web UI chat/RAG from the laptop |
-| GitHub repos | **Done** | Five private repos (see Repo map) |
+| GitHub repos | **Done** | Two public (homelab, gpu-systems-lab), three private (see Repo map) |
 | 1 TB drive layout | **Done** | Docs and services under `/Volumes/1tb drive` on the iMac |
 | Backups | **Partial** | `backup-postgres.sh` on the iMac; schedule is next — [BACKUPS.md](docs/BACKUPS.md) |
 

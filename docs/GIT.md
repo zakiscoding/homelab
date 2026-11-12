@@ -1,6 +1,6 @@
 # Git workflow — `homelab` (documentation)
 
-**Remote:** `https://github.com/zakiscoding/homelab` (private)
+**Remote:** `https://github.com/zakiscoding/homelab` (public)
 
 For the iMac Docker stack, use **[homelab-services](https://github.com/zakiscoding/homelab-services)** — see [REPOS.md](REPOS.md).
 
