@@ -46,7 +46,7 @@ git clone https://github.com/zakiscoding/homelab.git C:\Users\zakar\homelab
 # or sync existing: C:\Users\zakar\HOMELAB
 ```
 
-Same private repo on both Windows machines — **`cashh`** laptop is the usual place to edit and push; **`zakar`** GPU box is for running Ollama, not required to host the repo.
+Same repo on both Windows machines — **`cashh`** laptop is the usual place to edit and push; **`zakar`** GPU box is for running Ollama, not required to host the repo.
 
 ## Daily workflow
 
