@@ -4,6 +4,36 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 ---
 
+## 2026-11-04 to 11-05 — Cloudflare edge: LLM gateway, fallback, results site
+
+**Goal:** Give the home GPU's vLLM a public, OpenAI-compatible URL without opening router ports, and publish the benchmark results.
+
+**Done:**
+
+| Change | Where | Result |
+|--------|-------|--------|
+| LLM gateway | `gpu-systems-lab/gateway/`, Cloudflare Workers | Per-client keys (stored as hashes), route allowlist, body and token caps. Adds 0.2 s to 200 tokens; streaming isn't buffered |
+| Private path to vLLM | Workers VPC Service + Cloudflare Tunnel (`cloudflared`) | vLLM has no public hostname; the tunnel only makes outbound connections |
+| Strict rate limit | Durable Object per client | 300 requests at once: exactly 60 allowed. The Rate Limiting binding it replaced allowed all 300 |
+| Fallback | Workers AI, `llama-3.2-3b-instruct` | With the tunnel or vLLM stopped, chat kept working and returned to the GPU by itself |
+| Runs on the Windows boot | Ubuntu on WSL2: Docker, NVIDIA container toolkit, vLLM, monitoring, `cloudflared` | The Ubuntu boot was offline. A `WSL Keep Alive` scheduled task stops WSL shutting down; it stayed up 12 hours |
+| Results site | `gpu-systems-lab/site/`, Workers static assets | [gpu-systems-lab-results.vllm-gateway.workers.dev](https://gpu-systems-lab-results.vllm-gateway.workers.dev), with charts. The build fails if an IP or machine name would be published |
+| Grafana proxy | `gpu-systems-lab/grafana-proxy/` | Deployed, but refuses every request until Cloudflare Access is enabled |
+
+**Commits:** gpu-systems-lab `1f5179d`, `d7888ba`, `65c08b7`, `320b947`, `bb2f7be`, `ddec984`, `159f2c7`; merged in [pull request #1](https://github.com/zakiscoding/gpu-systems-lab/pull/1) (`744eb6c`).
+
+**Gotchas:**
+- WSL stops seconds after its last session closes, even with containers set to restart. The scheduled task holds a session open.
+- Wrangler deployed the site as a Worker with static assets rather than classic Pages, and rewrote `package.json` to drop the build step. The build step was restored.
+- The tunnel token was briefly exposed, so it was rotated through the API and all connections were dropped.
+- This copy of vLLM listens on localhost in WSL, so the iMac API still falls back to Ollama on the Windows boot.
+
+**Details:** [gpu-systems-lab docs/CLOUDFLARE.md](https://github.com/zakiscoding/gpu-systems-lab/blob/main/docs/CLOUDFLARE.md): status, decisions, test results and runbooks.
+
+**Next:** enable R2 and Cloudflare Access, test a reboot, set up the Ubuntu boot, and add a custom domain.
+
+---
+
 ## 2026-10-27 — Market-data weeks 2 through 6
 
 **Repo:** [zakiscoding/market-data-gpu-systems](https://github.com/zakiscoding/market-data-gpu-systems). Measurements: `docs/results.md` in that repo.

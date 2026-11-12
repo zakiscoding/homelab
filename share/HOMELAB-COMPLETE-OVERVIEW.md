@@ -3,7 +3,7 @@
 **Document purpose:** Standalone description of the homelab for collaborators, reviewers, or future you.  
 **No access required** to other files in the repository — everything essential is here.  
 **Last updated:** 2026-10-23 (Ubuntu GPU node, vLLM auto backend, job router, k3s, DCGM, Modal)  
-**Owner / GitHub:** [zakiscoding](https://github.com/zakiscoding) (private repositories)
+**Owner / GitHub:** [zakiscoding](https://github.com/zakiscoding) (homelab and gpu-systems-lab are public; the rest are private)
 
 ---
 
@@ -18,7 +18,7 @@ This homelab is a **self-hosted AI platform across three home machines plus clou
 3. A **Windows laptop** (`cashh`) is the **controller**: documentation, Git, browser, SSH (`imac-ts`, `zak-ts`, `gpu-ts`), and the **router worker** that sends GPU jobs to the local RTX 5070 or to the cloud.
 4. **Modal** (cloud) provides H100 / 2x H100 / L4 GPUs for jobs that don't fit the RTX 5070 ($10 usage limit).
 
-Machines connect over **home LAN** and **Tailscale**. **Default access is Tailscale only** — no public internet exposure unless you optionally add a domain and port-forward (documented separately).
+Machines connect over **home LAN** and **Tailscale**. **Default access is Tailscale only.** The one public path is a Cloudflare LLM gateway, which reaches the GPU through an outbound tunnel with no open ports. A domain with port forwarding for the web UI is documented separately as an option.
 
 **What works today (MVP):**
 
@@ -397,7 +397,8 @@ Persistent service data: `homelab-services/data/` (Postgres, Grafana, Qdrant, et
 | GPU Ollama (persistent) | Done | `HomelabOllamaServe` on `zak_pc` |
 | Docs on 1TB drive | Done | `/Volumes/1tb drive/homelab` |
 | Services on 1TB drive | Done | `/Volumes/1tb drive/homelab-services` |
-| GitHub repos | Done | Five private: homelab, homelab-services, homelab-web, homelab-gpu, gpu-systems-lab |
+| GitHub repos | Done | Public: homelab, gpu-systems-lab. Private: homelab-services, homelab-web, homelab-gpu |
+| Cloudflare LLM gateway | Running | Public API for the GPU with keys, rate limit and Workers AI fallback; tunnel, no open ports |
 | Monitoring | Running | Prometheus `:9090`, Grafana `:3000` on iMac |
 | Tailscale E2E tests | Done | GPU + iMac health; UI chat/RAG from laptop |
 | GPU training prep | Done | homelab-gpu cloned, Python, torch, data dirs |
