@@ -1,5 +1,22 @@
 # Public internet access (optional)
 
+There are two separate ways to reach the homelab from the internet:
+
+| Option | What it exposes | Ports opened | Status |
+|---|---|---|---|
+| **Cloudflare** (below) | The GPU's vLLM as an OpenAI-compatible API, and a [results page](https://gpu-systems-lab-results.vllm-gateway.workers.dev) | None | Running |
+| **Caddy + domain** (rest of this page) | The web UI on the iMac | 80, 443 | Optional, not set up |
+
+## Cloudflare: LLM gateway, no port forwarding
+
+A Cloudflare Worker gives vLLM a public, OpenAI-compatible URL. It checks a per-client API key, limits each client to 60 requests a minute, and falls back to Workers AI for chat when the GPU is unreachable. It reaches vLLM through a Cloudflare Tunnel: `cloudflared` on the GPU PC only makes outbound connections, and vLLM has no public hostname. Grafana gets the same treatment behind a Cloudflare Access login, once Access is enabled.
+
+Today this runs in Ubuntu on WSL2 on the GPU PC's Windows boot, kept up by the `WSL Keep Alive` scheduled task.
+
+Setup, test results and runbooks: [gpu-systems-lab docs/CLOUDFLARE.md](https://github.com/zakiscoding/gpu-systems-lab/blob/main/docs/CLOUDFLARE.md).
+
+## Caddy and a domain
+
 **Default homelab access is Tailscale only** — see [services/web-ui.md](../services/web-ui.md) (`http://100.91.113.98:3081`). Use this guide only if you want a **public domain** on your own router (no Cloudflare Tunnel / ngrok).
 
 Expose the **web UI** from the **iMac** using **Caddy** on ports **80/443**. Only your router, domain DNS, and the homelab stack.
@@ -45,7 +62,7 @@ Open **https://YOUR-DOMAIN** (the exact value of `DOMAIN` in `.env`). Use the ba
 
 Run `./scripts/check-public-tls.sh` on the iMac to verify DNS and the certificate before using Chrome.
 
-TLS certificates are issued automatically by **Let's Encrypt** via Caddy (outbound HTTPS only — no tunnel vendor).
+TLS certificates are issued automatically by **Let's Encrypt** via Caddy (outbound HTTPS only, with no tunnel vendor; the Cloudflare option above is separate).
 
 ## LAN / Tailscale without a domain
 
