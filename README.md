@@ -4,7 +4,7 @@
 
 **A self-hosted AI platform across three home machines plus cloud GPUs, joined by Tailscale. This repo is its documentation hub.**
 
-![nodes](https://img.shields.io/badge/nodes-3%20%2B%20cloud-2f81f7?style=flat-square) ![GPU](https://img.shields.io/badge/GPU-RTX%205070%2012%20GB-76b900?style=flat-square&logo=nvidia&logoColor=white) ![burst](https://img.shields.io/badge/burst-Modal%20H100-7c3aed?style=flat-square) ![network](https://img.shields.io/badge/network-Tailscale-242424?style=flat-square&logo=tailscale&logoColor=white) ![repos](https://img.shields.io/badge/repos-5%20private-6e7781?style=flat-square&logo=github&logoColor=white)
+![nodes](https://img.shields.io/badge/nodes-3%20%2B%20cloud-2f81f7?style=flat-square) ![GPU](https://img.shields.io/badge/GPU-RTX%205070%2012%20GB-76b900?style=flat-square&logo=nvidia&logoColor=white) ![burst](https://img.shields.io/badge/burst-Modal%20H100-7c3aed?style=flat-square) ![network](https://img.shields.io/badge/network-Tailscale-242424?style=flat-square&logo=tailscale&logoColor=white) ![repos](https://img.shields.io/badge/repos-5%20public-2da44e?style=flat-square&logo=github&logoColor=white)
 
 **homelab (docs hub)** · [homelab-services](https://github.com/zakiscoding/homelab-services) · [homelab-web](https://github.com/zakiscoding/homelab-web) · [homelab-gpu](https://github.com/zakiscoding/homelab-gpu) · [gpu-systems-lab](https://github.com/zakiscoding/gpu-systems-lab)
 
@@ -80,7 +80,7 @@ Sharing with someone outside the project? Send the standalone **[share/HOMELAB-C
 | [homelab-gpu](https://github.com/zakiscoding/homelab-gpu) | Windows GPU PC: Ollama, QLoRA training, GPU job worker, reaction CNN `:8100`, metrics push | GPU PC on Windows |
 | [gpu-systems-lab](https://github.com/zakiscoding/gpu-systems-lab) | Ubuntu GPU node + Modal: CUDA kernels, MPI/NCCL, FSDP, vLLM, k3s, DCGM observability, job router, Cloudflare gateway | GPU PC (Ubuntu, or WSL2 on Windows), Modal, Cloudflare, laptop |
 
-**homelab** and **gpu-systems-lab** are public. The other three are private, so their links open only for the owner. Details: [docs/REPOS.md](docs/REPOS.md).
+All five repos are public, with secret scanning, push protection and Dependabot alerts on. Details: [docs/REPOS.md](docs/REPOS.md).
 
 ## Machines
 
@@ -121,7 +121,7 @@ laptop; `zakar` is the GPU PC on Windows.
 | QLoRA training | **Done** | Smoke train via the GPU worker (Phase 3) |
 | LoRA → Ollama | **Ready** | `publish-lora-to-ollama.ps1` — [PHASE-3-LORA-SERVE.md](docs/PHASE-3-LORA-SERVE.md) |
 | Tailscale end-to-end tests | **Done** | GPU + iMac health; web UI chat/RAG from the laptop |
-| GitHub repos | **Done** | Two public (homelab, gpu-systems-lab), three private (see Repo map) |
+| GitHub repos | **Done** | All five public, with secret scanning, push protection and Dependabot alerts (see Repo map) |
 | 1 TB drive layout | **Done** | Docs and services under `/Volumes/1tb drive` on the iMac |
 | Backups | **Partial** | `backup-postgres.sh` on the iMac; schedule is next — [BACKUPS.md](docs/BACKUPS.md) |
 

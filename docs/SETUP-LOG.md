@@ -4,6 +4,32 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 ---
 
+## 2026-11-12 — Security pass, then all repos public
+
+**Goal:** Make every repo safe to show publicly, then make all five public.
+
+**Done:**
+
+| Check or change | Result |
+|--------|--------|
+| Full-history scan of all five repos, every branch | No tokens, keys, real passwords or `.env` files; only `.example` files and placeholders |
+| Personal email in commit authorship | Two commits (homelab-web, homelab-gpu) rewritten to the GitHub noreply address and force-pushed; file contents verified unchanged, backups kept |
+| Secret scanning and push protection | On for all five repos; GitHub's scan found nothing |
+| Dependabot alerts | On for all five. Surfaced five critical remote code execution advisories in Next.js 16.2.6 |
+| homelab-web | Next.js upgraded to 16.4.6 (pull request #1); production dependencies have no known vulnerabilities |
+| homelab-services | Grafana refuses to start without `GRAFANA_PASSWORD` instead of defaulting to `admin` (pull request #1) |
+| gpu-systems-lab | Gateway deploys run the unit tests first (pull request #3) |
+| Visibility | homelab-services, homelab-web and homelab-gpu made public after a final scan |
+
+**Gotchas:**
+- Checkouts of homelab-web and homelab-gpu on other machines need a fresh clone or `git reset --hard origin/main`, because their history was rewritten.
+- The Next.js fix isn't deployed yet: the iMac wasn't reachable. Rebuild the `web` container there.
+- One medium Dependabot alert remains on homelab-web, in development-only tooling.
+
+**Next:** deploy the web fix on the iMac, add a Redis password, review Tailscale access rules, and turn off Grafana's anonymous access on the tailnet.
+
+---
+
 ## 2026-11-04 to 11-05 — Cloudflare edge: LLM gateway, fallback, results site
 
 **Goal:** Give the home GPU's vLLM a public, OpenAI-compatible URL without opening router ports, and publish the benchmark results.
