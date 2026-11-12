@@ -33,7 +33,7 @@ git commit -m "Describe change"
 git push
 ```
 
-See [GIT.md](../GIT.md). GitHub: **zakiscoding/homelab** (private).
+See [GIT.md](../GIT.md). GitHub: **zakiscoding/homelab** (public).
 
 ## Web UI (browser)
 

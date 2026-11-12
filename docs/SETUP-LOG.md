@@ -4,6 +4,62 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 ---
 
+## 2026-11-12 — Security pass, then all repos public
+
+**Goal:** Make every repo safe to show publicly, then make all five public.
+
+**Done:**
+
+| Check or change | Result |
+|--------|--------|
+| Full-history scan of all five repos, every branch | No tokens, keys, real passwords or `.env` files; only `.example` files and placeholders |
+| Personal email in commit authorship | Two commits (homelab-web, homelab-gpu) rewritten to the GitHub noreply address and force-pushed; file contents verified unchanged, backups kept |
+| Secret scanning and push protection | On for all five repos; GitHub's scan found nothing |
+| Dependabot alerts | On for all five. Surfaced five critical remote code execution advisories in Next.js 16.2.6 |
+| homelab-web | Next.js upgraded to 16.4.6 (pull request #1); production dependencies have no known vulnerabilities |
+| homelab-services | Grafana refuses to start without `GRAFANA_PASSWORD` instead of defaulting to `admin` (pull request #1) |
+| gpu-systems-lab | Gateway deploys run the unit tests first (pull request #3) |
+| Visibility | homelab-services, homelab-web and homelab-gpu made public after a final scan |
+
+**Gotchas:**
+- Checkouts of homelab-web and homelab-gpu on other machines need a fresh clone or `git reset --hard origin/main`, because their history was rewritten.
+- The Next.js fix isn't deployed yet: the iMac wasn't reachable. Rebuild the `web` container there.
+- One medium Dependabot alert remains on homelab-web, in development-only tooling.
+
+**Next:** deploy the web fix on the iMac, add a Redis password, review Tailscale access rules, and turn off Grafana's anonymous access on the tailnet.
+
+---
+
+## 2026-11-04 to 11-05 — Cloudflare edge: LLM gateway, fallback, results site
+
+**Goal:** Give the home GPU's vLLM a public, OpenAI-compatible URL without opening router ports, and publish the benchmark results.
+
+**Done:**
+
+| Change | Where | Result |
+|--------|-------|--------|
+| LLM gateway | `gpu-systems-lab/gateway/`, Cloudflare Workers | Per-client keys (stored as hashes), route allowlist, body and token caps. Adds 0.2 s to 200 tokens; streaming isn't buffered |
+| Private path to vLLM | Workers VPC Service + Cloudflare Tunnel (`cloudflared`) | vLLM has no public hostname; the tunnel only makes outbound connections |
+| Strict rate limit | Durable Object per client | 300 requests at once: exactly 60 allowed. The Rate Limiting binding it replaced allowed all 300 |
+| Fallback | Workers AI, `llama-3.2-3b-instruct` | With the tunnel or vLLM stopped, chat kept working and returned to the GPU by itself |
+| Runs on the Windows boot | Ubuntu on WSL2: Docker, NVIDIA container toolkit, vLLM, monitoring, `cloudflared` | The Ubuntu boot was offline. A `WSL Keep Alive` scheduled task stops WSL shutting down; it stayed up 12 hours |
+| Results site | `gpu-systems-lab/site/`, Workers static assets | [gpu-systems-lab-results.vllm-gateway.workers.dev](https://gpu-systems-lab-results.vllm-gateway.workers.dev), with charts. The build fails if an IP or machine name would be published |
+| Grafana proxy | `gpu-systems-lab/grafana-proxy/` | Deployed, but refuses every request until Cloudflare Access is enabled |
+
+**Commits:** gpu-systems-lab `1f5179d`, `d7888ba`, `65c08b7`, `320b947`, `bb2f7be`, `ddec984`, `159f2c7`; merged in [pull request #1](https://github.com/zakiscoding/gpu-systems-lab/pull/1) (`744eb6c`).
+
+**Gotchas:**
+- WSL stops seconds after its last session closes, even with containers set to restart. The scheduled task holds a session open.
+- Wrangler deployed the site as a Worker with static assets rather than classic Pages, and rewrote `package.json` to drop the build step. The build step was restored.
+- The tunnel token was briefly exposed, so it was rotated through the API and all connections were dropped.
+- This copy of vLLM listens on localhost in WSL, so the iMac API still falls back to Ollama on the Windows boot.
+
+**Details:** [gpu-systems-lab docs/CLOUDFLARE.md](https://github.com/zakiscoding/gpu-systems-lab/blob/main/docs/CLOUDFLARE.md): status, decisions, test results and runbooks.
+
+**Next:** enable R2 and Cloudflare Access, test a reboot, set up the Ubuntu boot, and add a custom domain.
+
+---
+
 ## 2026-10-27 — Market-data weeks 2 through 6
 
 **Repo:** [zakiscoding/market-data-gpu-systems](https://github.com/zakiscoding/market-data-gpu-systems). Measurements: `docs/results.md` in that repo.

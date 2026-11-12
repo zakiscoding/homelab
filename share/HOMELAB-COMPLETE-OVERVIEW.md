@@ -2,8 +2,8 @@
 
 **Document purpose:** Standalone description of the homelab for collaborators, reviewers, or future you.  
 **No access required** to other files in the repository — everything essential is here.  
-**Last updated:** 2026-10-23 (Ubuntu GPU node, vLLM auto backend, job router, k3s, DCGM, Modal)  
-**Owner / GitHub:** [zakiscoding](https://github.com/zakiscoding) (private repositories)
+**Last updated:** 2026-11-12 (Cloudflare LLM gateway, all repos public after a security pass)  
+**Owner / GitHub:** [zakiscoding](https://github.com/zakiscoding) (all repositories are public)
 
 ---
 
@@ -18,7 +18,7 @@ This homelab is a **self-hosted AI platform across three home machines plus clou
 3. A **Windows laptop** (`cashh`) is the **controller**: documentation, Git, browser, SSH (`imac-ts`, `zak-ts`, `gpu-ts`), and the **router worker** that sends GPU jobs to the local RTX 5070 or to the cloud.
 4. **Modal** (cloud) provides H100 / 2x H100 / L4 GPUs for jobs that don't fit the RTX 5070 ($10 usage limit).
 
-Machines connect over **home LAN** and **Tailscale**. **Default access is Tailscale only** — no public internet exposure unless you optionally add a domain and port-forward (documented separately).
+Machines connect over **home LAN** and **Tailscale**. **Default access is Tailscale only.** The one public path is a Cloudflare LLM gateway, which reaches the GPU through an outbound tunnel with no open ports. A domain with port forwarding for the web UI is documented separately as an option.
 
 **What works today (MVP):**
 
@@ -132,7 +132,7 @@ The diagram renders on GitHub. Plain-text version of the original three machines
 | **Either boot is useful** | Chat falls back between vLLM and Ollama; the router sends work to Modal when the node is offline |
 | **iMac owns state** | Postgres job plane, RAG, metrics, API keys |
 | **Five Git repos** | Docs, iMac stack, web UI, Windows GPU code, Ubuntu GPU lab — see §5 |
-| **Private GitHub** | No secrets in git |
+| **Public GitHub** | No secrets in git; secret scanning and push protection block new ones |
 | **Tailscale default** | Remote ops without WAN port-forward |
 | **Web BFF** | API key stays on iMac in the Next.js server layer |
 
@@ -173,7 +173,7 @@ The diagram renders on GitHub. Plain-text version of the original three machines
 
 ### Security posture
 
-- GitHub repos are **private**.
+- GitHub repos are **public**. Secret scanning, push protection and Dependabot alerts are on; credentials live only in `.env` files on each machine.
 - **Do not** port-forward Ollama (`11434`) or internal API (`8000`) to the internet.
 - Web UI uses server-side API proxy; direct API calls still need `x-api-key`.
 - Optional public HTTPS: domain + router `80/443` → iMac Caddy only (see homelab `docs/deploy/public-internet.md`).
@@ -397,7 +397,8 @@ Persistent service data: `homelab-services/data/` (Postgres, Grafana, Qdrant, et
 | GPU Ollama (persistent) | Done | `HomelabOllamaServe` on `zak_pc` |
 | Docs on 1TB drive | Done | `/Volumes/1tb drive/homelab` |
 | Services on 1TB drive | Done | `/Volumes/1tb drive/homelab-services` |
-| GitHub repos | Done | Five private: homelab, homelab-services, homelab-web, homelab-gpu, gpu-systems-lab |
+| GitHub repos | Done | All five public: homelab, gpu-systems-lab, homelab-services, homelab-web, homelab-gpu |
+| Cloudflare LLM gateway | Running | Public API for the GPU with keys, rate limit and Workers AI fallback; tunnel, no open ports |
 | Monitoring | Running | Prometheus `:9090`, Grafana `:3000` on iMac |
 | Tailscale E2E tests | Done | GPU + iMac health; UI chat/RAG from laptop |
 | GPU training prep | Done | homelab-gpu cloned, Python, torch, data dirs |
@@ -497,7 +498,7 @@ Canonical copy also lives in [README.md](../README.md#status) in the homelab rep
 ## 15. Contact and repository access
 
 - GitHub user: **zakiscoding**  
-- Private repo access must be granted by the owner.  
+- All repositories are public; no access needs to be granted.  
 - This document contains **no** passwords, API keys, or tokens.
 
 After joining the project: clone **homelab**, read `docs/SETUP-LOG.md` for build history, `docs/services/web-ui.md` for the browser UI, and `docs/services/vision-reactions.md` for the reactions pipeline.
