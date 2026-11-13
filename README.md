@@ -4,9 +4,9 @@
 
 **A self-hosted AI platform across three home machines plus cloud GPUs, joined by Tailscale. This repo is its documentation hub.**
 
-![nodes](https://img.shields.io/badge/nodes-3%20%2B%20cloud-2f81f7?style=flat-square) ![GPU](https://img.shields.io/badge/GPU-RTX%205070%2012%20GB-76b900?style=flat-square&logo=nvidia&logoColor=white) ![burst](https://img.shields.io/badge/burst-Modal%20H100-7c3aed?style=flat-square) ![network](https://img.shields.io/badge/network-Tailscale-242424?style=flat-square&logo=tailscale&logoColor=white) ![repos](https://img.shields.io/badge/repos-5%20public-2da44e?style=flat-square&logo=github&logoColor=white)
+![nodes](https://img.shields.io/badge/nodes-3%20%2B%20cloud-2f81f7?style=flat-square) ![GPU](https://img.shields.io/badge/GPU-RTX%205070%2012%20GB-76b900?style=flat-square&logo=nvidia&logoColor=white) ![burst](https://img.shields.io/badge/burst-Modal%20H100-7c3aed?style=flat-square) ![network](https://img.shields.io/badge/network-Tailscale-242424?style=flat-square&logo=tailscale&logoColor=white) ![repos](https://img.shields.io/badge/repos-6%20public-2da44e?style=flat-square&logo=github&logoColor=white)
 
-**homelab (docs hub)** · [homelab-services](https://github.com/zakiscoding/homelab-services) · [homelab-web](https://github.com/zakiscoding/homelab-web) · [homelab-gpu](https://github.com/zakiscoding/homelab-gpu) · [gpu-systems-lab](https://github.com/zakiscoding/gpu-systems-lab)
+**homelab (docs hub)** · [homelab-services](https://github.com/zakiscoding/homelab-services) · [homelab-web](https://github.com/zakiscoding/homelab-web) · [homelab-gpu](https://github.com/zakiscoding/homelab-gpu) · [gpu-systems-lab](https://github.com/zakiscoding/gpu-systems-lab) · [gophergrid](https://github.com/zakiscoding/gophergrid)
 
 </div>
 
@@ -79,6 +79,7 @@ Sharing with someone outside the project? Send the standalone **[share/HOMELAB-C
 | [homelab-web](https://github.com/zakiscoding/homelab-web) | Next.js 16 / React 19 / Tailwind 4 UI: chat, RAG, reactions, status; BFF keeps the API key server-side | iMac `:3081` (prod), laptop (dev) |
 | [homelab-gpu](https://github.com/zakiscoding/homelab-gpu) | Windows GPU PC: Ollama, QLoRA training, GPU job worker, reaction CNN `:8100`, metrics push | GPU PC on Windows |
 | [gpu-systems-lab](https://github.com/zakiscoding/gpu-systems-lab) | Ubuntu GPU node + Modal: CUDA kernels, MPI/NCCL, FSDP, vLLM, k3s, DCGM observability, job router, Cloudflare gateway | GPU PC (Ubuntu, or WSL2 on Windows), Modal, Cloudflare, laptop |
+| [gophergrid](https://github.com/zakiscoding/gophergrid) | Distributed compute scheduler in Go: gRPC heartbeats, leases, etcd leader election, GPU-aware placement, exactly-once results | Laptop (Docker); [homelab plan](https://github.com/zakiscoding/gophergrid/blob/main/docs/homelab.md) not yet run |
 
 All five repos are public, with secret scanning, push protection and Dependabot alerts on. Details: [docs/REPOS.md](docs/REPOS.md).
 
@@ -153,3 +154,4 @@ On the iMac the docs live at `/Volumes/1tb drive/homelab`, next to `homelab-serv
 - [homelab-web](https://github.com/zakiscoding/homelab-web) — web UI
 - [homelab-gpu](https://github.com/zakiscoding/homelab-gpu) — GPU PC, Windows boot
 - [gpu-systems-lab](https://github.com/zakiscoding/gpu-systems-lab) — GPU PC, Ubuntu boot, Modal, router
+- [gophergrid](https://github.com/zakiscoding/gophergrid) — distributed job scheduler (Go, gRPC, etcd)
