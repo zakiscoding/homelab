@@ -1,0 +1,31 @@
+---
+- name: Add Docker's apt repository
+  ansible.builtin.deb822_repository:
+    name: docker
+    types: [deb]
+    uris: "https://download.docker.com/linux/{{ ansible_facts['distribution'] | lower }}"
+    suites: ["{{ ansible_facts['distribution_release'] }}"]
+    components: [stable]
+    architectures: ["{{ (ansible_facts['architecture'] == 'aarch64') | ternary('arm64', 'amd64') }}"]
+    signed_by: "https://download.docker.com/linux/{{ ansible_facts['distribution'] | lower }}/gpg"
+  register: docker_repo
+
+- name: Install Docker Engine and the Compose plugin
+  ansible.builtin.apt:
+    name: "{{ docker_packages }}"
+    state: present
+    # Refresh only when the repository was just added.
+    update_cache: "{{ docker_repo is changed }}"
+
+- name: Start and enable Docker
+  ansible.builtin.systemd_service:
+    name: docker
+    enabled: true
+    state: "{{ docker_service_state }}"
+
+- name: Add users to the docker group
+  ansible.builtin.user:
+    name: "{{ item }}"
+    groups: docker
+    append: true
+  loop: "{{ docker_users }}"

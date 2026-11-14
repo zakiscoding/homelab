@@ -1,0 +1,7 @@
+// Managed by Ansible (infra/ansible/roles/common). Overrides 50unattended-upgrades.
+Unattended-Upgrade::Allowed-Origins {
+{% for origin in common_unattended_origins %}
+        "{{ origin }}";
+{% endfor %}
+};
+Unattended-Upgrade::Automatic-Reboot "{{ common_unattended_automatic_reboot | lower }}";

@@ -1,0 +1,16 @@
+---
+gpu_enabled: true
+
+# Tailscale is installed in the distro but kept off: Windows' own Tailscale (zakar,
+# 100.88.71.33) forwards WSL's localhost ports to the tailnet with `tailscale serve`, and a
+# second node from inside WSL kept joining the wrong tailnet.
+tailscale_service_enabled: false
+
+# k3s runs on the Ubuntu boot only.
+k3s_enabled: false
+
+# obs-node-exporter in gpu-systems-lab/observability (compose.wsl.yml) covers this.
+node_exporter_enabled: false
+
+wsl_windows_user: zakar
+wsl_manage_wslconfig: true

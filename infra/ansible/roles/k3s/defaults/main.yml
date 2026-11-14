@@ -1,0 +1,11 @@
+---
+k3s_enabled: true
+# Version on zak-gpu-node (docs/INVENTORY.md). Changing it upgrades k3s in place.
+k3s_version: v1.36.5+k3s1
+k3s_install_script_url: https://get.k3s.io
+# Extra names and addresses on the API server certificate (the node's tailnet IP and name).
+k3s_tls_san: []
+k3s_write_kubeconfig_mode: "0600"
+# Make the nvidia runtime the containerd default, so GPU pods work without a RuntimeClass.
+# k3s adds the runtime by itself when it finds nvidia-container-runtime at startup.
+k3s_nvidia_default_runtime: "{{ gpu_enabled | default(false) }}"

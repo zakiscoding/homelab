@@ -1,0 +1,5 @@
+---
+- name: Restart docker after the runtime change
+  ansible.builtin.systemd_service:
+    name: docker
+    state: restarted
