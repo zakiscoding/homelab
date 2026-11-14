@@ -150,7 +150,7 @@ laptop; `zakar` is the GPU PC on Windows.
 | Area | Status | Notes |
 |------|--------|-------|
 | iMac stack (Colima) | **Running** | API, Postgres, Redis, Qdrant, Caddy, MLflow on `100.91.113.98` |
-| Web UI (homelab-web) | **Down** | Containers run but `:3081` and `:80` don't answer, even on the iMac itself: Colima VM networking. Fix in progress |
+| Web UI (homelab-web) | **Running** | Chat, RAG, reactions, status at `:3081` (and `:80` via Caddy). Restored 2026-11-14 after a Colima networking fix ([the 10-connect limit](https://github.com/zakiscoding/homelab-services/pull/4)) |
 | Chat backend | **Running** | `LLM_BACKEND=auto`: vLLM on the Ubuntu boot, Ollama on the Windows boot |
 | GPU PC, Windows: Ollama | **Off** | Replaced by vLLM in WSL2 as the Windows-boot chat backend |
 | GPU PC, Ubuntu boot | **Done** | `zak-gpu-node`, CUDA 13.2, Docker, Open MPI — [gpu-node-ubuntu.md](docs/nodes/gpu-node-ubuntu.md) |
@@ -161,7 +161,7 @@ laptop; `zakar` is the GPU PC on Windows.
 | k3s GPU scheduling | **Running** | Single node, NVIDIA device plugin, GPU admission policy |
 | Monitoring | **Running** | iMac Prometheus `:9090` + Grafana `:3000`; GPU node DCGM dashboard as a second datasource |
 | Cloudflare LLM gateway | **Running** | Public OpenAI-compatible API on Workers: per-client keys, 60 requests/min per client (Durable Object), Workers AI fallback when the GPU is unreachable. Reaches vLLM through a tunnel with no open ports — [details](https://github.com/zakiscoding/gpu-systems-lab/blob/main/docs/CLOUDFLARE.md) |
-| GPU PC, Windows: WSL2 | **Running** | vLLM, Prometheus, Grafana, DCGM and `cloudflared` in Ubuntu on WSL2, kept up by the `WSL Keep Alive` task. Ports bind to localhost and Windows Tailscale publishes them to the tailnet, so the iMac can reach this vLLM. The iMac's Prometheus currently times out scraping vLLM `/metrics` (Colima VM networking; fix in progress) |
+| GPU PC, Windows: WSL2 | **Running** | vLLM, Prometheus, Grafana, DCGM and `cloudflared` in Ubuntu on WSL2, kept up by the `WSL Keep Alive` task. Ports bind to localhost and Windows Tailscale publishes them to the tailnet, so the iMac can reach this vLLM. The iMac's Prometheus scrapes it |
 | Results site | **Live** | [gpu-systems-lab-results.vllm-gateway.workers.dev](https://gpu-systems-lab-results.vllm-gateway.workers.dev): benchmark results and charts, built from gpu-systems-lab. Latest: FP16 vs AWQ vs FP8 vLLM serving on the RTX 5070, run as GopherGrid jobs: FP8 works on Blackwell and gives 1.36–1.45x FP16 throughput; 4-bit AWQ halves single-request token latency; speculative decoding (n-gram or a 0.5B draft) made the 1.5B model slower |
 | Public dashboards | **Live** | [grafana-proxy.vllm-gateway.workers.dev](https://grafana-proxy.vllm-gateway.workers.dev): read-only homelab dashboards |
 | Paper-trading site | **Live** | [paper-trading.vllm-gateway.workers.dev](https://paper-trading.vllm-gateway.workers.dev): live data from the trading engine on the iMac; paper only. The native stack starts at iMac login, so a reboot needs a login to bring it back |
