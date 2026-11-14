@@ -1,0 +1,21 @@
+# Copy to backend.hcl (gitignored), then: terraform init -backend-config=backend.hcl
+# The R2 access key pair is NOT here: export AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY
+# from an R2 API token scoped to this one bucket (Object Read & Write).
+bucket = "homelab-tfstate"
+key    = "cloudflare/terraform.tfstate"
+region = "auto"
+
+endpoints = {
+  s3 = "https://<ACCOUNT_ID>.r2.cloudflarestorage.com"
+}
+
+# R2 is S3-compatible but is not AWS: skip the AWS-only checks.
+skip_credentials_validation = true
+skip_region_validation      = true
+skip_requesting_account_id  = true
+skip_metadata_api_check     = true
+skip_s3_checksum            = true
+use_path_style              = true
+
+# Lock with a .tflock object (conditional writes) instead of DynamoDB.
+use_lockfile = true

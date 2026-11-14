@@ -1,0 +1,44 @@
+---
+- name: Add NVIDIA's container toolkit repository
+  ansible.builtin.deb822_repository:
+    name: nvidia-container-toolkit
+    types: [deb]
+    uris: "https://nvidia.github.io/libnvidia-container/stable/deb/$(ARCH)"
+    suites: ["/"]
+    signed_by: https://nvidia.github.io/libnvidia-container/gpgkey
+  register: nvidia_container_toolkit_repo
+
+- name: Install the NVIDIA container toolkit
+  ansible.builtin.apt:
+    name: "{{ nvidia_container_toolkit_packages }}"
+    state: present
+    # Refresh only when the repository was just added.
+    update_cache: "{{ nvidia_container_toolkit_repo is changed }}"
+
+- name: Read Docker's daemon.json
+  ansible.builtin.slurp:
+    src: /etc/docker/daemon.json
+  register: nvidia_container_toolkit_daemon_json
+  failed_when: false
+  when: nvidia_container_toolkit_docker_runtime
+
+# Same result as `nvidia-ctk runtime configure --runtime=docker`, but idempotent and keeps any
+# other daemon.json settings.
+- name: Register the nvidia runtime with Docker
+  ansible.builtin.copy:
+    dest: /etc/docker/daemon.json
+    content: "{{ nvidia_container_toolkit_current | combine(nvidia_container_toolkit_runtime, recursive=true) | to_nice_json(indent=4) }}\n"
+    owner: root
+    group: root
+    mode: "0644"
+  vars:
+    nvidia_container_toolkit_current: >-
+      {{ (nvidia_container_toolkit_daemon_json.content | b64decode | from_json)
+         if nvidia_container_toolkit_daemon_json.content is defined else {} }}
+    nvidia_container_toolkit_runtime:
+      runtimes:
+        nvidia:
+          path: nvidia-container-runtime
+          args: []
+  when: nvidia_container_toolkit_docker_runtime
+  notify: Restart docker after the runtime change

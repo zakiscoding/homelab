@@ -1,0 +1,10 @@
+---
+docker_packages:
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+  - docker-buildx-plugin
+  - docker-compose-plugin
+# Users added to the docker group. Membership is root-equivalent, so keep this short.
+docker_users: []
+docker_service_state: started

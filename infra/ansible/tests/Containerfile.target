@@ -1,0 +1,10 @@
+# Throwaway systemd Ubuntu 24.04 host for the idempotency test. Run privileged with
+# --cgroupns=host so systemd and dockerd can start; never use it for anything else.
+FROM ubuntu:24.04
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends systemd systemd-sysv dbus python3 sudo ca-certificates \
+ && rm -rf /var/lib/apt/lists/* \
+ && systemctl mask systemd-logind.service getty.target console-getty.service
+STOPSIGNAL SIGRTMIN+3
+CMD ["/sbin/init"]

@@ -1,0 +1,4 @@
+---
+imac_brew_packages: [colima, docker, docker-compose]
+# Colima's VM lives on the external drive (docs/nodes/imac-node.md).
+imac_colima_home: "/Volumes/1tb drive/homelab-runtime/colima"

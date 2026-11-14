@@ -1,0 +1,5 @@
+.ansible/
+*.retry
+# Vault files and anything with a key in it stay out of the repo.
+vault*.yml
+*.vault

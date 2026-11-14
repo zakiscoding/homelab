@@ -1,0 +1,11 @@
+---
+# Set to enforce a timezone on every node; empty leaves each node's current one alone.
+common_timezone: ""
+
+# GPU-only work (NVIDIA container toolkit, Docker's nvidia runtime, k3s's default runtime).
+gpu_enabled: false
+
+# Tailscale auth key, read from the environment and never stored in the repo. Only used when a
+# node isn't logged in yet. For a vault instead: put tailscale_authkey in a vault-encrypted
+# file outside the repo and pass it with -e @path --ask-vault-pass.
+tailscale_authkey: "{{ lookup('ansible.builtin.env', 'TS_AUTHKEY') }}"

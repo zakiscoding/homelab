@@ -1,0 +1,23 @@
+---
+- name: Run systemd as PID 1 in the distro
+  community.general.ini_file:
+    path: /etc/wsl.conf
+    section: boot
+    option: systemd
+    value: "{{ wsl_systemd | lower }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Remind to restart the distro
+
+# No mode: drvfs (/mnt/c) ignores chmod, so setting one would report a change every run.
+- name: Keep the WSL VM from idling out (Windows .wslconfig)  # noqa: risky-file-permissions
+  community.general.ini_file:
+    path: "/mnt/c/Users/{{ wsl_windows_user }}/.wslconfig"
+    section: wsl2
+    option: vmIdleTimeout
+    value: "{{ wsl_vm_idle_timeout }}"
+    no_extra_spaces: true
+  when:
+    - wsl_manage_wslconfig
+    - wsl_windows_user | length > 0

@@ -1,0 +1,26 @@
+---
+# iMac control plane (macOS, Apple M1). Ansible's reach on macOS is small, so this only
+# installs the Homebrew formulae the stack needs and checks Colima. What stays manual and why:
+# infra/README.md ("macOS").
+- name: Check the iMac control plane
+  hosts: macos
+  gather_facts: true
+  tasks:
+    - name: Install the Homebrew formulae for Colima and Docker
+      community.general.homebrew:
+        name: "{{ imac_brew_packages }}"
+        state: present
+
+    - name: Read Colima's status from its home on the external drive
+      ansible.builtin.command: colima status
+      environment:
+        COLIMA_HOME: "{{ imac_colima_home }}"
+        PATH: "/opt/homebrew/bin:{{ ansible_facts['env']['PATH'] }}"
+      register: imac_colima_status
+      changed_when: false
+      failed_when: false
+      check_mode: false
+
+    - name: Report whether Colima is running
+      ansible.builtin.debug:
+        msg: "{{ (imac_colima_status.rc == 0) | ternary('Colima is running', 'Colima is NOT running: colima start (see docs/nodes/imac-node.md)') }}"
