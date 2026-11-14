@@ -1,0 +1,4 @@
+---
+- name: Remind to restart the distro
+  ansible.builtin.debug:
+    msg: "wsl.conf changed: run `wsl.exe --terminate <distro>` from Windows to apply it."

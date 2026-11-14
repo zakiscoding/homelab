@@ -1,0 +1,14 @@
+---
+gpu_enabled: true
+
+tailscale_service_enabled: true
+# Tailscale SSH (check mode) is how the laptop reaches this node: docs/nodes/gpu-node-ubuntu.md.
+tailscale_up_args: ["--ssh"]
+
+k3s_enabled: true
+k3s_version: v1.36.5+k3s1
+k3s_tls_san: ["100.121.51.35", "zak-gpu-node"]
+
+# Host metrics come from obs-node-exporter in gpu-systems-lab/observability. Turn this on to
+# replace that container with a native exporter.
+node_exporter_enabled: false

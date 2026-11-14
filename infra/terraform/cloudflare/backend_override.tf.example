@@ -1,0 +1,8 @@
+# Before R2 is enabled: copy to backend_override.tf (gitignored) to keep state on local disk,
+# outside the repo. Move it to R2 later with `terraform init -migrate-state -backend-config=backend.hcl`
+# after deleting backend_override.tf.
+terraform {
+  backend "local" {
+    path = "../../../../homelab-tfstate/cloudflare.tfstate"
+  }
+}

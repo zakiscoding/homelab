@@ -1,0 +1,50 @@
+# Copy to terraform.tfvars (gitignored) and fill in the IDs. These describe the resources that
+# exist on the account today (discovered read-only with wrangler on 2026-11-13); with the IDs
+# filled in, `terraform plan` imports them instead of creating new ones.
+#
+#   npx wrangler whoami              # account ID
+#   npx wrangler tunnel list         # tunnel IDs
+#   npx wrangler vpc service list    # VPC service IDs (also in each wrangler.jsonc)
+
+account_id            = "<32-hex account ID>"
+workers_dev_subdomain = "vllm-gateway"
+
+tunnels = {
+  # cloudflared in WSL2 on the GPU PC's Windows boot (gpu-systems-lab/cloudflare/compose.yml)
+  "gpu-pc" = { id = "<tunnel UUID>" }
+  # cloudflared on the iMac (homelab-services/cloudflare/compose.yml), for Grafana only
+  "mos-imac" = { id = "<tunnel UUID>" }
+}
+
+vpc_services = {
+  # vllm-gateway's VLLM binding
+  "vllm" = { id = "<service ID>", tunnel = "gpu-pc", hostname = "vllm", http_port = 8000 }
+  # grafana-proxy's GRAFANA binding (central Grafana on the iMac)
+  "grafana-imac" = { id = "<service ID>", tunnel = "mos-imac", hostname = "grafana", http_port = 3000 }
+  # Grafana in WSL on the GPU PC. No Worker binds it since grafana-proxy moved to the iMac;
+  # adopt it here, then delete this entry and apply to remove it.
+  "grafana" = { id = "<service ID>", tunnel = "gpu-pc", hostname = "grafana", http_port = 3000 }
+}
+
+workers = {
+  "vllm-gateway"            = {}
+  "gpu-systems-lab-results" = {}
+  # preview_urls = false in grafana-proxy/wrangler.jsonc
+  "grafana-proxy" = { previews_enabled = false }
+}
+
+# No zone on the account yet: custom domains and DNS records stay empty.
+zone_id               = null
+worker_custom_domains = {}
+dns_records           = {}
+# Example once a domain exists:
+# zone_id = "<zone ID>"
+# worker_custom_domains = { "llm.example.com" = { service = "vllm-gateway" } }
+
+# R2 isn't enabled on the account. After enabling it:
+# r2_buckets = { "gpu-systems-lab-results" = {} }
+r2_buckets = {}
+
+# grafana-proxy serves public read-only dashboards, so no Access app. To require a login:
+# access_apps = { "grafana-proxy" = { allowed_emails = ["you@example.com"] } }
+access_apps = {}

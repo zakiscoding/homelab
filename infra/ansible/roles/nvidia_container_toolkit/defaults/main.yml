@@ -1,0 +1,5 @@
+---
+# The NVIDIA driver is not managed here: the Ubuntu boot runs 595.99.02, and WSL uses the
+# Windows driver.
+nvidia_container_toolkit_packages: [nvidia-container-toolkit]
+nvidia_container_toolkit_docker_runtime: true

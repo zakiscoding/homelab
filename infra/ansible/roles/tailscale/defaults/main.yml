@@ -1,0 +1,6 @@
+---
+tailscale_service_enabled: true
+# Extra flags for the first `tailscale up`, for example ["--ssh"].
+tailscale_up_args: []
+# Set from TS_AUTHKEY in group_vars/all.yml. Empty skips the login step.
+tailscale_authkey: ""

@@ -1,0 +1,22 @@
+---
+common_packages:
+  - ca-certificates
+  - curl
+  - git
+  - gnupg
+  - htop
+  - jq
+  # deb822_repository needs it
+  - python3-debian
+  - rsync
+  - tmux
+  - unattended-upgrades
+  - vim
+# Empty leaves the node's timezone alone (group_vars/all.yml).
+common_timezone: ""
+# Security updates only. Driver and CUDA packages are not upgraded automatically.
+common_unattended_origins:
+  - "${distro_id}:${distro_codename}-security"
+  - "${distro_id}ESMApps:${distro_codename}-apps-security"
+  - "${distro_id}ESM:${distro_codename}-infra-security"
+common_unattended_automatic_reboot: false

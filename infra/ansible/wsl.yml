@@ -1,0 +1,15 @@
+---
+# Ubuntu in WSL2 on the GPU PC's Windows boot. Run from inside the distro:
+#   ansible-playbook -l zak-pc-wsl wsl.yml --check --diff --ask-become-pass
+- name: Set up the WSL2 distro on the Windows boot
+  hosts: wsl
+  become: true
+  roles:
+    - role: wsl
+    - role: common
+    - role: tailscale
+    - role: docker
+    - role: nvidia_container_toolkit
+      when: gpu_enabled | bool
+    - role: node_exporter
+      when: node_exporter_enabled | bool
