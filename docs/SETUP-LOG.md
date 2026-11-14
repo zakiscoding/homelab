@@ -4,6 +4,47 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 ---
 
+## 2026-11-14 — Job-market skills 6–18: Slurm, JAX, GKE, DeepSpeed, NCCL, kernels, LB, Postgres HA
+
+**Goal:** add the remaining AI-infra / MLOps / GPU skills from the job listings as measured work, one PR each.
+
+**Where things run:** everything long-running is on the GPU PC (WSL) or the iMac; the laptop is only a controller
+(the first Slurm controller ran there and was moved to the GPU PC). Cloud: Modal 2x H100 (items 10, 12; <$1 of the
+$6 approved) and a throwaway GCP project (item 9; deleted).
+
+**Done (PRs, none merged):**
+
+- Slurm 25.11 (controller + node on the GPU PC; GPU gres via `/dev/dxg`) — gpu-systems-lab#12
+- JAX/XLA port with parity tests; TPU notebook waiting on a Colab/Kaggle run — gpu-systems-lab#14
+- GopherGrid on GKE via Terraform, KEDA + cluster autoscaler, destroyed afterwards — gophergrid#2
+- DeepSpeed ZeRO 1/2/3 vs FSDP2 on 2x H100 — gpu-systems-lab#13; nccl-tests on 2x H100 — gpu-systems-lab#11
+- Triton-language kernel (#16), C++/CUDA custom op with torch.compile (#17), GEMM step by step vs cuBLAS/CUTLASS (#19),
+  roofline + site chart (#18)
+- HAProxy in front of vLLM replicas, failover measured — gpu-systems-lab#15
+- Postgres streaming replication / failover / chaos lab on a copy of the job-queue DB + bpftrace/perf/strace I/O
+  investigation — homelab-services#6
+- Ray Serve vs vLLM + a Ray cluster (GPU PC head joined to the tailnet with an ephemeral key, native Ray on the iMac)
+  — gpu-systems-lab#20
+- Upstream: draft PR vllm-project/vllm#67658
+
+**Gotchas found:**
+
+- WSL2: vLLM 0.29's V2 model runner needs pinned memory, which vLLM disables under WSL (`VLLM_USE_V2_MODEL_RUNNER=0`);
+  Nsight Compute needs Windows "GPU performance counters for all users" (left off); Nsight Systems records no kernels.
+- iMac Colima: containers *and* the VM itself have no reliable outbound network; tools were installed offline from
+  arm64 `.deb`s (bpftrace, strace, sysstat remain; perf removed; `dpkg --audit` clean). Colima's disk on the USB drive
+  causes 10 ms–1 s flush stalls (commit p99 85–143 ms).
+- A fresh vLLM replica answers `/health` before it can serve a large batch; a hung (not dead) Postgres standby blocked
+  a checkpoint for 10.5 min; sync replication stops all writes when the only standby is partitioned.
+
+**Rollback:** each item is self-contained in its PR; lab stacks (`pg-ha-lab`, `lb-lab`, `ray-*`) are stopped/removed;
+`slurmctld`/`slurmd` on the GPU PC: `systemctl disable --now slurmctld slurmd`.
+
+**Next:** TPU run (needs the user's Colab/Kaggle sign-in), items 19–21 (SGLang, nightly regression tracking,
+measurement rigor). Follow-up: move Colima's disk image off the USB drive (needs Colima downtime).
+
+---
+
 ## 2026-11-12 — Security pass, then all repos public
 
 **Goal:** Make every repo safe to show publicly, then make all five public.
