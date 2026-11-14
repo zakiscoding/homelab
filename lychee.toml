@@ -1,0 +1,22 @@
+# Link checker config for CI (.github/workflows/ci.yml).
+# Private, loopback and link-local addresses (tailnet IPs, localhost ports)
+# can't be reached from a GitHub runner, so they are skipped, not "fixed".
+exclude_all_private = true
+max_retries = 3
+timeout = 20
+accept = ["200..=299", "403", "429"]
+exclude = [
+  # Tailscale addresses (100.64.0.0/10, CGNAT) are tailnet-only.
+  '^https?://100\.(6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])\.',
+  # Placeholders in runbooks.
+  '^https?://your-domain',
+  # Private repo: 404 for anyone not signed in as the owner.
+  '^https://github\.com/zakiscoding/market-data-gpu-systems',
+  # Kaggle answers 404 to unauthenticated clients.
+  '^https://www\.kaggle\.com/',
+  # Tailscale MagicDNS names and Cloudflare Access-protected hosts need a login.
+  '\.ts\.net',
+  'cloudflareaccess\.com',
+  # GitHub search/blob anchors are rate-limited for anonymous runners.
+  '^https://github\.com/.*/(search|compare)',
+]
