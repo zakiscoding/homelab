@@ -4,7 +4,7 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 ---
 
-## 2026-11-14 — Job-market skills 6–18: Slurm, JAX, GKE, DeepSpeed, NCCL, kernels, LB, Postgres HA
+## 2026-11-14 — Job-market skills 6–21: Slurm, JAX, GKE, DeepSpeed, NCCL, kernels, LB, Postgres HA, engines, nightly regression, rigor
 
 **Goal:** add the remaining AI-infra / MLOps / GPU skills from the job listings as measured work, one PR each.
 
@@ -25,6 +25,9 @@ $6 approved) and a throwaway GCP project (item 9; deleted).
   investigation — homelab-services#6
 - Ray Serve vs vLLM + a Ray cluster (GPU PC head joined to the tailnet with an ephemeral key, native Ray on the iMac)
   — gpu-systems-lab#20
+- vLLM vs SGLang vs TensorRT-LLM with FlashAttention vs FlashInfer, throughput under a latency target — gpu-systems-lab#21
+- Nightly GPU regression benchmark through GopherGrid (systemd timer, textfile gauges, Grafana + alert; live) — gpu-systems-lab#22
+- Measurement rigor: `tools/benchstat.py` (warm-up, repeats, 95% CI, clocks), CUDA kernels re-measured — gpu-systems-lab#23
 - Upstream: draft PR vllm-project/vllm#67658
 
 **Gotchas found:**
@@ -34,14 +37,19 @@ $6 approved) and a throwaway GCP project (item 9; deleted).
 - iMac Colima: containers *and* the VM itself have no reliable outbound network; tools were installed offline from
   arm64 `.deb`s (bpftrace, strace, sysstat remain; perf removed; `dpkg --audit` clean). Colima's disk on the USB drive
   causes 10 ms–1 s flush stalls (commit p99 85–143 ms).
+- The first engine window failed: a shell bug started no engine, and the restore ran under systemd with `HOME` unset, so
+  compose recreated `vllm-chat` with an empty model-cache mount (crash loop, chat down ~14 min). `run_window.sh` now sets
+  `HOME`, checks the mount after restore, and must pass `DRY_RUN=1` first; the second window went cleanly.
 - A fresh vLLM replica answers `/health` before it can serve a large batch; a hung (not dead) Postgres standby blocked
   a checkpoint for 10.5 min; sync replication stops all writes when the only standby is partitioned.
 
 **Rollback:** each item is self-contained in its PR; lab stacks (`pg-ha-lab`, `lb-lab`, `ray-*`) are stopped/removed;
-`slurmctld`/`slurmd` on the GPU PC: `systemctl disable --now slurmctld slurmd`.
+`slurmctld`/`slurmd` on the GPU PC: `systemctl disable --now slurmctld slurmd`; nightly regression:
+`systemctl disable --now gg-nightly.timer` (node-exporter/Prometheus backups are `*.bak-pre-nightly`).
 
-**Next:** TPU run (needs the user's Colab/Kaggle sign-in), items 19–21 (SGLang, nightly regression tracking,
-measurement rigor). Follow-up: move Colima's disk image off the USB drive (needs Colima downtime).
+**Next:** TPU run (needs the user's Colab/Kaggle sign-in); revoke the reusable Tailscale key used for the Ray container;
+SGLang with `--cuda-graph-max-bs` / lower `--mem-fraction-static` (needs another chat window); move Colima's disk
+image off the USB drive (needs Colima downtime); 16 Dependabot alerts on gpu-systems-lab.
 
 ---
 
