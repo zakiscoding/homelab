@@ -79,9 +79,9 @@ Sharing with someone outside the project? Send the standalone **[share/HOMELAB-C
 | [homelab-web](https://github.com/zakiscoding/homelab-web) | Next.js 16 / React 19 / Tailwind 4 UI: chat, RAG, reactions, status; BFF keeps the API key server-side | iMac `:3081` (prod), laptop (dev) |
 | [homelab-gpu](https://github.com/zakiscoding/homelab-gpu) | Windows GPU PC: Ollama, QLoRA training, GPU job worker, reaction CNN `:8100`, metrics push | GPU PC on Windows |
 | [gpu-systems-lab](https://github.com/zakiscoding/gpu-systems-lab) | Ubuntu GPU node + Modal: CUDA kernels, MPI/NCCL, FSDP, vLLM, k3s, DCGM observability, job router, Cloudflare gateway | GPU PC (Ubuntu, or WSL2 on Windows), Modal, Cloudflare, laptop |
-| [gophergrid](https://github.com/zakiscoding/gophergrid) | Distributed compute scheduler in Go: gRPC heartbeats, leases, etcd leader election, GPU-aware placement, exactly-once results | Laptop (Docker); [homelab plan](https://github.com/zakiscoding/gophergrid/blob/main/docs/homelab.md) not yet run |
+| [gophergrid](https://github.com/zakiscoding/gophergrid) | Distributed compute scheduler in Go: gRPC heartbeats, leases, etcd leader election, GPU-aware placement, exactly-once results | iMac (Postgres, etcd, scheduler), laptop (scheduler, worker), GPU PC (worker with the RTX 5070) — [homelab deployment](https://github.com/zakiscoding/gophergrid/blob/main/docs/homelab.md) |
 
-All five repos are public, with secret scanning, push protection and Dependabot alerts on. Details: [docs/REPOS.md](docs/REPOS.md).
+All six repos are public, with secret scanning, push protection and Dependabot alerts on. Details: [docs/REPOS.md](docs/REPOS.md).
 
 ## Machines
 
@@ -122,8 +122,10 @@ laptop; `zakar` is the GPU PC on Windows.
 | QLoRA training | **Done** | Smoke train via the GPU worker (Phase 3) |
 | LoRA → Ollama | **Ready** | `publish-lora-to-ollama.ps1` — [PHASE-3-LORA-SERVE.md](docs/PHASE-3-LORA-SERVE.md) |
 | Tailscale end-to-end tests | **Done** | GPU + iMac health; web UI chat/RAG from the laptop |
-| GitHub repos | **Done** | All five public, with secret scanning, push protection and Dependabot alerts (see Repo map) |
+| GitHub repos | **Done** | All six public, with secret scanning, push protection and Dependabot alerts (see Repo map) |
 | 1 TB drive layout | **Done** | Docs and services under `/Volumes/1tb drive` on the iMac |
+| GopherGrid on the homelab | **Running** | Schedulers on the iMac and laptop, workers on the laptop and GPU PC. Real `llm` jobs on the live vLLM: 300 jobs × 8 prompts at 5,792 completion tok/s; with the GPU worker SIGKILLed mid-run, 600/600 jobs recorded exactly one result. A `benchmark` job ran gpu-systems-lab's matmul at 63.6 TFLOPS fp16 next to vLLM — [measurements](https://github.com/zakiscoding/gophergrid/blob/main/docs/homelab.md#measured-on-the-homelab) |
+| CI | **Running** | GitHub Actions in all six repos: tests, lint, builds, config checks; GPU and live-host tests run on the homelab, not in CI |
 | Backups | **Partial** | `backup-postgres.sh` on the iMac; schedule is next — [BACKUPS.md](docs/BACKUPS.md) |
 
 ## Docs
