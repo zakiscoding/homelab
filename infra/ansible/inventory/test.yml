@@ -1,0 +1,21 @@
+---
+# Throwaway systemd Ubuntu 24.04 container (tests/Containerfile.target), reached through the
+# Docker API. GPU and k3s tasks are off: there is no GPU, and k3s in a container isn't a
+# meaningful test of the real node.
+all:
+  children:
+    gpu_ubuntu:
+      hosts:
+        iac-test-ubuntu:
+          ansible_connection: community.docker.docker_api
+          gpu_enabled: false
+          k3s_enabled: false
+          common_timezone: America/Toronto
+          node_exporter_enabled: true
+          node_exporter_listen_address: "127.0.0.1:9100"
+    wsl:
+      hosts:
+        iac-test-wsl:
+          ansible_connection: community.docker.docker_api
+          gpu_enabled: false
+          wsl_manage_wslconfig: false

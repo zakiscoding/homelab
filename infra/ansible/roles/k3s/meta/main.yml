@@ -1,0 +1,10 @@
+---
+galaxy_info:
+  author: zakiscoding
+  description: "Single-node k3s server, pinned, with the nvidia runtime as default on GPU hosts"
+  license: MIT
+  min_ansible_version: "2.19"
+  platforms:
+    - name: Ubuntu
+      versions: [noble]
+dependencies: []

@@ -1,0 +1,8 @@
+---
+# /etc/wsl.conf: systemd as PID 1, so Docker and the compose stacks start with the distro.
+wsl_systemd: true
+# Windows-side keep-alive, written from inside WSL through /mnt/c. vmIdleTimeout=-1 stops the
+# WSL VM idling out; the "WSL Keep Alive" scheduled task (see the README) keeps the distro up.
+wsl_manage_wslconfig: true
+wsl_windows_user: ""
+wsl_vm_idle_timeout: -1

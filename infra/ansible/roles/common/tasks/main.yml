@@ -1,0 +1,39 @@
+---
+- name: Refresh the apt cache when older than an hour
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Install base packages
+  ansible.builtin.apt:
+    name: "{{ common_packages }}"
+    state: present
+
+- name: Set the timezone
+  community.general.timezone:
+    name: "{{ common_timezone }}"
+  when: common_timezone | length > 0
+
+- name: Turn on daily package lists and unattended upgrades
+  ansible.builtin.copy:
+    dest: /etc/apt/apt.conf.d/20auto-upgrades
+    content: |
+      // Managed by Ansible (infra/ansible/roles/common).
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Unattended-Upgrade "1";
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Limit unattended upgrades to security origins
+  ansible.builtin.template:
+    src: 52unattended-upgrades-homelab.j2
+    dest: /etc/apt/apt.conf.d/52unattended-upgrades-homelab
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Enable the unattended-upgrades service
+  ansible.builtin.systemd_service:
+    name: unattended-upgrades
+    enabled: true
