@@ -102,7 +102,7 @@ laptop; `zakar` is the GPU PC on Windows.
 |------|--------|-------|
 | iMac stack (Colima) | **Running** | API, Postgres, Redis, Qdrant, Caddy, MLflow on `100.91.113.98` |
 | Web UI (homelab-web) | **Running** | Chat, RAG, reactions, status at `:3081` (and `:80` via Caddy) |
-| Chat backend | **Running** | `LLM_BACKEND=auto`: vLLM on the Ubuntu boot, Ollama on the Windows boot |
+| Chat backend | **Degraded** | `LLM_BACKEND=auto`: vLLM on either boot, else Ollama. Since 2026-11-14 traces show the iMac API mostly on the Ollama fallback because of Colima container networking (see the postmortem) |
 | GPU PC, Windows: Ollama | **Done** | `100.88.71.33:11434`, task `HomelabOllamaServe` |
 | GPU PC, Ubuntu boot | **Done** | `zak-gpu-node`, CUDA 13.2, Docker, Open MPI — [gpu-node-ubuntu.md](docs/nodes/gpu-node-ubuntu.md) |
 | vLLM serving | **Running** | Always-on, tailnet `:8000/v1`, API key; Qwen2.5-1.5B 4.4k tok/s on RTX 5070 |
@@ -111,6 +111,11 @@ laptop; `zakar` is the GPU PC on Windows.
 | Cloud GPU burst (Modal) | **Done** | H100 / 2x H100 / L4; **$10** usage limit |
 | k3s GPU scheduling | **Running** | Single node, NVIDIA device plugin, GPU admission policy |
 | Monitoring | **Running** | iMac Prometheus `:9090` + Grafana `:3000`; GPU node DCGM dashboard as a second datasource |
+| Tracing, SLOs, alerting | **Running** (PR open) | OpenTelemetry traces gateway → iMac API → vLLM in Tempo; 5 SLOs with burn-rate alerts; Alertmanager → ntfy. Found the iMac's Colima egress problem on day one — [homelab-services#4](https://github.com/zakiscoding/homelab-services/pull/4), [gpu-systems-lab#10](https://github.com/zakiscoding/gpu-systems-lab/pull/10), [postmortem](docs/postmortems/2026-11-04-wsl-down.md) |
+| NVIDIA serving stack | **Measured** (PR open) | Triton + TensorRT-LLM vs vLLM on the RTX 5070, same client and KV cache: TRT-LLM +10% at 256 in flight, vLLM 12–21% faster at 1–64 — [gpu-systems-lab#8](https://github.com/zakiscoding/gpu-systems-lab/pull/8) |
+| GpuJob operator (Go) | **Tested** (PR open) | controller-runtime CRD → GPU Jobs; 31 envtest/unit cases; queueing shown on kind with a fake GPU. GPU Operator + 4-way time-slicing prepared for k3s — [gpu-systems-lab#9](https://github.com/zakiscoding/gpu-systems-lab/pull/9) |
+| Helm + Argo CD | **Tested** (PR open) | Chart for the iMac stack, 32 unit tests, Argo CD sync and selfHeal on k3d (reverts in 2–5 s) — [homelab-services#3](https://github.com/zakiscoding/homelab-services/pull/3) |
+| Infrastructure as code | **Validated** (PR open) | Terraform for the Cloudflare edge (imports, R2 state), Ansible roles idempotent on test containers; no plan against the real account yet — [homelab#4](https://github.com/zakiscoding/homelab/pull/4) |
 | Cloudflare LLM gateway | **Running** | Public OpenAI-compatible API on Workers: per-client keys, 60 requests/min per client (Durable Object), Workers AI fallback when the GPU is unreachable. Reaches vLLM through a tunnel with no open ports — [details](https://github.com/zakiscoding/gpu-systems-lab/blob/main/docs/CLOUDFLARE.md) |
 | GPU PC, Windows: WSL2 | **Running** | vLLM, Prometheus, Grafana, DCGM and `cloudflared` in Ubuntu on WSL2, kept up by the `WSL Keep Alive` task. Localhost only; the iMac can't reach this vLLM |
 | Results site | **Live** | [gpu-systems-lab-results.vllm-gateway.workers.dev](https://gpu-systems-lab-results.vllm-gateway.workers.dev): benchmark results and charts, built from gpu-systems-lab |
