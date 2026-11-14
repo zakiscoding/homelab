@@ -1,0 +1,15 @@
+# State and plans can hold resource IDs and, for some resources, secrets: never commit them.
+*.tfstate
+*.tfstate.*
+*.tfplan
+tfplan
+crash.log
+crash.*.log
+.terraform/
+# Inputs with account-specific values; commit the .example files only.
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+backend.hcl
+*_override.tf
+*_override.tf.json
