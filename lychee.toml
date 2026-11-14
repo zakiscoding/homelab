@@ -1,10 +1,7 @@
 # Link checker config for CI (.github/workflows/ci.yml).
 # Private, loopback and link-local addresses (tailnet IPs, localhost ports)
 # can't be reached from a GitHub runner, so they are skipped, not "fixed".
-exclude_private = true
-exclude_loopback = true
-exclude_link_local = true
-include_fragments = false
+exclude_all_private = true
 max_retries = 3
 timeout = 20
 accept = ["200..=299", "403", "429"]

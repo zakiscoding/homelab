@@ -22,7 +22,7 @@ jobs:
       - uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
         with:
           # Tailnet hosts, localhost and private ranges are not reachable from CI;
-          # lychee's --exclude-private/--exclude-loopback skip them (see lychee.toml).
+          # exclude_all_private skips them (see lychee.toml).
           args: --config lychee.toml --no-progress './**/*.md'
           fail: true
 
