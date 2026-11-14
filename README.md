@@ -113,7 +113,7 @@ laptop; `zakar` is the GPU PC on Windows.
 | Monitoring | **Running** | iMac Prometheus `:9090` + Grafana `:3000`; GPU node DCGM dashboard as a second datasource |
 | Cloudflare LLM gateway | **Running** | Public OpenAI-compatible API on Workers: per-client keys, 60 requests/min per client (Durable Object), Workers AI fallback when the GPU is unreachable. Reaches vLLM through a tunnel with no open ports — [details](https://github.com/zakiscoding/gpu-systems-lab/blob/main/docs/CLOUDFLARE.md) |
 | GPU PC, Windows: WSL2 | **Running** | vLLM, Prometheus, Grafana, DCGM and `cloudflared` in Ubuntu on WSL2, kept up by the `WSL Keep Alive` task. Localhost only; the iMac can't reach this vLLM |
-| Results site | **Live** | [gpu-systems-lab-results.vllm-gateway.workers.dev](https://gpu-systems-lab-results.vllm-gateway.workers.dev): benchmark results and charts, built from gpu-systems-lab |
+| Results site | **Live** | [gpu-systems-lab-results.vllm-gateway.workers.dev](https://gpu-systems-lab-results.vllm-gateway.workers.dev): benchmark results and charts, built from gpu-systems-lab. Latest: FP16 vs AWQ vs FP8 vLLM serving on the RTX 5070, run as GopherGrid jobs: FP8 works on Blackwell and gives 1.36–1.45x FP16 throughput; 4-bit AWQ halves single-request token latency |
 | Grafana via Cloudflare Access | **Waiting** | Proxy deployed; it refuses every request until Access is enabled |
 | R2 results storage | **Waiting** | Upload script ready; R2 isn't enabled on the account |
 | Ubuntu node hardening | **Done** | LAN blocked for 22/6443/10250 (verified); reboot pending for Nsight counters |
