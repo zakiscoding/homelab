@@ -1,0 +1,16 @@
+---
+# GPU PC, Ubuntu boot (zak-gpu-node). Dry run first:
+#   ansible-playbook gpu-node.yml --check --diff
+- name: Set up the GPU node (Ubuntu boot)
+  hosts: gpu_ubuntu
+  become: true
+  roles:
+    - role: common
+    - role: tailscale
+    - role: docker
+    - role: nvidia_container_toolkit
+      when: gpu_enabled | bool
+    - role: node_exporter
+      when: node_exporter_enabled | bool
+    - role: k3s
+      when: k3s_enabled | bool

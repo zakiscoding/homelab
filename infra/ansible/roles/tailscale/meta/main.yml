@@ -1,0 +1,10 @@
+---
+galaxy_info:
+  author: zakiscoding
+  description: "Tailscale from its apt repository; logs in only with an auth key from the environment"
+  license: MIT
+  min_ansible_version: "2.19"
+  platforms:
+    - name: Ubuntu
+      versions: [noble]
+dependencies: []

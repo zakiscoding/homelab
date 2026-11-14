@@ -1,0 +1,6 @@
+# Ansible controller for the tests: pinned ansible-core, ansible-lint and collections.
+FROM python:3.12-slim
+COPY tests/requirements.txt requirements.yml /tmp/
+RUN pip install --no-cache-dir -r /tmp/requirements.txt \
+ && ansible-galaxy collection install -r /tmp/requirements.yml -p /usr/share/ansible/collections
+WORKDIR /work

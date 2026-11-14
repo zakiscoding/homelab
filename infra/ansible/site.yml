@@ -1,0 +1,11 @@
+---
+# Every managed node. Hosts that are offline (the GPU PC runs one OS at a time) are reported
+# unreachable and skipped; the rest carry on.
+- name: GPU node, Ubuntu boot
+  ansible.builtin.import_playbook: gpu-node.yml
+
+- name: WSL2 distro, Windows boot
+  ansible.builtin.import_playbook: wsl.yml
+
+- name: The iMac control plane
+  ansible.builtin.import_playbook: imac.yml
