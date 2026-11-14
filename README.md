@@ -86,7 +86,6 @@ Checked on 2026-11-14. The laptop is the controller only: it builds, tests and d
 | Monitoring (Colima) | `prometheus`, `grafana`, `alertmanager`, `blackbox`, `pushgateway`, `otel-collector`, `tempo` |
 | GopherGrid (Colima) | `scheduler-1` (leader), `postgres`, `etcd` |
 | Trading engine | `crypto_engine`, `paper_exchange`, `recorder`, `telemetry` run natively under launchd; `questdb` tick store in Colima |
-| Ray | Worker node |
 | Edge | `homelab-cloudflared` tunnel for the public dashboards and the trading site |
 
 ### GPU PC (`zakar`, Windows boot, 100.88.71.33)
@@ -96,7 +95,7 @@ Checked on 2026-11-14. The laptop is the controller only: it builds, tests and d
 | AI serving | `vllm-chat`: Qwen2.5-1.5B, the backend for the gateway and the web UI |
 | Monitoring | `obs-prometheus`, `obs-grafana`, `obs-dcgm-exporter`, `obs-node-exporter` |
 | GopherGrid | `scheduler-2` (follower), `gpu-worker` (RTX 5070), `cpu-worker` |
-| Ray | `ray-head` with its dashboard on `:8265` |
+| Scheduling | `slurmctld` + `slurmd` (native systemd in WSL2, GPU as a gres), `gg-nightly.timer` (nightly GopherGrid regression benchmark) |
 | Edge | `cloudflared` tunnel for the LLM gateway |
 
 Windows Tailscale publishes vLLM `:8000`, Grafana `:3000`, Prometheus `:9090` and the GopherGrid ports to the tailnet only (`tailscale serve`).
@@ -107,7 +106,7 @@ Windows Tailscale publishes vLLM `:8000`, Grafana `:3000`, Prometheus `:9090` an
 |------|-----|
 | GPU PC Ubuntu boot (`zak-gpu-node`): vLLM, k3s, DCGM | The PC is booted into Windows |
 | Ollama on the GPU PC | Replaced by vLLM in WSL2 as the chat backend |
-| Slurm controller | Being moved off the laptop |
+| Ray cluster (head on the GPU PC, worker on the iMac) | Stopped after its benchmark; start it again from gpu-systems-lab `serving/ray/` |
 
 ## Start here
 
@@ -161,18 +160,16 @@ laptop; `zakar` is the GPU PC on Windows.
 | Cloud GPU burst (Modal) | **Done** | H100 / 2x H100 / L4; **$10** usage limit |
 | k3s GPU scheduling | **Running** | Single node, NVIDIA device plugin, GPU admission policy |
 | Monitoring | **Running** | iMac Prometheus `:9090` + Grafana `:3000`; GPU node DCGM dashboard as a second datasource |
-| Tracing, SLOs, alerting | **Running** (PR open) | OpenTelemetry traces gateway → iMac API → vLLM in Tempo; 5 SLOs with burn-rate alerts; Alertmanager → ntfy. Found the iMac's Colima egress problem on day one — [homelab-services#4](https://github.com/zakiscoding/homelab-services/pull/4), [gpu-systems-lab#10](https://github.com/zakiscoding/gpu-systems-lab/pull/10), [postmortem](docs/postmortems/2026-11-04-wsl-down.md) |
-| NVIDIA serving stack | **Measured** (PR open) | Triton + TensorRT-LLM vs vLLM on the RTX 5070, same client and KV cache: TRT-LLM +10% at 256 in flight, vLLM 12–21% faster at 1–64 — [gpu-systems-lab#8](https://github.com/zakiscoding/gpu-systems-lab/pull/8) |
-| GpuJob operator (Go) | **Tested** (PR open) | controller-runtime CRD → GPU Jobs; 31 envtest/unit cases; queueing shown on kind with a fake GPU. GPU Operator + 4-way time-slicing prepared for k3s — [gpu-systems-lab#9](https://github.com/zakiscoding/gpu-systems-lab/pull/9) |
-| Helm + Argo CD | **Tested** (PR open) | Chart for the iMac stack, 32 unit tests, Argo CD sync and selfHeal on k3d (reverts in 2–5 s) — [homelab-services#3](https://github.com/zakiscoding/homelab-services/pull/3) |
-| Infrastructure as code | **Validated** (PR open) | Terraform for the Cloudflare edge (imports, R2 state), Ansible roles idempotent on test containers; no plan against the real account yet — [homelab#4](https://github.com/zakiscoding/homelab/pull/4) |
+| Tracing, SLOs, alerting | **Running** | OpenTelemetry traces gateway → iMac API → vLLM in Tempo; 5 SLOs with burn-rate alerts; Alertmanager → ntfy. Found the iMac's Colima egress problem on day one — [homelab-services#4](https://github.com/zakiscoding/homelab-services/pull/4), [gpu-systems-lab#10](https://github.com/zakiscoding/gpu-systems-lab/pull/10), [postmortem](docs/postmortems/2026-11-04-wsl-down.md) |
+| NVIDIA serving stack | **Measured** | Triton + TensorRT-LLM vs vLLM on the RTX 5070, same client and KV cache: TRT-LLM +10% at 256 in flight, vLLM 12–21% faster at 1–64 — [gpu-systems-lab#8](https://github.com/zakiscoding/gpu-systems-lab/pull/8) |
+| GpuJob operator (Go) | **Tested** | controller-runtime CRD → GPU Jobs; 31 envtest/unit cases; queueing shown on kind with a fake GPU. GPU Operator + 4-way time-slicing prepared for k3s — [gpu-systems-lab#9](https://github.com/zakiscoding/gpu-systems-lab/pull/9) |
+| Helm + Argo CD | **Tested** | Chart for the iMac stack, 32 unit tests, Argo CD sync and selfHeal on k3d (reverts in 2–5 s) — [homelab-services#3](https://github.com/zakiscoding/homelab-services/pull/3) |
+| Infrastructure as code | **Validated** | Terraform for the Cloudflare edge (imports, R2 state), Ansible roles idempotent on test containers; no plan against the real account yet — [homelab#4](https://github.com/zakiscoding/homelab/pull/4) |
 | Cloudflare LLM gateway | **Running** | Public OpenAI-compatible API on Workers: per-client keys, 60 requests/min per client (Durable Object), Workers AI fallback when the GPU is unreachable. Reaches vLLM through a tunnel with no open ports — [details](https://github.com/zakiscoding/gpu-systems-lab/blob/main/docs/CLOUDFLARE.md) |
 | GPU PC, Windows: WSL2 | **Running** | vLLM, Prometheus, Grafana, DCGM and `cloudflared` in Ubuntu on WSL2, kept up by the `WSL Keep Alive` task. Ports bind to localhost and Windows Tailscale publishes them to the tailnet, so the iMac can reach this vLLM. The iMac's Prometheus scrapes it |
 | Results site | **Live** | [gpu-systems-lab-results.vllm-gateway.workers.dev](https://gpu-systems-lab-results.vllm-gateway.workers.dev): benchmark results and charts, built from gpu-systems-lab. Latest: FP16 vs AWQ vs FP8 vLLM serving on the RTX 5070, run as GopherGrid jobs: FP8 works on Blackwell and gives 1.36–1.45x FP16 throughput; 4-bit AWQ halves single-request token latency; speculative decoding (n-gram or a 0.5B draft) made the 1.5B model slower |
 | Public dashboards | **Live** | [grafana-proxy.vllm-gateway.workers.dev](https://grafana-proxy.vllm-gateway.workers.dev): read-only homelab dashboards |
 | Paper-trading site | **Live** | [paper-trading.vllm-gateway.workers.dev](https://paper-trading.vllm-gateway.workers.dev): live data from the trading engine on the iMac; paper only. The native stack starts at iMac login, so a reboot needs a login to bring it back |
-| Ray | **Running** | Head on the GPU PC (WSL2), worker on the iMac |
-| Slurm | **Paused** | Controller is being moved off the laptop |
 | R2 results storage | **Waiting** | Upload script ready; R2 isn't enabled on the account |
 | Ubuntu node hardening | **Done** | LAN blocked for 22/6443/10250 (verified); reboot pending for Nsight counters |
 | Postgres migrations | **Done** | 004–007 applied 2026-10-23 (`scripts/migrate-all.sh`) |
@@ -183,6 +180,22 @@ laptop; `zakar` is the GPU PC on Windows.
 | GitHub repos | **Done** | All seven public, with secret scanning, push protection and Dependabot alerts (see Repo map) |
 | 1 TB drive layout | **Done** | Docs and services under `/Volumes/1tb drive` on the iMac |
 | GopherGrid on the homelab | **Running** | Schedulers on the iMac and the GPU PC (moved off the laptop on 2026-11-14), both workers on the GPU PC. Real `llm` jobs on the live vLLM: 300 jobs × 8 prompts at 5,792 completion tok/s; with the GPU worker SIGKILLed mid-run, 600/600 jobs recorded exactly one result. A `benchmark` job ran gpu-systems-lab's matmul at 63.6 TFLOPS fp16 next to vLLM — [measurements](https://github.com/zakiscoding/gophergrid/blob/main/docs/homelab.md#measured-on-the-homelab) |
+| Slurm | **Running** | Slurm 25.11 on the GPU PC (controller + node in WSL, GPU as a gres on `/dev/dxg`) running gpu-systems-lab's FSDP/NCCL jobs; a job survived controller and slurmd restarts — [PR](https://github.com/zakiscoding/gpu-systems-lab/pull/12) |
+| JAX/XLA | **Done** (TPU run pending) | GPT benchmark ported to JAX with logit/grad parity tests: JAX + cuDNN attention 68.9 ms/step vs 73.5 for the best PyTorch setup on the RTX 5070; Colab/Kaggle TPU notebook ready — [PR](https://github.com/zakiscoding/gpu-systems-lab/pull/14) |
+| GKE (Terraform) | **Done, torn down** | GopherGrid on GKE with KEDA + cluster autoscaler: exactly-once through a scheduler-leader kill; node autoscaling 17.2 → 23.6 jobs/s; project deleted after (<$0.25) — [PR](https://github.com/zakiscoding/gophergrid/pull/2) |
+| DeepSpeed ZeRO | **Done** | ZeRO 1/2/3 vs DDP/FSDP2 on Modal 2x H100: ZeRO-1/2 within 5% of FSDP2 at 1.34B; optimizer-step bound at 5.64B — [PR](https://github.com/zakiscoding/gpu-systems-lab/pull/13). Megatron-LM not attempted |
+| nccl-tests | **Done** | 2x H100: all-reduce 344 GB/s busbw (72% of the 478 GB/s NVLink limit), 13x slower without P2P; no IB/RDMA at home — [PR](https://github.com/zakiscoding/gpu-systems-lab/pull/11) |
+| Triton kernel | **Done** | Fused bias+GELU in Triton: 559 GB/s, ties torch.compile, 14% faster than the hand-written CUDA kernel — [PR](https://github.com/zakiscoding/gpu-systems-lab/pull/16) |
+| Custom PyTorch op | **Done** | C++/CUDA RMSNorm via `torch.library` (fake + autograd, passes `opcheck`, `fullgraph=True`): 562 GB/s, level with TorchInductor — [PR](https://github.com/zakiscoding/gpu-systems-lab/pull/17) |
+| GEMM step by step | **Done** | Naive 0.5 → vectorized 18.4 TFLOPS (82% of cuBLAS FP32); WMMA 43.4 vs cuBLAS/CUTLASS 66.5 FP16 — [PR](https://github.com/zakiscoding/gpu-systems-lab/pull/19) |
+| Roofline | **Done** | Every measured workload against the 5070's measured roofs, charted on the results site — [PR](https://github.com/zakiscoding/gpu-systems-lab/pull/18) |
+| Ray | **Done** (cluster stopped) | Ray Serve LLM vs plain vLLM (same engine): −3.6% to −25% throughput, +43 ms TTFT, bursty tokens; Ray cluster GPU PC head (tailnet-joined container) + native iMac worker: 24 ms task RTT, ~10 MB/s; cross-node DDP to macOS failed at gloo rendezvous (documented) — [PR](https://github.com/zakiscoding/gpu-systems-lab/pull/20) |
+| Engine comparison | **Done** | vLLM vs SGLang vs TensorRT-LLM, FlashAttention vs FlashInfer, 512→256 tokens on Qwen2.5-1.5B: SGLang peaks highest (5,243 tok/s), but under TTFT p95 ≤ 1 s / TPOT p95 ≤ 30 ms vLLM gives 3,048 tok/s vs TensorRT-LLM 2,518 and SGLang 1,516; one agreed 47-min `vllm-chat` window — [PR](https://github.com/zakiscoding/gpu-systems-lab/pull/21) |
+| Nightly regression tracking | **Running** | systemd timer on the GPU PC submits a matmul `benchmark` job through GopherGrid each night; >5% below the 7-run median sets a Grafana flag and a Prometheus alert. A noisy-neighbour test was flagged at 0.47–0.49x; no self-hosted runner, `vllm-chat` never stopped — [PR](https://github.com/zakiscoding/gpu-systems-lab/pull/22) |
+| Measurement rigor | **Done** | `benchstat.py`: warm-up, 10 separate runs, 95% CI and recorded GPU clocks. CUDA kernels re-measured: CV ≤ 0.5%; warp-shuffle reduction is 1.8% faster than CUB (not tied), fusion 1.98x — [PR](https://github.com/zakiscoding/gpu-systems-lab/pull/23) |
+| Load balancer | **Done** | HAProxy in front of vLLM replicas: a replica kill fails 0.23% of requests with L7 retries vs 5.8% without; +1.1 ms p50 — [PR](https://github.com/zakiscoding/gpu-systems-lab/pull/15) |
+| Postgres HA lab | **Done** | Streaming replication + failover on a copy of the job-queue DB: RTO 6–8 s, 0 acknowledged commits lost; sync partition stalls writes; commit p99 traced with bpftrace/iostat/strace/perf to flush stalls on the USB-backed Colima disk — [PR](https://github.com/zakiscoding/homelab-services/pull/6) |
+| Upstream contribution | **Draft PR** | vLLM `bench throughput` spurious `--random-range-ratio` warning, e2e-validated — [vllm-project/vllm#67658](https://github.com/vllm-project/vllm/pull/67658) |
 | CI | **Running** | GitHub Actions in all six repos: tests, lint, builds, config checks; GPU and live-host tests run on the homelab, not in CI |
 | Backups | **Partial** | `backup-postgres.sh` on the iMac; schedule is next — [BACKUPS.md](docs/BACKUPS.md) |
 
