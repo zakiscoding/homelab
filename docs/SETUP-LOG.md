@@ -12,7 +12,7 @@ Chronological record of homelab setup work. Newest entries at the top.
 (the first Slurm controller ran there and was moved to the GPU PC). Cloud: Modal 2x H100 (items 10, 12; <$1 of the
 $6 approved) and a throwaway GCP project (item 9; deleted).
 
-**Done (all merged on 2026-11-14 except gpu-systems-lab#14 and #20, still open; the vLLM PR is an upstream draft):**
+**Done (all merged on 2026-11-14; the vLLM PR is an upstream draft):**
 
 - Slurm 25.11 (controller + node on the GPU PC; GPU gres via `/dev/dxg`) — gpu-systems-lab#12
 - JAX/XLA port with parity tests; TPU notebook waiting on a Colab/Kaggle run — gpu-systems-lab#14
