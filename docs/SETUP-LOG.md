@@ -4,6 +4,38 @@ Chronological record of homelab setup work. Newest entries at the top.
 
 ---
 
+## 2026-11-13 to 11-14 — AI-infrastructure skills: NVIDIA serving, operator, GitOps, IaC, observability
+
+**Goal:** Cover what AI-infrastructure and MLOps job listings ask for (NVIDIA's especially) with measured work in the public repos, one PR per item.
+
+**Done:**
+
+| Item | Where | Result |
+|--------|-------|--------|
+| Triton + TensorRT-LLM vs vLLM | [gpu-systems-lab#8](https://github.com/zakiscoding/gpu-systems-lab/pull/8) | Same model, prompts, client and 171,360-token KV cache on the RTX 5070. TRT-LLM 4,556 vs 4,135 tok/s at 256 in flight (+10%); vLLM 12–21% faster at 1–64 and ~2 GB lighter. Results-site charts added |
+| GpuJob operator (Go, controller-runtime) | [gpu-systems-lab#9](https://github.com/zakiscoding/gpu-systems-lab/pull/9) | 31 envtest/unit cases pass; on kind with a fake `nvidia.com/gpu` a second job queued 28 s and started when the first finished. GPU Operator v26.7.2 + 4-way time-slicing prepared (needs the Ubuntu boot) |
+| Helm chart + Argo CD | [homelab-services#3](https://github.com/zakiscoding/homelab-services/pull/3) | 90/90 manifests valid, 32/32 unit tests; Argo CD Synced/Healthy in 87 s on k3d; selfHeal reverted changes in 2–5 s |
+| Terraform + Ansible | [homelab#4](https://github.com/zakiscoding/homelab/pull/4) | Cloudflare edge described with `import {}` blocks; validate/tflint/5 offline tests pass; Ansible second run changed=0 on fresh Ubuntu 24.04 containers |
+| Tracing, SLOs, alerts, postmortem | [homelab-services#4](https://github.com/zakiscoding/homelab-services/pull/4), [gpu-systems-lab#10](https://github.com/zakiscoding/gpu-systems-lab/pull/10), [postmortem](postmortems/2026-11-04-wsl-down.md) | Live traces gateway → vLLM and API → vLLM; 5 SLOs; 9/9 rule tests incl. the 9-day outage replay; alerts delivered to ntfy; tracing adds no measurable gateway latency |
+
+**Commands / artifacts:**
+
+```bash
+# GPU PC (WSL): Triton image + engine kept in ~/nvidia-serving (not running)
+# iMac: homelab-services clone is on branch otel-slo-alerting until #4 merges
+./scripts/sync-observability.sh      # after any change under observability/ or prometheus/
+```
+
+**Downtime (approved):** live vllm-chat stopped about 55 min for the benchmark window (00:30–01:22 UTC on 11-14) and about 4 min for the OTLP restart; the iMac API restarted once (~10 s).
+
+**Gotchas:**
+- Containers on the iMac's Colima VM reach tailnet hosts only about 1 time in 3 (the macOS host: 20/20), and public HTTPS from the VM is flaky too. The API's 2 s backend probe usually fails, so chat via the API falls back to Ollama, which times out after 133 s. Needs a Colima networking change with downtime.
+- ICMP from the Colima VM is answered by its user-mode network, even for powered-off hosts. Don't use ping for liveness there.
+- Triton's OpenAI frontend rejects unknown request fields (HTTP 422), including the `repetition_penalty` that `vllm bench serve` always sends.
+- gpu-systems-lab's code guide says commits carry no AI co-author lines; two PR branches (#8, #9) still have them and should drop them on squash-merge.
+
+**Next:** Colima networking fix; `tailscale serve --tcp 2222` on the Windows boot for `GpuPcWslDown`; real k3s run of the operator and GPU Operator; `terraform plan` with a scoped token; then items 6–16 (Slurm, JAX/TPU, Ray, GKE, DeepSpeed, Triton kernels, nccl-tests, custom torch op, upstream PR, load balancer, resilience lab).
+
 ## 2026-11-12 — Security pass, then all repos public
 
 **Goal:** Make every repo safe to show publicly, then make all five public.
